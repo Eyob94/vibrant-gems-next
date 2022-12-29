@@ -1,3 +1,5 @@
+import qs from "qs";
+
 /**
  * Get full Strapi URL from path
  * @param {string} path Path of the URL
@@ -16,11 +18,7 @@ export function getStrapiURL(path = "") {
  * @param {Object} options Options passed to fetch
  * @returns Parsed API call response
  */
-export async function fetchAPI(
-  path: string,
-  urlParamsObject = {},
-  options = {}
-) {
+export async function fetchAPI(path, urlParamsObject = {}, options = {}) {
   // Merge default and user options
   const mergedOptions = {
     headers: {
@@ -30,8 +28,7 @@ export async function fetchAPI(
   };
 
   // Build request URL
-  const queryString = JSON.stringify(urlParamsObject);
-  console.log(urlParamsObject, queryString);
+  const queryString = qs.stringify(urlParamsObject);
   const requestUrl = `${getStrapiURL(
     `/api${path}${queryString ? `?${queryString}` : ""}`
   )}`;

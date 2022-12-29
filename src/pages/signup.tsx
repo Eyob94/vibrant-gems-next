@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { Helmet } from "react-helmet";
+import { Head } from "next/head";
 import Input from "../shared/Input/Input";
 import ButtonPrimary from "../shared/Button/ButtonPrimary";
 import Link from "next/link";
@@ -28,9 +28,9 @@ const loginSocials = [
 const PageSignUp: FC<PageSignUpProps> = ({ className = "" }) => {
   return (
     <div className={`nc-PageSignUp  ${className}`} data-nc-id="PageSignUp">
-      <Helmet>
+      <Head>
         <title>Sign up || Ciscryp React Template</title>
-      </Helmet>
+      </Head>
       <div className="container mb-24 lg:mb-32">
         <h2 className="my-20 flex items-center text-3xl leading-[115%] md:text-5xl md:leading-[115%] font-semibold text-neutral-900 dark:text-neutral-100 justify-center">
           Signup

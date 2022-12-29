@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { Helmet } from "react-helmet";
+import { Head } from "next/head";
 import SocialsList from "../shared/SocialsList/SocialsList";
 import Label from "../components/Label/Label";
 import Input from "../shared/Input/Input";
@@ -33,9 +33,9 @@ const PageContact: FC<PageContactProps> = ({ className = "" }) => {
       className={`nc-PageContact overflow-hidden ${className}`}
       data-nc-id="PageContact"
     >
-      <Helmet>
+      <Head>
         <title>Contact || NFT React Template</title>
-      </Helmet>
+      </Head>
       <div className="">
         <h2 className="my-20 flex items-center text-3xl leading-[115%] md:text-5xl md:leading-[115%] font-semibold text-neutral-900 dark:text-neutral-100 justify-center">
           Contact

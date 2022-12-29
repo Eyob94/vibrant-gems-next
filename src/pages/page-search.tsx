@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { Helmet } from "react-helmet";
+import { Head } from "next/head";
 import Pagination from "../shared/Pagination/Pagination";
 import ButtonPrimary from "../shared/Button/ButtonPrimary";
 import SectionSliderCollections from "../components/SectionSliderLargeProduct";
@@ -17,9 +17,9 @@ export interface PageSearchProps {
 const PageSearch: FC<PageSearchProps> = ({ className = "" }) => {
   return (
     <div className={`nc-PageSearch  ${className}`} data-nc-id="PageSearch">
-      <Helmet>
+      <Head>
         <title>Search || Ciseco Ecommerce Template</title>
-      </Helmet>
+      </Head>
 
       <div
         className={`nc-HeadBackgroundCommon h-24 2xl:h-28 top-0 left-0 right-0 w-full bg-primary-50 dark:bg-neutral-800/20 `}

@@ -1,6 +1,6 @@
 import SectionHowItWork from "../components/SectionHowItWork/SectionHowItWork";
 import BackgroundSection from "../components/BackgroundSection/BackgroundSection";
-import { Helmet } from "react-helmet";
+import { Head } from "next/head";
 import SectionSliderLargeProduct from "../components/SectionSliderLargeProduct";
 import SectionSliderProductCard from "../components/SectionSliderProductCard";
 import SectionGridMoreExplore, {
@@ -15,9 +15,9 @@ import { SPORT_PRODUCTS } from "../data/data";
 function PageHome2() {
   return (
     <div className="nc-PageHome2 relative overflow-hidden">
-      <Helmet>
+      <Head>
         <title>Ciseco || Home 2 Ecommerce Template</title>
-      </Helmet>
+      </Head>
 
       <div className="container px-4">
         {/* SECTION HERO */}

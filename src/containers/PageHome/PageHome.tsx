@@ -2,7 +2,7 @@ import React from "react";
 import SectionHowItWork from "../../components/SectionHowItWork/SectionHowItWork";
 import BackgroundSection from "../../components/BackgroundSection/BackgroundSection";
 import SectionPromo1 from "../../components/SectionPromo1";
-import { Helmet } from "react-helmet";
+import { Head } from "next/head";
 import SectionHero2 from "../../components/SectionHero/SectionHero2";
 import SectionSliderLargeProduct from "../../components/SectionSliderLargeProduct";
 import SectionSliderProductCard from "../../components/SectionSliderProductCard";
@@ -21,9 +21,9 @@ import { PRODUCTS, SPORT_PRODUCTS } from "../../data/data";
 function PageHome() {
   return (
     <div className="nc-PageHome relative overflow-hidden">
-      <Helmet>
+      <Head>
         <title>Ciseco || Ecommerce Template</title>
-      </Helmet>
+      </Head>
 
       {/* SECTION HERO */}
       <SectionHero2 />

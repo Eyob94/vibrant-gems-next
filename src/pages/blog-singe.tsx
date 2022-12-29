@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Helmet } from "react-helmet";
+import { Head } from "next/head";
 import { _getImgRd, _getTitleRd, _getPersonNameRd } from "../contains/fakeData";
 import Avatar from "../shared/Avatar/Avatar";
 import Badge from "../shared/Badge/Badge";
@@ -280,9 +280,9 @@ const BlogSingle = () => {
 
   return (
     <div className="nc-PageSingle pt-8 lg:pt-16 ">
-      <Helmet>
+      <Head>
         <title>Single Blog || Ciseco Ecommerce React Template</title>
-      </Helmet>
+      </Head>
       {renderHeader()}
       <NcImage
         className="w-full rounded-xl"

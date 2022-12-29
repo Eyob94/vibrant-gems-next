@@ -1,26 +1,53 @@
-import React, { FC } from "react";
-import { Helmet } from "react-helmet";
+import React, { FC, useEffect, useState } from "react";
 import Pagination from "../shared/Pagination/Pagination";
 import ButtonPrimary from "../shared/Button/ButtonPrimary";
 import SectionSliderCollections from "../components/SectionSliderLargeProduct";
 import SectionPromo1 from "../components/SectionPromo1";
 import ProductCard from "../components/ProductCard";
 import TabFilters from "../containers/TabFilters";
-import { PRODUCTS } from "../data/data";
+import { Product, PRODUCTS } from "../data/data";
+import Head from "next/head";
 
 export interface PageCollectionProps {
   className?: string;
 }
 
 const PageCollection: FC<PageCollectionProps> = ({ className = "" }) => {
+  const [products, setProducts] = useState<Product[]>();
+
+  const fetchProducts = async () => {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/products?populate[0]=category&populate[1]=image`
+    );
+    const json = await res.json();
+    const s = json.data.map(({ attributes }: any) => ({
+      id: attributes.id,
+      name: attributes.name,
+      price: attributes.price,
+      image: `${process.env.NEXT_PUBLIC_STRAPI_API_URL}${attributes.image.data.attributes.formats.thumbnail.url}`,
+      description: attributes.description,
+      category: attributes.category.data.attributes.name,
+      tags: attributes.name,
+      link: attributes.name,
+      // sizes: attributes.name,
+      // allOfSizes: attributes.name,
+      status: attributes.name,
+    }));
+    setProducts(s);
+    console.log(s, "here");
+  };
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
   return (
     <div
       className={`nc-PageCollection ${className}`}
       data-nc-id="PageCollection"
     >
-      <Helmet>
+      <Head>
         <title>Collection || Ciseco Ecommerce Template</title>
-      </Helmet>
+      </Head>
 
       <div className="container py-16 lg:pb-28 lg:pt-20 space-y-16 sm:space-y-20 lg:space-y-28">
         <div className="space-y-10 lg:space-y-14">
@@ -42,9 +69,10 @@ const PageCollection: FC<PageCollectionProps> = ({ className = "" }) => {
 
             {/* LOOP ITEMS */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-10 mt-8 lg:mt-10">
-              {PRODUCTS.map((item, index) => (
-                <ProductCard data={item} key={index} />
-              ))}
+              {products &&
+                products.map((item, index) => (
+                  <ProductCard data={item} key={index} />
+                ))}
             </div>
 
             {/* PAGINATION */}

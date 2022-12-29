@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { Helmet } from "react-helmet";
+import { Head } from "next/head";
 import Input from "../shared/Input/Input";
 import Link from "next/link";
 import ButtonPrimary from "../shared/Button/ButtonPrimary";
@@ -29,9 +29,9 @@ const loginSocials = [
 const PageLogin: FC<PageLoginProps> = ({ className = "" }) => {
   return (
     <div className={`nc-PageLogin ${className}`} data-nc-id="PageLogin">
-      <Helmet>
+      <Head>
         <title>Login || Booking React Template</title>
-      </Helmet>
+      </Head>
       <div className="container mb-24 lg:mb-32">
         <h2 className="my-20 flex items-center text-3xl leading-[115%] md:text-5xl md:leading-[115%] font-semibold text-neutral-900 dark:text-neutral-100 justify-center">
           Login

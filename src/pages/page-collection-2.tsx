@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { Helmet } from "react-helmet";
+import { Head } from "next/head";
 import SectionSliderCollections from "../components/SectionSliderLargeProduct";
 import SectionPromo1 from "../components/SectionPromo1";
 import ProductCard from "../components/ProductCard";
@@ -16,9 +16,9 @@ const PageCollection2: FC<PageCollection2Props> = ({ className = "" }) => {
       className={`nc-PageCollection2 ${className}`}
       data-nc-id="PageCollection2"
     >
-      <Helmet>
+      <Head>
         <title>Category || Ciseco Ecommerce Template</title>
-      </Helmet>
+      </Head>
 
       <div className="container py-16 lg:pb-28 lg:pt-20 space-y-16 sm:space-y-20 lg:space-y-28">
         <div className="space-y-10 lg:space-y-14">

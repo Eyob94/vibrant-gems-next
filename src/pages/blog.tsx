@@ -1,5 +1,5 @@
 import React from "react";
-import { Helmet } from "react-helmet";
+import { Head } from "next/head";
 import SectionAds from "../containers/BlogPage/SectionAds";
 import SectionMagazine5 from "../containers/BlogPage/SectionMagazine5";
 import SectionLatestPosts from "../containers/BlogPage/SectionLatestPosts";
@@ -11,9 +11,9 @@ import SectionPromo3 from "../components/SectionPromo3";
 const BlogPage: React.FC = () => {
   return (
     <div className="nc-BlogPage overflow-hidden relative">
-      <Helmet>
+      <Head>
         <title>Blog || Ciscryp React Template</title>
-      </Helmet>
+      </Head>
 
       {/* ======== BG GLASS ======== */}
       <BgGlassmorphism />

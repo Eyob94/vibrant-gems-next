@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import SectionFounder from "../containers/PageAbout/SectionFounder";
 import SectionStatistic from "../containers/PageAbout/SectionStatistic";
-import { Helmet } from "react-helmet";
+import { Head } from "next/head";
 import BgGlassmorphism from "../components/BgGlassmorphism/BgGlassmorphism";
 import BackgroundSection from "../components/BackgroundSection/BackgroundSection";
 import SectionHero from "../containers/PageAbout/SectionHero";
@@ -18,9 +18,9 @@ const PageAbout: FC<PageAboutProps> = ({ className = "" }) => {
       className={`nc-PageAbout overflow-hidden relative ${className}`}
       data-nc-id="PageAbout"
     >
-      <Helmet>
+      <Head>
         <title>About || Ciscryp React Template</title>
-      </Helmet>
+      </Head>
 
       {/* ======== BG GLASS ======== */}
       <BgGlassmorphism />

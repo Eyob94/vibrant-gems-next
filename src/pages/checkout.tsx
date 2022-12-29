@@ -3,7 +3,7 @@ import NcInputNumber from "../components/NcInputNumber";
 import Prices from "../components/Prices";
 import { Product, PRODUCTS } from "../data/data";
 import { useState } from "react";
-import { Helmet } from "react-helmet";
+import { Head } from "next/head";
 import Link from "next/link";
 import ButtonPrimary from "../shared/Button/ButtonPrimary";
 import Input from "../shared/Input/Input";
@@ -218,9 +218,9 @@ const CheckoutPage = () => {
 
   return (
     <div className="nc-CheckoutPage">
-      <Helmet>
+      <Head>
         <title>Checkout || Ciseco Ecommerce Template</title>
-      </Helmet>
+      </Head>
 
       <main className="container py-16 lg:pb-28 lg:pt-20 ">
         <div className="mb-16">

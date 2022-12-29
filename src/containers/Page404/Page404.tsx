@@ -1,13 +1,13 @@
 import ButtonPrimary from "../../shared/Button/ButtonPrimary";
 import React from "react";
-import { Helmet } from "react-helmet";
+import { Head } from "next/head";
 import NcImage from "../../shared/NcImage/NcImage";
 
 const Page404: React.FC = () => (
   <div className="nc-Page404">
-    <Helmet>
+    <Head>
       <title>404 || Ciscryp React Template</title>
-    </Helmet>
+    </Head>
     <div className="container relative pt-5 pb-16 lg:pb-20 lg:pt-5">
       {/* HEADER */}
       <header className="text-center max-w-2xl mx-auto space-y-2">

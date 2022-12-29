@@ -2,7 +2,7 @@ import { NoSymbolIcon, CheckIcon } from "@heroicons/react/24/outline";
 import NcInputNumber from "../components/NcInputNumber";
 import Prices from "../components/Prices";
 import { Product, PRODUCTS } from "../data/data";
-import { Helmet } from "react-helmet";
+import { Head } from "next/head";
 import Link from "next/link";
 import ButtonPrimary from "../shared/Button/ButtonPrimary";
 
@@ -182,9 +182,9 @@ const CartPage = () => {
 
   return (
     <div className="nc-CartPage">
-      <Helmet>
+      <Head>
         <title>Shopping Cart || Ciseco Ecommerce Template</title>
-      </Helmet>
+      </Head>
 
       <main className="container py-16 lg:pb-28 lg:pt-20 ">
         <div className="mb-12 sm:mb-16">
