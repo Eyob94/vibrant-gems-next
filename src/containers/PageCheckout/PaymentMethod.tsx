@@ -4,6 +4,7 @@ import ButtonPrimary from "../../shared/Button/ButtonPrimary";
 import ButtonSecondary from "../../shared/Button/ButtonSecondary";
 import Input from "../../shared/Input/Input";
 import Radio from "../../shared/Radio/Radio";
+import getStripe from "../../utils/get-stripejs";
 
 interface Props {
   isActive: boolean;

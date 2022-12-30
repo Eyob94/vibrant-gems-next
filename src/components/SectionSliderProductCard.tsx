@@ -26,8 +26,15 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   const sliderRef = useRef(null);
   const id = useId();
   const UNIQUE_CLASS = "glidejs" + id.replace(/:/g, "_");
+  const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<Product[]>();
 
+  // useEffect(() => {
+  //   console.log("heres");
+  //   fetchProducts().then((s) => {
+  //     setProducts(s);
+  //   });
+  // }, []);
   useEffect(() => {
     if (!sliderRef.current) {
       return () => {};
@@ -69,11 +76,12 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   }, [sliderRef, UNIQUE_CLASS]);
 
   const fetchProducts = async () => {
+    setLoading(true);
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/products?populate[0]=category&populate[1]=image&filters[status][$eq]=New In`
     );
     const json = await res.json();
-    const s = json.data.map(({ attributes }: any) => ({
+    return json.data.map(({ attributes }: any) => ({
       id: attributes.id,
       name: attributes.name,
       price: attributes.price,
@@ -84,15 +92,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
       link: attributes.name,
       status: attributes.name,
     }));
-    setProducts(s);
-    console.log(s, "here");
   };
-  useEffect(() => {
-    (async function () {
-      await fetchProducts();
-      console.log(products);
-    })();
-  }, []);
 
   return (
     <div className={`nc-SectionSliderProductCard ${className}`}>
@@ -107,12 +107,11 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
         </Heading>
         <div className="glide__track" data-glide-el="track">
           <ul className="glide__slides">
-            {products &&
-              products.map((item, index) => (
-                <li key={index} className={`glide__slide ${itemClassName}`}>
-                  <ProductCard data={item} />
-                </li>
-              ))}
+            {products?.map((item, index) => (
+              <li key={index} className={`glide__slide ${itemClassName}`}>
+                <ProductCard data={item} />
+              </li>
+            ))}
           </ul>
         </div>
       </div>

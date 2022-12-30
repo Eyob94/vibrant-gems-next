@@ -10,6 +10,7 @@ import Input from "../shared/Input/Input";
 import ContactInfo from "../containers/PageCheckout/ContactInfo";
 import PaymentMethod from "../containers/PageCheckout/PaymentMethod";
 import ShippingAddress from "../containers/PageCheckout/ShippingAddress";
+import getStripe from "../utils/get-stripejs";
 
 const CheckoutPage = () => {
   const [tabActive, setTabActive] = useState<
@@ -21,6 +22,31 @@ const CheckoutPage = () => {
     setTimeout(() => {
       element?.scrollIntoView({ behavior: "smooth" });
     }, 80);
+  };
+  const handleSubmit = async () => {
+    const products = [PRODUCTS[0], PRODUCTS[2], PRODUCTS[3]];
+    const response = await fetch("/api/checkout_sessions", {
+      method: "POST",
+      body: JSON.stringify(products),
+    }).then((res) => res.json());
+    console.log(response);
+    if (response.statusCode === 500) {
+      console.error(response.message);
+      return;
+    }
+
+    // Redirect to Checkout.
+    const stripe = await getStripe();
+    const { error } = await stripe!.redirectToCheckout({
+      // Make the id field from the Checkout Session creation API response
+      // available to this file, so you can provide it as parameter here
+      // instead of the {{CHECKOUT_SESSION_ID}} placeholder.
+      sessionId: response.id,
+    });
+    // If `redirectToCheckout` fails due to a browser or network
+    // error, display the localized error message to your customer
+    // using `error.message`.
+    console.warn(error.message);
   };
 
   const renderProduct = (item: Product, index: number) => {
@@ -285,7 +311,9 @@ const CheckoutPage = () => {
                 <span>$276.00</span>
               </div>
             </div>
-            <ButtonPrimary className="mt-8 w-full">Confirm order</ButtonPrimary>
+            <ButtonPrimary className="mt-8 w-full" onClick={handleSubmit}>
+              Confirm order
+            </ButtonPrimary>
             <div className="mt-5 text-sm text-slate-500 dark:text-slate-400 flex items-center justify-center">
               <p className="block relative pl-5">
                 <svg

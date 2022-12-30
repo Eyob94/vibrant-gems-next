@@ -26,7 +26,7 @@ const PageCollection: FC<PageCollectionProps> = ({ className = "" }) => {
       price: attributes.price,
       image: `${process.env.NEXT_PUBLIC_STRAPI_API_URL}${attributes.image.data.attributes.formats.thumbnail.url}`,
       description: attributes.description,
-      category: attributes.category.data.attributes.name,
+      category: "category",
       tags: attributes.name,
       link: attributes.name,
       // sizes: attributes.name,

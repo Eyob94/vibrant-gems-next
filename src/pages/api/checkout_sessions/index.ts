@@ -1,9 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-// import { CURRENCY, MIN_AMOUNT, MAX_AMOUNT } from "../../../config";
-import { formatAmountForStripe } from "../../../utils/stripe-helpers";
-
 import Stripe from "stripe";
+import { Product } from "use-shopping-cart/core";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   // https://github.com/stripe/stripe-node#configuration
   apiVersion: "2022-11-15",
@@ -14,23 +12,30 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
-    const amount: number = req.body.amount;
-    try {
-      // Validate the amount that was passed from the client.
+    // const products = req.body.products;
+    // const amount: number = req.body.amount;
+    const products: Product[] = JSON.parse(req.body);
 
-      // Create Checkout Sessions from body params.
+    try {
       const params: Stripe.Checkout.SessionCreateParams = {
-        submit_type: "donate",
-        payment_method_types: ["card"],
-        line_items: [
-          {
-            price: "",
-            quantity: 1,
+        submit_type: "pay",
+        mode: "payment",
+        line_items: products.map((product) => ({
+          price_data: {
+            currency: "USD",
+            product_data: {
+              name: product.name,
+              description: product.description,
+              images: [`${req.headers.origin}${product.image}`],
+            },
+            unit_amount: product.price * 100,
           },
-        ],
-        success_url: `${req.headers.origin}/result?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${req.headers.origin}/donate-with-checkout`,
+          quantity: 1,
+        })),
+        success_url: `${req.headers.origin}`,
+        cancel_url: `${req.headers.origin}/checkout`,
       };
+      console.log(params);
       const checkoutSession: Stripe.Checkout.Session =
         await stripe.checkout.sessions.create(params);
 
