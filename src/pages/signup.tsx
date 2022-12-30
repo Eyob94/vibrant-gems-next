@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { Head } from "next/head";
+import Head from "next/head";
 import Input from "../shared/Input/Input";
 import ButtonPrimary from "../shared/Button/ButtonPrimary";
 import Link from "next/link";

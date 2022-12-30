@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { Head } from "next/head";
+import Head from "next/head";
 import SectionSliderCollections from "../components/SectionSliderLargeProduct";
 import SectionPromo1 from "../components/SectionPromo1";
 import ProductCard from "../components/ProductCard";

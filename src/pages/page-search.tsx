@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { Head } from "next/head";
+import Head from "next/head";
 import Pagination from "../shared/Pagination/Pagination";
 import ButtonPrimary from "../shared/Button/ButtonPrimary";
 import SectionSliderCollections from "../components/SectionSliderLargeProduct";

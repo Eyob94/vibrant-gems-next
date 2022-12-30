@@ -2,7 +2,7 @@ import React from "react";
 import SectionHowItWork from "../../components/SectionHowItWork/SectionHowItWork";
 import BackgroundSection from "../../components/BackgroundSection/BackgroundSection";
 import SectionPromo1 from "../../components/SectionPromo1";
-import { Head } from "next/head";
+import Head from "next/head";
 import SectionHero2 from "../../components/SectionHero/SectionHero2";
 import SectionSliderLargeProduct from "../../components/SectionSliderLargeProduct";
 import SectionSliderProductCard from "../../components/SectionSliderProductCard";

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Head } from "next/head";
+import Head from "next/head";
 import { _getImgRd, _getTitleRd, _getPersonNameRd } from "../contains/fakeData";
 import Avatar from "../shared/Avatar/Avatar";
 import Badge from "../shared/Badge/Badge";

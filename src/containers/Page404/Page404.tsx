@@ -1,6 +1,6 @@
 import ButtonPrimary from "../../shared/Button/ButtonPrimary";
 import React from "react";
-import { Head } from "next/head";
+import Head from "next/head";
 import NcImage from "../../shared/NcImage/NcImage";
 
 const Page404: React.FC = () => (

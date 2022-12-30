@@ -3,7 +3,7 @@ import NcInputNumber from "../components/NcInputNumber";
 import Prices from "../components/Prices";
 import { Product, PRODUCTS } from "../data/data";
 import { useState } from "react";
-import { Head } from "next/head";
+import Head from "next/head";
 import Link from "next/link";
 import ButtonPrimary from "../shared/Button/ButtonPrimary";
 import Input from "../shared/Input/Input";

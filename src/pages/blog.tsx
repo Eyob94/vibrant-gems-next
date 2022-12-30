@@ -1,5 +1,5 @@
 import React from "react";
-import { Head } from "next/head";
+import Head from "next/head";
 import SectionAds from "../containers/BlogPage/SectionAds";
 import SectionMagazine5 from "../containers/BlogPage/SectionMagazine5";
 import SectionLatestPosts from "../containers/BlogPage/SectionLatestPosts";

@@ -8,13 +8,13 @@ import { NextApiRequest, NextApiResponse } from "next";
  * The important thing is that the product info is loaded from somewhere trusted
  * so you know the pricing information is accurate.
  */
-import { validateCartItems } from "use-shopping-cart/utilities/serverless";
-import inventory from "../../../data/products";
+// import { validateCartItems } from "use-shopping-cart/utilities/serverless";
 
 import Stripe from "stripe";
+import { PRODUCTS } from "../../../data/data";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   // https://github.com/stripe/stripe-node#configuration
-  apiVersion: "2022-08-01",
+  apiVersion: "2022-11-15",
 });
 
 export default async function handler(
@@ -24,7 +24,7 @@ export default async function handler(
   if (req.method === "POST") {
     try {
       // Validate the cart details that were sent from the client.
-      const line_items = validateCartItems(inventory as any, req.body);
+      const line_items = req.body as any[];
       const hasSubscription = line_items.find((item) => {
         return !!item.price_data.recurring;
       });

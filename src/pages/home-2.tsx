@@ -1,6 +1,6 @@
 import SectionHowItWork from "../components/SectionHowItWork/SectionHowItWork";
 import BackgroundSection from "../components/BackgroundSection/BackgroundSection";
-import { Head } from "next/head";
+import Head from "next/head";
 import SectionSliderLargeProduct from "../components/SectionSliderLargeProduct";
 import SectionSliderProductCard from "../components/SectionSliderProductCard";
 import SectionGridMoreExplore, {

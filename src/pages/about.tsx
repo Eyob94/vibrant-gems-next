@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import SectionFounder from "../containers/PageAbout/SectionFounder";
 import SectionStatistic from "../containers/PageAbout/SectionStatistic";
-import { Head } from "next/head";
+import Head from "next/head";
 import BgGlassmorphism from "../components/BgGlassmorphism/BgGlassmorphism";
 import BackgroundSection from "../components/BackgroundSection/BackgroundSection";
 import SectionHero from "../containers/PageAbout/SectionHero";

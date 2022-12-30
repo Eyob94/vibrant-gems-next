@@ -2,7 +2,7 @@ import { NoSymbolIcon, CheckIcon } from "@heroicons/react/24/outline";
 import NcInputNumber from "../components/NcInputNumber";
 import Prices from "../components/Prices";
 import { Product, PRODUCTS } from "../data/data";
-import { Head } from "next/head";
+import Head from "next/head";
 import Link from "next/link";
 import ButtonPrimary from "../shared/Button/ButtonPrimary";
 
