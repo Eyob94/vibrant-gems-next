@@ -88,7 +88,10 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
     console.log(s, "here");
   };
   useEffect(() => {
-    fetchProducts();
+    (async function () {
+      await fetchProducts();
+      console.log(products);
+    })();
   }, []);
 
   return (
