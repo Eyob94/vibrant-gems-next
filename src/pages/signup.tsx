@@ -3,6 +3,8 @@ import Head from "next/head";
 import Input from "../shared/Input/Input";
 import ButtonPrimary from "../shared/Button/ButtonPrimary";
 import Link from "next/link";
+import Image from "next/image";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 export interface PageSignUpProps {
   className?: string;
@@ -20,7 +22,7 @@ const loginSocials = [
   },
   {
     name: "Continue with Google",
-    href: "#",
+    href: "/api/auth/signin",
     icon: "images/Google.svg",
   },
 ];
@@ -40,13 +42,16 @@ const PageSignUp: FC<PageSignUpProps> = ({ className = "" }) => {
             {loginSocials.map((item, index) => (
               <a
                 key={index}
-                href={item.href}
+                // href={item.href}
+                onClick={() => signIn()}
                 className=" flex w-full rounded-lg bg-primary-50 dark:bg-neutral-800 px-4 py-3 transform transition-transform sm:px-6 hover:translate-y-[-2px]"
               >
-                <img
+                <Image
                   className="flex-shrink-0"
                   src={item.icon}
                   alt={item.name}
+                  width={23}
+                  height={23}
                 />
                 <h3 className="flex-grow text-center text-sm font-medium text-neutral-700 dark:text-neutral-300 sm:text-sm">
                   {item.name}

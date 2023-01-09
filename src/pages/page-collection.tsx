@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import Pagination from "../shared/Pagination/Pagination";
 import ButtonPrimary from "../shared/Button/ButtonPrimary";
 import SectionSliderCollections from "../components/SectionSliderLargeProduct";
@@ -7,38 +7,100 @@ import ProductCard from "../components/ProductCard";
 import TabFilters from "../containers/TabFilters";
 import { Product, PRODUCTS } from "../data/data";
 import Head from "next/head";
+import { fetchStrapi } from "../lib/strapi";
 
 export interface PageCollectionProps {
   className?: string;
 }
 
 const PageCollection: FC<PageCollectionProps> = ({ className = "" }) => {
+  const take = 28;
+  const firstRender = useRef(null);
+  const [categories, setCategories] = useState<
+    { name: string; active: boolean }[]
+  >([]);
+  const [metals, setMetals] = useState<{ name: string; active: boolean }[]>([]);
   const [products, setProducts] = useState<Product[]>();
+  const [paginationPage, setPaginationPage] = useState(1);
+  const [productsLength, setProductLength] = useState(0);
+  const [rangePrice, setRangePrices] = useState([0, 500000]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedMetals, setSelectedMetals] = useState<string[]>([]);
 
   const fetchProducts = async () => {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/products?populate[0]=category&populate[1]=image`
-    );
-    const json = await res.json();
-    const s = json.data.map(({ attributes }: any) => ({
-      id: attributes.id,
+    const products = await fetchStrapi(`/products`, {
+      populate: ["category", "image"],
+      pagination: {
+        page: paginationPage,
+        pageSize: take,
+      },
+      filters: {
+        price: {
+          $between: [rangePrice[0], rangePrice[1]],
+        },
+        category: {
+          name: selectedCategories,
+        },
+        // productItem: {
+        //   metal: {
+        //     name: selectedMetals,
+        //   },
+        // },
+      },
+    });
+
+    setProductLength(products.meta.pagination.total);
+
+    const s = products.data.map(({ id, attributes }: any) => ({
+      id,
       name: attributes.name,
       price: attributes.price,
       image: `${process.env.NEXT_PUBLIC_STRAPI_API_URL}${attributes.image.data.attributes.formats.thumbnail.url}`,
       description: attributes.description,
       category: "category",
       tags: attributes.name,
-      link: attributes.name,
-      // sizes: attributes.name,
-      // allOfSizes: attributes.name,
+      slug: attributes.slug,
       status: attributes.name,
     }));
     setProducts(s);
-    console.log(s, "here");
   };
+  const getMetalTypes = async () => {
+    const metals = await fetchStrapi("/metals");
+    const mappedMetalData = metals.data.map((metal: any) => ({
+      name: metal.attributes.name as string,
+      active: false,
+    }));
+    setMetals(mappedMetalData);
+  };
+  const getAllCategories = async () => {
+    const categories = await fetchStrapi("/categories");
+    const mappedCategoriesData = categories.data.map((category: any) => ({
+      name: category.attributes.name as string,
+      active: false,
+    }));
+    setCategories(mappedCategoriesData);
+  };
+  const handlePaginate = (page: number) => {
+    setPaginationPage(page);
+  };
+  const handlePriceFilter = (min: number, max: number) => {
+    setPaginationPage(1);
+    setRangePrices([min, max]);
+  };
+  const handleCategoryFilter = (selectedCategories: string[]) => {
+    setSelectedCategories(selectedCategories);
+  };
+  const handleMetalsFilter = (selectedMetals: string[]) => {
+    setSelectedMetals(selectedMetals);
+  };
+
   useEffect(() => {
+    if (!firstRender.current) {
+      getAllCategories();
+      getMetalTypes();
+    }
     fetchProducts();
-  }, []);
+  }, [paginationPage, rangePrice, selectedCategories, selectedMetals]);
 
   return (
     <div
@@ -49,7 +111,10 @@ const PageCollection: FC<PageCollectionProps> = ({ className = "" }) => {
         <title>Collection || Ciseco Ecommerce Template</title>
       </Head>
 
-      <div className="container py-16 lg:pb-28 lg:pt-20 space-y-16 sm:space-y-20 lg:space-y-28">
+      <div
+        ref={firstRender.current}
+        className="container py-16 lg:pb-28 lg:pt-20 space-y-16 sm:space-y-20 lg:space-y-28"
+      >
         <div className="space-y-10 lg:space-y-14">
           {/* HEADING */}
           <div className="max-w-screen-sm">
@@ -65,7 +130,13 @@ const PageCollection: FC<PageCollectionProps> = ({ className = "" }) => {
           <hr className="border-slate-200 dark:border-slate-700" />
           <main>
             {/* TABS FILTER */}
-            <TabFilters />
+            <TabFilters
+              handlePriceFilter={handlePriceFilter}
+              categories={categories}
+              handleCategoriesFilter={handleCategoryFilter}
+              metals={metals}
+              handleMetalsFilter={handleMetalsFilter}
+            />
 
             {/* LOOP ITEMS */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-10 mt-8 lg:mt-10">
@@ -77,7 +148,11 @@ const PageCollection: FC<PageCollectionProps> = ({ className = "" }) => {
 
             {/* PAGINATION */}
             <div className="flex flex-col mt-12 lg:mt-16 space-y-5 sm:space-y-0 sm:space-x-3 sm:flex-row sm:justify-between sm:items-center">
-              <Pagination />
+              <Pagination
+                length={productsLength}
+                take={take}
+                handleClick={handlePaginate}
+              />
               <ButtonPrimary loading>Show me more</ButtonPrimary>
             </div>
           </main>

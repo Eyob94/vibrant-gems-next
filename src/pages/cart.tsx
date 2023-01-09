@@ -26,7 +26,7 @@ const CartPage = () => {
   };
 
   const renderProduct = (item: Product, index: number) => {
-    const { image, price, name } = item;
+    const { image: image, price, name } = item;
 
     return (
       <div

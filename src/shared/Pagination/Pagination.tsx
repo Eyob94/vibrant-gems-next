@@ -1,61 +1,52 @@
 import { CustomLink } from "../../data/types";
-import React, { FC } from "react";
+import React, { FC, MouseEventHandler, useState } from "react";
 import Link from "next/link";
 import twFocusClass from "../../utils/twFocusClass";
 
-const DEMO_PAGINATION: CustomLink[] = [
-  {
-    label: "1",
-    href: "#",
-  },
-  {
-    label: "2",
-    href: "#",
-  },
-  {
-    label: "3",
-    href: "#",
-  },
-  {
-    label: "4",
-    href: "#",
-  },
-];
-
-export interface PaginationProps {
+interface PaginationProps {
   className?: string;
+  length: number;
+  take: number;
+  handleClick: (page: number) => void;
 }
 
-const Pagination: FC<PaginationProps> = ({ className = "" }) => {
-  const renderItem = (pag: CustomLink, index: number) => {
-    if (index === 0) {
-      // RETURN ACTIVE PAGINATION
-      return (
-        <span
-          key={index}
-          className={`inline-flex w-11 h-11 items-center justify-center rounded-full bg-primary-6000 text-white ${twFocusClass()}`}
-        >
-          {pag.label}
-        </span>
-      );
-    }
-    // RETURN UNACTIVE PAGINATION
-    return (
-      <Link
-        key={index}
-        className={`inline-flex w-11 h-11 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`}
-        href={pag.href}
-      >
-        {pag.label}
-      </Link>
-    );
+const Pagination: FC<PaginationProps> = ({
+  className = "",
+  length,
+  take,
+  handleClick: handlePaginate,
+}) => {
+  const [activePage, setActivePage] = useState(1);
+
+  const handleClick = (value: number) => {
+    handlePaginate(value);
+    setActivePage(value);
   };
 
   return (
     <nav
       className={`nc-Pagination inline-flex space-x-1 text-base font-medium ${className}`}
     >
-      {DEMO_PAGINATION.map(renderItem)}
+      {Array.from({ length: Math.ceil(length / take) }, (_, idx) => ++idx).map(
+        (label, idx) =>
+          label === activePage ? (
+            <span
+              key={idx}
+              onClick={() => handleClick(label)}
+              className={`cursor-pointer inline-flex w-11 h-11 items-center justify-center rounded-full bg-primary-6000 text-white ${twFocusClass()}`}
+            >
+              {label}
+            </span>
+          ) : (
+            <span
+              key={idx}
+              onClick={() => handleClick(label)}
+              className={`cursor-pointer inline-flex w-11 h-11 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`}
+            >
+              {label}
+            </span>
+          )
+      )}
     </nav>
   );
 };

@@ -14,10 +14,11 @@ export interface Product {
   name: string;
   price: number;
   image: string;
+  variantImage?: string[];
   description: string;
   category: string;
   tags: string[];
-  link: "/product-detail/";
+  slug: string;
   variants?: ProductVariant[];
   variantType?: "color" | "image";
   sizes?: string[];
@@ -99,7 +100,7 @@ export const PRODUCTS: Product[] = [
     image: productImgs[16],
     category: "Category 1",
     tags: ["tag1", "tag2"],
-    link: "/product-detail/",
+    slug: "/product-detail/",
     variants: DEMO_VARIANTS,
     variantType: "image",
     sizes: ["XS", "S", "M", "L", "XL"],
@@ -114,7 +115,7 @@ export const PRODUCTS: Product[] = [
     image: productImgs[1],
     category: "Category 1",
     tags: ["tag1", "tag2"],
-    link: "/product-detail/",
+    slug: "/product-detail/",
     variants: DEMO_VARIANT_COLORS,
     variantType: "color",
     status: "50% Discount",
@@ -127,7 +128,7 @@ export const PRODUCTS: Product[] = [
     image: productImgs[15],
     category: "Category 1",
     tags: ["tag1", "tag2"],
-    link: "/product-detail/",
+    slug: "/product-detail/",
     variants: DEMO_VARIANTS,
     variantType: "image",
     sizes: ["S", "M", "L", "XL"],
@@ -143,7 +144,7 @@ export const PRODUCTS: Product[] = [
     tags: ["tag1", "tag2"],
     variants: DEMO_VARIANT_COLORS,
     variantType: "color",
-    link: "/product-detail/",
+    slug: "/product-detail/",
     status: "Sold Out",
   },
   {
@@ -158,7 +159,7 @@ export const PRODUCTS: Product[] = [
     variantType: "image",
     sizes: ["XS", "S", "M", "L", "XL"],
     allOfSizes: ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
-    link: "/product-detail/",
+    slug: "/product-detail/",
   },
   {
     id: 6,
@@ -170,7 +171,7 @@ export const PRODUCTS: Product[] = [
     tags: ["tag1", "tag2"],
     variantType: "color",
     variants: DEMO_VARIANT_COLORS,
-    link: "/product-detail/",
+    slug: "/product-detail/",
   },
   {
     id: 7,
@@ -182,7 +183,7 @@ export const PRODUCTS: Product[] = [
     tags: ["tag1", "tag2"],
     variants: DEMO_VARIANTS,
     variantType: "image",
-    link: "/product-detail/",
+    slug: "/product-detail/",
     status: "New in",
   },
   {
@@ -197,7 +198,7 @@ export const PRODUCTS: Product[] = [
     variantType: "image",
     sizes: ["XS", "S", "M", "L", "XL"],
     allOfSizes: ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
-    link: "/product-detail/",
+    slug: "/product-detail/",
     status: "limited edition",
   },
 ];
@@ -212,7 +213,7 @@ export const SPORT_PRODUCTS: Product[] = [
 
     category: "Category 1",
     tags: ["tag1", "tag2"],
-    link: "/product-detail/",
+    slug: "/product-detail/",
     variants: DEMO_VARIANT_COLORS,
     variantType: "color",
     sizes: ["XS", "S", "M", "L", "XL"],
@@ -227,7 +228,7 @@ export const SPORT_PRODUCTS: Product[] = [
     image: "/images/products/sport-2.png",
     category: "Category 1",
     tags: ["tag1", "tag2"],
-    link: "/product-detail/",
+    slug: "/product-detail/",
     variants: DEMO_VARIANT_COLORS,
     variantType: "color",
     status: "50% Discount",
@@ -240,7 +241,7 @@ export const SPORT_PRODUCTS: Product[] = [
     image: "/images/products/sport-3.png",
     category: "Category 1",
     tags: ["tag1", "tag2"],
-    link: "/product-detail/",
+    slug: "/product-detail/",
     variants: DEMO_VARIANTS,
     variantType: "image",
     sizes: ["S", "M", "L", "XL"],
@@ -256,7 +257,7 @@ export const SPORT_PRODUCTS: Product[] = [
     tags: ["tag1", "tag2"],
     variants: DEMO_VARIANT_COLORS,
     variantType: "color",
-    link: "/product-detail/",
+    slug: "/product-detail/",
     status: "Sold Out",
   },
   {
@@ -271,7 +272,7 @@ export const SPORT_PRODUCTS: Product[] = [
     variantType: "image",
     sizes: ["XS", "S", "M", "L", "XL"],
     allOfSizes: ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
-    link: "/product-detail/",
+    slug: "/product-detail/",
   },
   {
     id: 6,
@@ -283,7 +284,7 @@ export const SPORT_PRODUCTS: Product[] = [
     tags: ["tag1", "tag2"],
     variantType: "color",
     variants: DEMO_VARIANT_COLORS,
-    link: "/product-detail/",
+    slug: "/product-detail/",
   },
   {
     id: 7,
@@ -295,7 +296,7 @@ export const SPORT_PRODUCTS: Product[] = [
     tags: ["tag1", "tag2"],
     variants: DEMO_VARIANTS,
     variantType: "image",
-    link: "/product-detail/",
+    slug: "/product-detail/",
     status: "New in",
   },
   {
@@ -310,7 +311,7 @@ export const SPORT_PRODUCTS: Product[] = [
     variantType: "color",
     sizes: ["XS", "S", "M", "L", "XL"],
     allOfSizes: ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
-    link: "/product-detail/",
+    slug: "/product-detail/",
     status: "limited edition",
   },
 ];

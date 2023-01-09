@@ -14,28 +14,32 @@ import ModalQuickView from "./ModalQuickView";
 import ProductStatus from "./ProductStatus";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import Image from "next/image";
 
 export interface ProductCardProps {
   className?: string;
-  data?: Product;
+  data: Product;
   isLiked?: boolean;
 }
 
 const ProductCard: FC<ProductCardProps> = ({
   className = "",
-  data = PRODUCTS[0],
+  data,
   isLiked,
 }) => {
   const {
+    id,
     name,
     price,
     description,
     sizes,
     variants,
     variantType,
+    slug,
     status,
-    image,
+    image: image,
   } = data;
+  console.log(name, slug, "here");
   const [variantActive, setVariantActive] = React.useState(0);
   const [showModalQuickView, setShowModalQuickView] = React.useState(false);
 
@@ -68,12 +72,14 @@ const ProductCard: FC<ProductCardProps> = ({
 
   const renderProductCartOnNotify = ({ size }: { size?: string }) => {
     return (
-      <div className="flex ">
+      <div className="flex">
         <div className="h-24 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-          <img
+          <Image
             src={image}
             alt={name}
             className="h-full w-full object-cover object-center"
+            width={500}
+            height={500}
           />
         </div>
 
@@ -181,11 +187,15 @@ const ProductCard: FC<ProductCardProps> = ({
             title={variant.name}
           >
             <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
-              <img
-                src={variant.thumbnail}
-                alt="variant"
-                className="absolute w-full h-full object-cover"
-              />
+              {variant.thumbnail && (
+                <Image
+                  src={variant.thumbnail}
+                  alt="variant"
+                  className="absolute w-full h-full object-cover"
+                  width={500}
+                  height={500}
+                />
+              )}
             </div>
           </div>
         ))}
@@ -246,10 +256,13 @@ const ProductCard: FC<ProductCardProps> = ({
         className={`nc-ProductCard relative flex flex-col bg-transparent ${className}`}
         data-nc-id="ProductCard"
       >
-        <Link href={"/product-detail"} className="absolute inset-0"></Link>
+        <Link
+          href={`/product-detail/${slug}`}
+          className="absolute inset-0"
+        ></Link>
 
         <div className="relative flex-shrink-0 bg-slate-50 dark:bg-slate-300 rounded-3xl overflow-hidden z-1 group">
-          <Link href={"/product-detail"} className="block">
+          <Link href={`/product-detail/${id}`} className="block">
             <NcImage
               containerClassName="flex aspect-w-11 aspect-h-12 w-full h-0"
               src={image}

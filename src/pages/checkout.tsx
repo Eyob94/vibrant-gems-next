@@ -50,7 +50,7 @@ const CheckoutPage = () => {
   };
 
   const renderProduct = (item: Product, index: number) => {
-    const { image, price, name } = item;
+    const { image: image, price, name } = item;
 
     return (
       <div key={index} className="relative flex py-7 first:pt-0 last:pb-0">

@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import { Fragment, useState } from "react";
 import { Dialog, Popover, Transition } from "@headlessui/react";
 import ButtonPrimary from "../shared/Button/ButtonPrimary";
 import ButtonThird from "../shared/Button/ButtonThird";
@@ -8,41 +8,6 @@ import Slider from "rc-slider";
 import Radio from "../shared/Radio/Radio";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import MySwitch from "../components/MySwitch";
-
-// DEMO DATA
-const DATA_categories = [
-  {
-    name: "New Arrivals",
-  },
-  {
-    name: "Sale",
-  },
-  {
-    name: "Backpacks",
-  },
-  {
-    name: "Travel Bags",
-  },
-  {
-    name: "Laptop Sleeves",
-  },
-  {
-    name: "Organization",
-  },
-  {
-    name: "Accessories",
-  },
-];
-
-const DATA_colors = [
-  { name: "White" },
-  { name: "Beige" },
-  { name: "Blue" },
-  { name: "Black" },
-  { name: "Brown" },
-  { name: "Green" },
-  { name: "Navy" },
-];
 
 const DATA_sizes = [
   { name: "XXS" },
@@ -63,14 +28,25 @@ const DATA_sortOrderRadios = [
 ];
 
 const PRICE_RANGE = [1, 500];
-//
-const TabFilters = () => {
+interface Props {
+  handlePriceFilter: (min: number, max: number) => void;
+  categories: { name: string; active: boolean }[];
+  handleCategoriesFilter: (selectedCategories: string[]) => void;
+  metals: { name: string; active: boolean }[];
+  handleMetalsFilter: (selectedMetals: string[]) => void;
+}
+const TabFilters: React.FC<Props> = ({
+  handlePriceFilter,
+  categories,
+  handleCategoriesFilter,
+  metals,
+  handleMetalsFilter,
+}) => {
   const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
-  //
   const [isOnSale, setIsIsOnSale] = useState(true);
   const [rangePrices, setRangePrices] = useState([100, 500]);
   const [categoriesState, setCategoriesState] = useState<string[]>([]);
-  const [colorsState, setColorsState] = useState<string[]>([]);
+  const [metalsState, setMetalsState] = useState<string[]>([]);
   const [sizesState, setSizesState] = useState<string[]>([]);
   const [sortOrderStates, setSortOrderStates] = useState<string>("");
 
@@ -85,10 +61,10 @@ const TabFilters = () => {
       : setCategoriesState(categoriesState.filter((i) => i !== name));
   };
 
-  const handleChangeColors = (checked: boolean, name: string) => {
+  const handleChangeMetals = (checked: boolean, name: string) => {
     checked
-      ? setColorsState([...colorsState, name])
-      : setColorsState(colorsState.filter((i) => i !== name));
+      ? setMetalsState([...metalsState, name])
+      : setMetalsState(metalsState.filter((i) => i !== name));
   };
 
   const handleChangeSizes = (checked: boolean, name: string) => {
@@ -219,7 +195,7 @@ const TabFilters = () => {
                       }
                     />
                     <div className="w-full border-b border-neutral-200 dark:border-neutral-700" />
-                    {DATA_categories.map((item) => (
+                    {categories.map((item) => (
                       <div key={item.name} className="">
                         <Checkbox
                           name={item.name}
@@ -243,7 +219,10 @@ const TabFilters = () => {
                       Clear
                     </ButtonThird>
                     <ButtonPrimary
-                      onClick={close}
+                      onClick={() => {
+                        handleCategoriesFilter(categoriesState);
+                        close();
+                      }}
                       sizeClass="px-4 py-2 sm:px-5"
                     >
                       Apply
@@ -390,7 +369,7 @@ const TabFilters = () => {
               className={`flex items-center justify-center px-4 py-2 text-sm rounded-full border focus:outline-none select-none
               ${open ? "!border-primary-500 " : ""}
                 ${
-                  !!colorsState.length
+                  !!metalsState.length
                     ? "!border-primary-500 bg-primary-50 text-primary-900"
                     : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
                 }
@@ -443,11 +422,11 @@ const TabFilters = () => {
                 />
               </svg>
 
-              <span className="ml-2">Colors</span>
-              {!colorsState.length ? (
+              <span className="ml-2">Metal Type</span>
+              {!metalsState.length ? (
                 <ChevronDownIcon className="w-4 h-4 ml-3" />
               ) : (
-                <span onClick={() => setColorsState([])}>{renderXClear()}</span>
+                <span onClick={() => setMetalsState([])}>{renderXClear()}</span>
               )}
             </Popover.Button>
             <Transition
@@ -462,14 +441,14 @@ const TabFilters = () => {
               <Popover.Panel className="absolute z-40 w-screen max-w-sm px-4 mt-3 left-0 sm:px-0 lg:max-w-sm">
                 <div className="overflow-hidden rounded-2xl shadow-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
                   <div className="relative flex flex-col px-5 py-6 space-y-5">
-                    {DATA_colors.map((item) => (
+                    {metals.map((item) => (
                       <div key={item.name} className="">
                         <Checkbox
                           name={item.name}
                           label={item.name}
-                          defaultChecked={colorsState.includes(item.name)}
+                          defaultChecked={metalsState.includes(item.name)}
                           onChange={(checked) =>
-                            handleChangeColors(checked, item.name)
+                            handleChangeMetals(checked, item.name)
                           }
                         />
                       </div>
@@ -479,14 +458,17 @@ const TabFilters = () => {
                     <ButtonThird
                       onClick={() => {
                         close();
-                        setColorsState([]);
+                        setMetalsState([]);
                       }}
                       sizeClass="px-4 py-2 sm:px-5"
                     >
                       Clear
                     </ButtonThird>
                     <ButtonPrimary
-                      onClick={close}
+                      onClick={() => {
+                        handleMetalsFilter(metalsState);
+                        close();
+                      }}
                       sizeClass="px-4 py-2 sm:px-5"
                     >
                       Apply
@@ -699,10 +681,15 @@ const TabFilters = () => {
                           <input
                             type="text"
                             name="minPrice"
-                            disabled
                             id="minPrice"
                             className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
                             value={rangePrices[0]}
+                            onChange={(event) => {
+                              setRangePrices((range) => [
+                                parseInt(event.target.value) || 0,
+                                range[1],
+                              ]);
+                            }}
                           />
                         </div>
                       </div>
@@ -719,11 +706,16 @@ const TabFilters = () => {
                           </span>
                           <input
                             type="text"
-                            disabled
                             name="maxPrice"
                             id="maxPrice"
                             className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
                             value={rangePrices[1]}
+                            onChange={(event) => {
+                              setRangePrices((range) => [
+                                range[0],
+                                parseInt(event.target.value) || 0,
+                              ]);
+                            }}
                           />
                         </div>
                       </div>
@@ -740,7 +732,10 @@ const TabFilters = () => {
                       Clear
                     </ButtonThird>
                     <ButtonPrimary
-                      onClick={close}
+                      onClick={() => {
+                        handlePriceFilter(rangePrices[0], rangePrices[1]);
+                        close();
+                      }}
                       sizeClass="px-4 py-2 sm:px-5"
                     >
                       Apply
@@ -971,15 +966,15 @@ const TabFilters = () => {
                       <div className="py-7">
                         <h3 className="text-xl font-medium">Categories</h3>
                         <div className="mt-6 relative ">
-                          {renderMoreFilterItem(DATA_categories)}
+                          {renderMoreFilterItem(categories)}
                         </div>
                       </div>
                       {/* --------- */}
                       {/* ---- */}
                       <div className="py-7">
-                        <h3 className="text-xl font-medium">Colors</h3>
+                        <h3 className="text-xl font-medium">Metal Type</h3>
                         <div className="mt-6 relative ">
-                          {renderMoreFilterItem(DATA_colors)}
+                          {renderMoreFilterItem(metals)}
                         </div>
                       </div>
                       {/* --------- */}
@@ -1028,10 +1023,15 @@ const TabFilters = () => {
                                   <input
                                     type="text"
                                     name="minPrice"
-                                    disabled
                                     id="minPrice"
                                     className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-3 sm:text-sm border-neutral-200 rounded-full text-neutral-900"
                                     value={rangePrices[0]}
+                                    onChange={(event) => {
+                                      setRangePrices((range) => [
+                                        parseInt(event.target.value) || 0,
+                                        range[1],
+                                      ]);
+                                    }}
                                   />
                                 </div>
                               </div>
@@ -1050,11 +1050,16 @@ const TabFilters = () => {
                                   </div>
                                   <input
                                     type="text"
-                                    disabled
                                     name="maxPrice"
                                     id="maxPrice"
                                     className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-3 sm:text-sm border-neutral-200 rounded-full text-neutral-900"
                                     value={rangePrices[1]}
+                                    onChange={(event) => {
+                                      setRangePrices((range) => [
+                                        range[0],
+                                        parseInt(event.target.value) || 0,
+                                      ]);
+                                    }}
                                   />
                                 </div>
                               </div>
@@ -1104,7 +1109,7 @@ const TabFilters = () => {
                       onClick={() => {
                         setRangePrices(PRICE_RANGE);
                         setCategoriesState([]);
-                        setColorsState([]);
+                        setMetalsState([]);
                         setSortOrderStates("");
                         closeModalMoreFilter();
                       }}
