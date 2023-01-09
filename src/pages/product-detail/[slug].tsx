@@ -28,7 +28,6 @@ import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Image from "next/image";
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
-  console.log(query);
   try {
     const { data: productData } = await fetchStrapi(`/products/${query.slug}`, {
       populate: ["image", "variantImages"],
@@ -41,7 +40,6 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
             `${process.env.NEXT_PUBLIC_STRAPI_API_URL}${variantImage.attributes.formats.medium.url}`
         )
       : [];
-    console.log(productData);
     const product: Product = {
       id: productData.id,
       name: productData.attributes.name,
@@ -54,7 +52,6 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
       slug: productData.attributes.name,
       status: productData.attributes.name,
     };
-    console.log(product);
     if (!product) {
       return {
         notFound: true,

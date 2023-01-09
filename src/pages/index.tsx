@@ -1,4 +1,6 @@
+import { GetServerSideProps } from "next";
 import Head from "next/head";
+import { FC, useEffect, useState } from "react";
 import BackgroundSection from "../components/BackgroundSection/BackgroundSection";
 import DiscoverMoreSlider from "../components/DiscoverMoreSlider";
 import Heading from "../components/Heading/Heading";
@@ -15,9 +17,51 @@ import SectionSliderProductCard from "../components/SectionSliderProductCard";
 import SectionMagazine5 from "../containers/BlogPage/SectionMagazine5";
 import SectionGridFeatureItems from "../containers/PageHome/SectionGridFeatureItems";
 import { PRODUCTS, SPORT_PRODUCTS } from "../data/data";
+import { fetchStrapi } from "../lib/strapi";
 import ButtonSecondary from "../shared/Button/ButtonSecondary";
 
-function PageHome() {
+export const getServerSideProps: GetServerSideProps = async () => {
+  const rawCollections = await fetchStrapi("/collections", {
+    populate: {
+      categories: {
+        sort: ["name:asc"],
+      },
+    },
+    sort: ["order:asc"],
+    pagination: {
+      limit: 6,
+    },
+  });
+  const collections: Collection[] = rawCollections.data.map(
+    ({ attributes }: any) => ({
+      name: attributes.name,
+      icon: attributes.icon,
+      categories: attributes.categories?.data.map(
+        ({ attributes: { name, image } }: any) => ({
+          name,
+          image,
+        })
+      ),
+    })
+  );
+  console.log(collections);
+
+  return {
+    props: { collections: JSON.parse(JSON.stringify(collections)) },
+  };
+};
+
+type Category = { name: string; image: string };
+export type Collection = { name: string; icon: string; categories: Category[] };
+
+interface Props {
+  collections?: Collection[];
+}
+const PageHome: FC<Props> = ({ collections }) => {
+  // const [startExploringData, setStartExploringData] = useState<Collection[]>();
+
+  console.log(collections, "coll");
+  // useEffect(() => )
   return (
     <>
       <Head>
@@ -53,7 +97,7 @@ function PageHome() {
           {/* SECTION */}
           <div className="relative py-24 lg:py-32">
             <BackgroundSection />
-            <SectionGridMoreExplore />
+            {collections && <SectionGridMoreExplore data={collections} />}
           </div>
 
           <SectionSliderProductCard
@@ -95,6 +139,6 @@ function PageHome() {
       </div>
     </>
   );
-}
+};
 
 export default PageHome;

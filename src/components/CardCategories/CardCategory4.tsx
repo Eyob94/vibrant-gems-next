@@ -2,6 +2,7 @@ import React, { FC } from "react";
 import NcImage from "../../shared/NcImage/NcImage";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import Image from "next/image";
 
 export interface CardCategory4Props {
   className?: string;
@@ -27,7 +28,7 @@ const CardCategory4: FC<CardCategory4Props> = ({
     >
       <div>
         <div className="absolute bottom-0 right-0 max-w-[280px] opacity-80">
-          <img src={bgSVG} alt="" />
+          <Image src={bgSVG} alt="" width={1000} height={1000} />
         </div>
 
         <div className="absolute inset-5 sm:inset-8 flex flex-col justify-between">

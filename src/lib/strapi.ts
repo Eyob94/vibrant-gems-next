@@ -33,15 +33,13 @@ export async function fetchStrapi(
 
   // Build request URL
   const queryString = qs.stringify(urlParamsObject, { encodeValuesOnly: true });
-  console.log(queryString);
   const requestUrl = `${getStrapiURL(
     `/api${path}${queryString ? `?${queryString}` : ""}`
   )}`;
+  console.log(requestUrl);
 
   // Trigger API call
   const response = await fetch(requestUrl, mergedOptions);
-
-  console.log(response);
 
   // Handle response
   if (!response.ok) {
