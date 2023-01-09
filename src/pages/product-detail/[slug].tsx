@@ -33,16 +33,21 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     const { data: productData } = await fetchStrapi(`/products/${query.slug}`, {
       populate: ["image", "variantImages"],
     });
+    const variantImage = Array.isArray(
+      productData.attributes.variantImages.data
+    )
+      ? productData.attributes.variantImages.data.map(
+          (variantImage: any) =>
+            `${process.env.NEXT_PUBLIC_STRAPI_API_URL}${variantImage.attributes.formats.medium.url}`
+        )
+      : [];
     console.log(productData);
     const product: Product = {
       id: productData.id,
       name: productData.attributes.name,
       price: productData.attributes.price,
       image: `${process.env.NEXT_PUBLIC_STRAPI_API_URL}${productData.attributes.image.data.attributes.url}`,
-      variantImage: productData.attributes.variantImages.data.map(
-        (variantImage: any) =>
-          `${process.env.NEXT_PUBLIC_STRAPI_API_URL}${variantImage.attributes.formats.medium.url}`
-      ),
+      variantImage,
       description: productData.attributes.description,
       category: "category",
       tags: productData.attributes.name,

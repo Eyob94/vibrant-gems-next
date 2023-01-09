@@ -3,22 +3,23 @@ import Head from "next/head";
 import Input from "../shared/Input/Input";
 import Link from "next/link";
 import ButtonPrimary from "../shared/Button/ButtonPrimary";
+import Image from "next/image";
 
 export interface PageLoginProps {
   className?: string;
 }
 
 const loginSocials = [
-  {
-    name: "Continue with Facebook",
-    href: "#",
-    icon: "images/Facebook.svg",
-  },
-  {
-    name: "Continue with Twitter",
-    href: "#",
-    icon: "images/Twitter.svg",
-  },
+  // {
+  //   name: "Continue with Facebook",
+  //   href: "#",
+  //   icon: "images/Facebook.svg",
+  // },
+  // {
+  //   name: "Continue with Twitter",
+  //   href: "#",
+  //   icon: "images/Twitter.svg",
+  // },
   {
     name: "Continue with Google",
     href: "#",
@@ -44,10 +45,12 @@ const PageLogin: FC<PageLoginProps> = ({ className = "" }) => {
                 href={item.href}
                 className="flex w-full rounded-lg bg-primary-50 dark:bg-neutral-800 px-4 py-3 transform transition-transform sm:px-6 hover:translate-y-[-2px]"
               >
-                <img
+                <Image
                   className="flex-shrink-0"
                   src={item.icon}
                   alt={item.name}
+                  width={23}
+                  height={23}
                 />
                 <h3 className="flex-grow text-center text-sm font-medium text-neutral-700 dark:text-neutral-300 sm:text-sm">
                   {item.name}
@@ -56,14 +59,14 @@ const PageLogin: FC<PageLoginProps> = ({ className = "" }) => {
             ))}
           </div>
           {/* OR */}
-          <div className="relative text-center">
+          {/* <div className="relative text-center">
             <span className="relative z-10 inline-block px-4 font-medium text-sm bg-white dark:text-neutral-400 dark:bg-neutral-900">
               OR
             </span>
             <div className="absolute left-0 w-full top-1/2 transform -translate-y-1/2 border border-neutral-100 dark:border-neutral-800"></div>
-          </div>
+          </div> */}
           {/* FORM */}
-          <form className="grid grid-cols-1 gap-6" action="#" method="post">
+          {/* <form className="grid grid-cols-1 gap-6" action="#" method="post">
             <label className="block">
               <span className="text-neutral-800 dark:text-neutral-200">
                 Email address
@@ -84,7 +87,7 @@ const PageLogin: FC<PageLoginProps> = ({ className = "" }) => {
               <Input type="password" className="mt-1" />
             </label>
             <ButtonPrimary type="submit">Continue</ButtonPrimary>
-          </form>
+          </form> */}
 
           {/* ==== */}
           <span className="block text-center text-neutral-700 dark:text-neutral-300">

@@ -9,17 +9,20 @@ import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "../app/store";
 import SiteHeader from "../containers/SiteHeader";
 import Footer from "../shared/Footer/Footer";
+import { SessionProvider } from "next-auth/react";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
-      <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
-          <SiteHeader />
-          <Component {...pageProps} />
-          <Footer />
-        </PersistGate>
-      </Provider>
+      <SessionProvider session={pageProps.session}>
+        <Provider store={store}>
+          <PersistGate loading={null} persistor={persistor}>
+            <SiteHeader />
+            <Component {...pageProps} />
+            <Footer />
+          </PersistGate>
+        </Provider>
+      </SessionProvider>
     </>
   );
 }

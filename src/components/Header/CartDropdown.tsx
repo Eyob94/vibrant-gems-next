@@ -17,6 +17,8 @@ export default function CartDropdown() {
             src={image}
             alt={name}
             className="h-full w-full object-contain object-center"
+            width={500}
+            height={500}
           />
           <Link
             onClick={close}
