@@ -26,26 +26,29 @@ import { fetchStrapi } from "../../lib/strapi";
 import { getSingleProductWithId } from "../../lib/strapiQueries";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Image from "next/image";
+import { getStrapiMedia } from "../../lib/media";
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   try {
-    const { data: productData } = await fetchStrapi(`/products/${query.slug}`, {
+    const { data } = await fetchStrapi(`/products`, {
+      filters: {
+        slug: query.slug,
+      },
       populate: ["image", "variantImages"],
     });
-    const variantImage = Array.isArray(
-      productData.attributes.variantImages.data
-    )
-      ? productData.attributes.variantImages.data.map(
-          (variantImage: any) =>
-            `${process.env.NEXT_PUBLIC_STRAPI_API_URL}${variantImage.attributes.formats.medium.url}`
+    const productData = data[0];
+    // console.log(productData.attributes.variantImages, "hereee");
+    const variants = Array.isArray(productData.attributes.variants?.data)
+      ? productData.attributes.variantImages?.data.map((variant: any) =>
+          getStrapiMedia(variant)
         )
       : [];
     const product: Product = {
       id: productData.id,
       name: productData.attributes.name,
       price: productData.attributes.price,
-      image: `${process.env.NEXT_PUBLIC_STRAPI_API_URL}${productData.attributes.image.data.attributes.url}`,
-      variantImage,
+      image: getStrapiMedia(productData.attributes.image),
+      variants,
       description: productData.attributes.description,
       category: "category",
       tags: productData.attributes.name,

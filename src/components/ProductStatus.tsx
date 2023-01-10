@@ -1,14 +1,13 @@
+import { FC } from "react";
 import {
   NoSymbolIcon,
   ClockIcon,
   SparklesIcon,
 } from "@heroicons/react/24/outline";
-import { Product } from "../data/data";
-import React, { FC } from "react";
 import IconDiscount from "./IconDiscount";
 
 interface Props {
-  status: Product["status"];
+  status: string;
   className?: string;
 }
 

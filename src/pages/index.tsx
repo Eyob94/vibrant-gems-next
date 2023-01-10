@@ -1,6 +1,6 @@
 import { GetServerSideProps } from "next";
 import Head from "next/head";
-import { FC, useEffect, useState } from "react";
+import { FC } from "react";
 import BackgroundSection from "../components/BackgroundSection/BackgroundSection";
 import DiscoverMoreSlider from "../components/DiscoverMoreSlider";
 import Heading from "../components/Heading/Heading";
@@ -16,9 +16,9 @@ import SectionSliderLargeProduct from "../components/SectionSliderLargeProduct";
 import SectionSliderProductCard from "../components/SectionSliderProductCard";
 import SectionMagazine5 from "../containers/BlogPage/SectionMagazine5";
 import SectionGridFeatureItems from "../containers/PageHome/SectionGridFeatureItems";
-import { PRODUCTS, SPORT_PRODUCTS } from "../data/data";
 import { fetchStrapi } from "../lib/strapi";
 import ButtonSecondary from "../shared/Button/ButtonSecondary";
+import { getStrapiMedia } from "../lib/media";
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const rawCollections = await fetchStrapi("/collections", {
@@ -32,9 +32,61 @@ export const getServerSideProps: GetServerSideProps = async () => {
       limit: 6,
     },
   });
+  const rawNewInProducts = await fetchStrapi("/products", {
+    populate: ["image", "variantImage", "productVariants"],
+    sort: ["newInOrder:asc"],
+    filters: {
+      status: "New In",
+    },
+    pagination: {
+      limit: 6,
+    },
+  });
+  const rawBestSellerProducts = await fetchStrapi("/products", {
+    populate: ["image", "variantImage", "productVariants"],
+    sort: ["bestSellerOrder:asc"],
+    filters: {
+      status: "Best Seller",
+    },
+    pagination: {
+      limit: 6,
+    },
+  });
+  const newInProducts: Product[] = rawNewInProducts.data.map(
+    ({ id, attributes }: any) => ({
+      id: id,
+      name: attributes.name,
+      price: attributes.price,
+      image: getStrapiMedia(attributes.image),
+      variants: attributes.variantImages?.data.map(({ attributes }: any) =>
+        getStrapiMedia(attributes)
+      ),
+      description: attributes.description,
+      rating: attributes.rating,
+      status: attributes.status,
+      slug: attributes.slug,
+    })
+  );
+  const bestSellerProducts: Product[] = rawBestSellerProducts.data.map(
+    ({ id, attributes }: any) => ({
+      id: id,
+      name: attributes.name,
+      price: attributes.price,
+      image: getStrapiMedia(attributes.image),
+      variants: attributes.variantImages?.data.map(({ attributes }: any) =>
+        getStrapiMedia(attributes)
+      ),
+      description: attributes.description,
+      rating: attributes.rating,
+      status: attributes.status,
+      slug: attributes.slug,
+    })
+  );
+
   const collections: Collection[] = rawCollections.data.map(
     ({ attributes }: any) => ({
       name: attributes.name,
+      slug: attributes.slug,
       icon: attributes.icon,
       categories: attributes.categories?.data.map(
         ({ attributes: { name, image } }: any) => ({
@@ -44,24 +96,40 @@ export const getServerSideProps: GetServerSideProps = async () => {
       ),
     })
   );
-  console.log(collections);
-
   return {
-    props: { collections: JSON.parse(JSON.stringify(collections)) },
+    props: {
+      collections: JSON.parse(JSON.stringify(collections)),
+      newInProducts: JSON.parse(JSON.stringify(newInProducts)),
+      bestSellerProducts: JSON.parse(JSON.stringify(bestSellerProducts)),
+    },
   };
 };
 
 type Category = { name: string; image: string };
+export type Product = {
+  id: string;
+  name: string;
+  slug: string;
+  price: number;
+  image: string;
+  description: string;
+  rating: number;
+  variants: string[];
+  status: string;
+};
+
 export type Collection = { name: string; icon: string; categories: Category[] };
 
 interface Props {
   collections?: Collection[];
+  newInProducts?: Product[];
+  bestSellerProducts?: Product[];
 }
-const PageHome: FC<Props> = ({ collections }) => {
-  // const [startExploringData, setStartExploringData] = useState<Collection[]>();
-
-  console.log(collections, "coll");
-  // useEffect(() => )
+const PageHome: FC<Props> = ({
+  collections,
+  newInProducts,
+  bestSellerProducts,
+}) => {
   return (
     <>
       <Head>
@@ -77,15 +145,7 @@ const PageHome: FC<Props> = ({ collections }) => {
 
         <div className="container relative space-y-24 my-24 lg:space-y-32 lg:my-32">
           {/* SECTION */}
-          <SectionSliderProductCard
-            data={[
-              PRODUCTS[4],
-              SPORT_PRODUCTS[5],
-              PRODUCTS[7],
-              SPORT_PRODUCTS[1],
-              PRODUCTS[6],
-            ]}
-          />
+          <SectionSliderProductCard data={newInProducts} />
 
           <div className="py-24 lg:py-32 border-t border-b border-slate-200 dark:border-slate-700">
             <SectionHowItWork />
@@ -103,6 +163,7 @@ const PageHome: FC<Props> = ({ collections }) => {
           <SectionSliderProductCard
             heading="Best Sellers"
             subHeading="Best selling of the month"
+            data={bestSellerProducts}
           />
 
           {/*  */}

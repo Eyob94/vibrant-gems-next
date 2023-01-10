@@ -2,7 +2,7 @@ import React, { FC, useEffect, useId, useRef, useState } from "react";
 import Heading from "./Heading/Heading";
 import Glide from "@glidejs/glide";
 import ProductCard from "./ProductCard";
-import { Product, PRODUCTS } from "../data/data";
+import { Product } from "../pages";
 
 export interface SectionSliderProductCardProps {
   className?: string;
@@ -21,20 +21,12 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   headingClassName,
   heading,
   subHeading = "REY backpacks & bags",
-  data = PRODUCTS.filter((_, i) => i < 8 && i > 2),
+  data,
 }) => {
   const sliderRef = useRef(null);
   const id = useId();
   const UNIQUE_CLASS = "glidejs" + id.replace(/:/g, "_");
-  const [loading, setLoading] = useState(false);
-  const [products, setProducts] = useState<Product[]>();
 
-  // useEffect(() => {
-  //   console.log("heres");
-  //   fetchProducts().then((s) => {
-  //     setProducts(s);
-  //   });
-  // }, []);
   useEffect(() => {
     if (!sliderRef.current) {
       return () => {};
@@ -75,24 +67,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
     };
   }, [sliderRef, UNIQUE_CLASS]);
 
-  const fetchProducts = async () => {
-    setLoading(true);
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/products?populate[0]=category&populate[1]=image&filters[status][$eq]=New In`
-    );
-    const json = await res.json();
-    return json.data.map(({ attributes }: any) => ({
-      id: attributes.id,
-      name: attributes.name,
-      price: attributes.price,
-      image: `${process.env.NEXT_PUBLIC_STRAPI_API_URL}${attributes.image.data.attributes.formats.thumbnail.url}`,
-      description: attributes.description,
-      category: attributes.category.data.attributes.name,
-      tags: attributes.name,
-      link: attributes.name,
-      status: attributes.name,
-    }));
-  };
+  const fetchProducts = async () => {};
 
   return (
     <div className={`nc-SectionSliderProductCard ${className}`}>
@@ -107,11 +82,12 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
         </Heading>
         <div className="glide__track" data-glide-el="track">
           <ul className="glide__slides">
-            {products?.map((item, index) => (
-              <li key={index} className={`glide__slide ${itemClassName}`}>
-                <ProductCard data={item} />
-              </li>
-            ))}
+            {data &&
+              data.map((product, index) => (
+                <li key={index} className={`glide__slide ${itemClassName}`}>
+                  <ProductCard data={product} />
+                </li>
+              ))}
           </ul>
         </div>
       </div>
