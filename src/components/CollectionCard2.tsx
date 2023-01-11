@@ -11,6 +11,7 @@ export interface CollectionCard2Props {
   name?: string;
   price?: number;
   description?: string;
+  slug?: string;
 }
 
 const CollectionCard2: FC<CollectionCard2Props> = ({
@@ -18,6 +19,7 @@ const CollectionCard2: FC<CollectionCard2Props> = ({
   imgs = [productImgs[9], productImgs[10], productImgs[11], productImgs[8]],
   name = "Product Name",
   description = "Product Description",
+  slug,
   price,
 }) => {
   return (
@@ -65,7 +67,11 @@ const CollectionCard2: FC<CollectionCard2Props> = ({
         </div>
         <Prices className="mt-0.5 sm:mt-1 ml-4" price={price} />
       </div>
-      <Link href={"/product-detail-2"} className="absolute inset-0 "></Link>
+
+      <Link
+        href={`/product-detail/${slug}`}
+        className="absolute inset-0 "
+      ></Link>
     </div>
   );
 };

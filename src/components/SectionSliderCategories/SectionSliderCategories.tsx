@@ -3,53 +3,54 @@ import Heading from "../Heading/Heading";
 import Glide from "@glidejs/glide";
 import CardCategory2 from "../CardCategories/CardCategory2";
 import Link from "next/link";
+import { Collection, Product } from "../../pages";
 
-export interface CardCategoryData {
-  name: string;
-  desc: string;
-  img: string;
-  color?: string;
-}
-const CATS: CardCategoryData[] = [
-  {
-    name: "Travel Kits",
-    desc: "20+ categories",
-    img: "/images/collections/department1.png",
-    color: "bg-indigo-100",
-  },
-  {
-    name: "Beauty Products",
-    desc: "10+ categories",
-    img: "/images/collections/department1.png",
-    color: "bg-slate-100",
-  },
-  {
-    name: "Sport Kits",
-    desc: "34+ categories",
-    img: "/images/collections/department1.png",
-    color: "bg-sky-100",
-  },
-  {
-    name: "Pets Food",
-    desc: "12+ categories",
-    img: "/images/collections/department1.png",
-    color: "bg-orange-100",
-  },
-];
-export interface SectionSliderCategoriesProps {
+// interface CardCategoryData {
+//   name: string;
+//   desc: string;
+//   img: string;
+//   color?: string;
+// }
+// const CATS: CardCategoryData[] = [
+//   {
+//     name: "Travel Kits",
+//     desc: "20+ categories",
+//     img: "/images/collections/department1.png",
+//     color: "bg-indigo-100",
+//   },
+//   {
+//     name: "Beauty Products",
+//     desc: "10+ categories",
+//     img: "/images/collections/department1.png",
+//     color: "bg-slate-100",
+//   },
+//   {
+//     name: "Sport Kits",
+//     desc: "34+ categories",
+//     img: "/images/collections/department1.png",
+//     color: "bg-sky-100",
+//   },
+//   {
+//     name: "Pets Food",
+//     desc: "12+ categories",
+//     img: "/images/collections/department1.png",
+//     color: "bg-orange-100",
+//   },
+// ];
+interface Props {
   className?: string;
   itemClassName?: string;
   heading?: string;
   subHeading?: string;
-  data?: CardCategoryData[];
+  data?: Collection[];
 }
 
-const SectionSliderCategories: FC<SectionSliderCategoriesProps> = ({
+const SectionSliderCategories: FC<Props> = ({
   heading = "Shop by department",
   subHeading = "",
   className = "",
   itemClassName = "",
-  data = CATS,
+  data,
 }) => {
   const id = useId();
   const UNIQUE_CLASS = "glidejs" + id.replace(/:/g, "_");
@@ -98,13 +99,13 @@ const SectionSliderCategories: FC<SectionSliderCategoriesProps> = ({
         </Heading>
         <div className="glide__track" data-glide-el="track">
           <ul className="glide__slides">
-            {data.map((item, index) => (
+            {data?.map((item, index) => (
               <li key={index} className={`glide__slide ${itemClassName}`}>
                 <CardCategory2
-                  featuredImage={item.img}
+                  featuredImage={item.image}
                   name={item.name}
-                  desc={item.desc}
-                  bgClass={item.color}
+                  desc={"sdf"}
+                  bgClass="bg-slate-100"
                 />
               </li>
             ))}

@@ -23,8 +23,14 @@ import { getStrapiMedia } from "../lib/media";
 export const getServerSideProps: GetServerSideProps = async () => {
   const rawCollections = await fetchStrapi("/collections", {
     populate: {
+      image: true,
       categories: {
         sort: ["name:asc"],
+        populate: {
+          products: {
+            count: true,
+          },
+        },
       },
     },
     sort: ["order:asc"],
@@ -33,7 +39,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     },
   });
   const rawNewInProducts = await fetchStrapi("/products", {
-    populate: ["image", "variantImage", "productVariants"],
+    populate: ["image"],
     sort: ["newInOrder:asc"],
     filters: {
       status: "New In",
@@ -43,7 +49,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     },
   });
   const rawBestSellerProducts = await fetchStrapi("/products", {
-    populate: ["image", "variantImage", "productVariants"],
+    populate: ["image"],
     sort: ["bestSellerOrder:asc"],
     filters: {
       status: "Best Seller",
@@ -52,15 +58,35 @@ export const getServerSideProps: GetServerSideProps = async () => {
       limit: 6,
     },
   });
+  const rawPopularGemstoneProducts = await fetchStrapi("/products", {
+    populate: ["image"],
+    sort: ["popularOrder:asc"],
+    filters: {
+      type: "GEMSTONE",
+      status: "Popular",
+    },
+    pagination: {
+      limit: 10,
+    },
+  });
+  const rawExpertRecomentedJewleryProducts = await fetchStrapi("/products", {
+    populate: ["image", "productVariants", "productVariants.image"],
+    sort: ["expertRecommendedOrder:asc"],
+    filters: {
+      type: "JEWLERY",
+      status: "ExpertRecommended",
+    },
+    pagination: {
+      limit: 10,
+    },
+  });
   const newInProducts: Product[] = rawNewInProducts.data.map(
     ({ id, attributes }: any) => ({
       id: id,
       name: attributes.name,
       price: attributes.price,
       image: getStrapiMedia(attributes.image),
-      variants: attributes.variantImages?.data.map(({ attributes }: any) =>
-        getStrapiMedia(attributes)
-      ),
+
       description: attributes.description,
       rating: attributes.rating,
       status: attributes.status,
@@ -73,25 +99,48 @@ export const getServerSideProps: GetServerSideProps = async () => {
       name: attributes.name,
       price: attributes.price,
       image: getStrapiMedia(attributes.image),
-      variants: attributes.variantImages?.data.map(({ attributes }: any) =>
-        getStrapiMedia(attributes)
-      ),
       description: attributes.description,
       rating: attributes.rating,
       status: attributes.status,
       slug: attributes.slug,
     })
   );
+  const popularGemstoneProducts: Product[] =
+    rawPopularGemstoneProducts.data.map(({ id, attributes }: any) => ({
+      id: id,
+      name: attributes.name,
+      price: attributes.price,
+      image: getStrapiMedia(attributes.image),
+      description: attributes.description,
+      rating: attributes.rating,
+      status: attributes.status,
+      slug: attributes.slug,
+    }));
+  const expertRecommendedProducts: Product[] =
+    rawExpertRecomentedJewleryProducts.data.map(({ id, attributes }: any) => ({
+      id: id,
+      name: attributes.name,
+      price: attributes.price,
+      image: getStrapiMedia(attributes.image),
+      variantImages: attributes.productVariants?.data?.map(
+        ({ attributes }: any) => getStrapiMedia(attributes.image)
+      ),
+      description: attributes.description,
+      rating: attributes.rating,
+      status: attributes.status,
+      slug: attributes.slug,
+    }));
 
   const collections: Collection[] = rawCollections.data.map(
     ({ attributes }: any) => ({
       name: attributes.name,
       slug: attributes.slug,
-      icon: attributes.icon,
+      image: attributes.image.data && getStrapiMedia(attributes.image),
       categories: attributes.categories?.data.map(
-        ({ attributes: { name, image } }: any) => ({
+        ({ attributes: { name, image, products } }: any) => ({
           name,
           image,
+          productsCount: products.data?.attributes.count,
         })
       ),
     })
@@ -101,35 +150,50 @@ export const getServerSideProps: GetServerSideProps = async () => {
       collections: JSON.parse(JSON.stringify(collections)),
       newInProducts: JSON.parse(JSON.stringify(newInProducts)),
       bestSellerProducts: JSON.parse(JSON.stringify(bestSellerProducts)),
+      popularGemstoneProducts: JSON.parse(
+        JSON.stringify(popularGemstoneProducts)
+      ),
+      expertRecommendedProducts: JSON.parse(
+        JSON.stringify(expertRecommendedProducts)
+      ),
     },
   };
 };
 
-type Category = { name: string; image: string };
+type Category = { name: string; image: string; productsCount: number };
 export type Product = {
   id: string;
   name: string;
   slug: string;
   price: number;
   image: string;
+  variantImages?: string[];
   description: string;
   rating: number;
-  variants: string[];
   status: string;
 };
 
-export type Collection = { name: string; icon: string; categories: Category[] };
+export type Collection = {
+  name: string;
+  image: string;
+  categories: Category[];
+};
 
 interface Props {
   collections?: Collection[];
   newInProducts?: Product[];
   bestSellerProducts?: Product[];
+  popularGemstoneProducts?: Product[];
+  expertRecommendedProducts?: Product[];
 }
 const PageHome: FC<Props> = ({
   collections,
   newInProducts,
   bestSellerProducts,
+  popularGemstoneProducts,
+  expertRecommendedProducts,
 }) => {
+  console.log(expertRecommendedProducts);
   return (
     <>
       <Head>
@@ -139,17 +203,19 @@ const PageHome: FC<Props> = ({
         {/* SECTION HERO */}
         <SectionHero2 />
 
-        <div className="mt-24 lg:mt-32">
-          <DiscoverMoreSlider />
-        </div>
+        {popularGemstoneProducts && (
+          <div className="mt-24 lg:mt-32">
+            <DiscoverMoreSlider data={popularGemstoneProducts} />
+          </div>
+        )}
 
         <div className="container relative space-y-24 my-24 lg:space-y-32 lg:my-32">
           {/* SECTION */}
-          <SectionSliderProductCard data={newInProducts} />
+          {newInProducts && <SectionSliderProductCard data={newInProducts} />}
 
-          <div className="py-24 lg:py-32 border-t border-b border-slate-200 dark:border-slate-700">
+          {/* <div className="py-24 lg:py-32 border-t border-b border-slate-200 dark:border-slate-700">
             <SectionHowItWork />
-          </div>
+          </div> */}
 
           {/* SECTION */}
           <SectionPromo1 />
@@ -167,21 +233,29 @@ const PageHome: FC<Props> = ({
           />
 
           {/*  */}
-          <SectionPromo2 />
+          {/* <SectionPromo2 /> */}
 
           {/* SECTION 3 */}
-          <SectionSliderLargeProduct cardStyle="style2" />
+          {expertRecommendedProducts && (
+            <SectionSliderLargeProduct
+              data={expertRecommendedProducts}
+              cardStyle="style2"
+            />
+          )}
 
           {/*  */}
-          <SectionSliderCategories />
+          <SectionSliderCategories
+            heading="Our Collections"
+            data={collections}
+          />
 
           {/* SECTION */}
-          <SectionPromo3 />
+          {/* <SectionPromo3 /> */}
 
           {/* SECTION */}
           <SectionGridFeatureItems />
 
-          <div className="relative py-24 lg:py-32">
+          {/* <div className="relative py-24 lg:py-32">
             <BackgroundSection />
             <div>
               <Heading rightDescText="From the Ciseco blog">
@@ -192,7 +266,7 @@ const PageHome: FC<Props> = ({
                 <ButtonSecondary>Show all blog articles</ButtonSecondary>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/*  */}
           <SectionClientSay />

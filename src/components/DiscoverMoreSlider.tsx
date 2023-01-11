@@ -1,9 +1,10 @@
-import React, { useEffect, useId } from "react";
+import React, { FC, useEffect, useId } from "react";
 import Heading from "./Heading/Heading";
 import CardCategory3, {
   CardCategory3Props,
 } from "./CardCategories/CardCategory3";
 import Glide from "@glidejs/glide";
+import { Product } from "../pages";
 
 export const CATS_DISCOVER: CardCategory3Props[] = [
   {
@@ -32,7 +33,10 @@ export const CATS_DISCOVER: CardCategory3Props[] = [
   },
 ];
 
-const DiscoverMoreSlider = () => {
+interface Props {
+  data: Product[];
+}
+const DiscoverMoreSlider: FC<Props> = ({ data }) => {
   const id = useId();
   const UNIQUE_CLASS = "glidejs" + id.replace(/:/g, "_");
 
@@ -78,20 +82,20 @@ const DiscoverMoreSlider = () => {
       <Heading
         className="mb-12 lg:mb-14 text-neutral-900 dark:text-neutral-50 nc-p-r-container "
         desc=""
-        rightDescText="Good things are waiting for you"
+        // rightDescText="Good things are waiting for you"
         hasNextPrev
       >
-        Discover more
+        Discover Most Popular Gemstones
       </Heading>
       <div className="" data-glide-el="track">
         <ul className="glide__slides">
-          {CATS_DISCOVER.map((item, index) => (
+          {data?.map((item, index) => (
             <li key={index} className={`glide__slide`}>
               <CardCategory3
                 name={item.name}
-                desc={item.desc}
-                featuredImage={item.featuredImage}
-                color={item.color}
+                desc={item.description}
+                featuredImage={item.image}
+                color={CATS_DISCOVER[index].color}
               />
             </li>
           ))}

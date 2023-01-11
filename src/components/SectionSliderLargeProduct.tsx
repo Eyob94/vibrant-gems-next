@@ -5,16 +5,19 @@ import CollectionCard from "./CollectionCard";
 import CollectionCard2 from "./CollectionCard2";
 import { DEMO_LARGE_PRODUCTS } from "./SectionSliderLargeProduct2";
 import Link from "next/link";
+import { Product } from "../pages";
 
 export interface SectionSliderLargeProductProps {
   className?: string;
   itemClassName?: string;
   cardStyle?: "style1" | "style2";
+  data: Product[];
 }
 
 const SectionSliderLargeProduct: FC<SectionSliderLargeProductProps> = ({
   className = "",
   cardStyle = "style2",
+  data,
 }) => {
   const id = useId();
   const UNIQUE_CLASS = "glidejs" + id.replace(/:/g, "_");
@@ -60,17 +63,23 @@ const SectionSliderLargeProduct: FC<SectionSliderLargeProductProps> = ({
     <div className={`nc-SectionSliderLargeProduct ${className}`}>
       <div className={`${UNIQUE_CLASS} flow-root`}>
         <Heading isCenter={false} hasNextPrev>
-          Chosen by our experts
+          Recommend by our jewelry experts
         </Heading>
         <div className="glide__track" data-glide-el="track">
           <ul className="glide__slides">
-            {DEMO_LARGE_PRODUCTS.map((product, index) => (
+            {data.map((product, index) => (
               <li className={`glide__slide`} key={index}>
                 <MyCollectionCard
                   name={product.name}
                   price={product.price}
-                  imgs={product.images}
-                  description={product.desc}
+                  slug={product.slug}
+                  imgs={[
+                    product.image,
+                    ...(product.variantImages
+                      ? product.variantImages.slice(0, 2)
+                      : []),
+                  ]}
+                  description={product.description}
                 />
               </li>
             ))}

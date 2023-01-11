@@ -9,6 +9,7 @@ export interface CardCategory4Props {
   featuredImage?: string;
   bgSVG?: string;
   name: string;
+  productCount?: number;
   desc: string;
   color?: string;
 }
@@ -19,6 +20,7 @@ const CardCategory4: FC<CardCategory4Props> = ({
   bgSVG = "/images/collections/explore1.svg",
   name,
   desc,
+  productCount = 0,
   color = "bg-rose-50",
 }) => {
   return (
@@ -38,7 +40,7 @@ const CardCategory4: FC<CardCategory4Props> = ({
               containerClassName={`w-20 h-20 rounded-full overflow-hidden z-0 ${color}`}
             />
             <span className="text-xs text-slate-700 dark:text-neutral-300 font-medium">
-              {Math.floor(Math.random() * 200 + 125)} products
+              {productCount} products
             </span>
           </div>
 

@@ -270,10 +270,12 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
         {data &&
           data
             .find(({ name }) => name === tabActive)
-            ?.categories?.map((category, idx) => (
+            ?.categories?.slice(0, 6)
+            .map((category, idx) => (
               <CardCategory4
                 key={idx}
                 name={category.name}
+                productCount={category.productsCount}
                 desc={"description"}
                 bgSVG={category.image}
                 featuredImage={category.image}
