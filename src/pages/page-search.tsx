@@ -98,7 +98,7 @@ const PageSearch: FC<PageSearchProps> = ({ className = "" }) => {
 
         {/* === SECTION 5 === */}
         <hr className="border-slate-200 dark:border-slate-700" />
-        <SectionSliderCollections />
+        {/* <SectionSliderCollections data={[]} /> */}
         <hr className="border-slate-200 dark:border-slate-700" />
 
         {/* SUBCRIBES */}

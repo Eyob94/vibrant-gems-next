@@ -33,7 +33,6 @@ const ProductCard: FC<ProductCardProps> = ({
     price,
     description,
     // sizes,
-    variants,
     // variantType,
     slug,
     status,
@@ -89,7 +88,7 @@ const ProductCard: FC<ProductCardProps> = ({
               <div>
                 <h3 className="text-base font-medium ">{name}</h3>
                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                  <span>{variants ? variants[variantActive] : `Natural`}</span>
+                  {/* <span>{variants ? variants[variantActive] : `Natural`}</span> */}
                   <span className="mx-2 border-l border-slate-200 dark:border-slate-700 h-4"></span>
                   <span>{size || "XL"}</span>
                 </p>
@@ -144,13 +143,11 @@ const ProductCard: FC<ProductCardProps> = ({
   // };
 
   const renderVariants = () => {
-    if (!variants || !variants.length) {
-      return null;
-    }
+    return null;
 
     return (
       <div className="flex ">
-        {variants.map((variant, index) => (
+        {[].map((variant, index) => (
           <div
             key={index}
             onClick={() => setVariantActive(index)}

@@ -3,21 +3,15 @@ import Head from "next/head";
 import { FC } from "react";
 import BackgroundSection from "../components/BackgroundSection/BackgroundSection";
 import DiscoverMoreSlider from "../components/DiscoverMoreSlider";
-import Heading from "../components/Heading/Heading";
 import SectionClientSay from "../components/SectionClientSay/SectionClientSay";
 import SectionGridMoreExplore from "../components/SectionGridMoreExplore/SectionGridMoreExplore";
 import SectionHero2 from "../components/SectionHero/SectionHero2";
-import SectionHowItWork from "../components/SectionHowItWork/SectionHowItWork";
 import SectionPromo1 from "../components/SectionPromo1";
-import SectionPromo2 from "../components/SectionPromo2";
-import SectionPromo3 from "../components/SectionPromo3";
 import SectionSliderCategories from "../components/SectionSliderCategories/SectionSliderCategories";
 import SectionSliderLargeProduct from "../components/SectionSliderLargeProduct";
 import SectionSliderProductCard from "../components/SectionSliderProductCard";
-import SectionMagazine5 from "../containers/BlogPage/SectionMagazine5";
 import SectionGridFeatureItems from "../containers/PageHome/SectionGridFeatureItems";
 import { fetchStrapi } from "../lib/strapi";
-import ButtonSecondary from "../shared/Button/ButtonSecondary";
 import { getStrapiMedia } from "../lib/media";
 
 export const getServerSideProps: GetServerSideProps = async () => {
