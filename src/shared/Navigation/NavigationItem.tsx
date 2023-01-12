@@ -61,9 +61,9 @@ const NavigationItem: FC<NavigationItemProps> = ({ menuItem }) => {
                     </div>
                   ))}
                 </div>
-                <div className="w-[40%] xl:w-[35%]">
+                {/* <div className="w-[40%] xl:w-[35%]">
                   <CardCategory3 />
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

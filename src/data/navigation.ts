@@ -5,7 +5,7 @@ const MEGAMENU_DEMO: NavItemType[] = [
   {
     id: ncNanoId(),
     href: "/#",
-    name: "Clothing",
+    name: "Shop by style",
     children: [
       { id: ncNanoId(), href: "#", name: "Activewear" },
       { id: ncNanoId(), href: "#", name: "Coats & Jackets" },
@@ -18,7 +18,7 @@ const MEGAMENU_DEMO: NavItemType[] = [
   {
     id: ncNanoId(),
     href: "/#",
-    name: "Accessories",
+    name: "Shop by metal",
     children: [
       { id: ncNanoId(), href: "#", name: "Sunglasses" },
       { id: ncNanoId(), href: "#", name: "Gloves" },
@@ -31,7 +31,7 @@ const MEGAMENU_DEMO: NavItemType[] = [
   {
     id: ncNanoId(),
     href: "/#",
-    name: "Shoes",
+    name: "Shop by Shape",
     children: [
       { id: ncNanoId(), href: "#", name: "Boots" },
       { id: ncNanoId(), href: "#", name: "Loafers " },
@@ -44,7 +44,7 @@ const MEGAMENU_DEMO: NavItemType[] = [
   {
     id: ncNanoId(),
     href: "/#",
-    name: "Brands",
+    name: "Education",
     children: [
       { id: ncNanoId(), href: "#", name: "Full Nelson" },
       { id: ncNanoId(), href: "#", name: "Backpacks" },
@@ -60,47 +60,50 @@ export const MEGAMENU_TEMPLATES: NavItemType[] = [
   {
     id: ncNanoId(),
     href: "/#",
-    name: "Home Page",
+    name: "About Us",
     children: [
-      { id: ncNanoId(), href: "/", name: "Home  1" },
-      { id: ncNanoId(), href: "/home2", name: "Home  2", isNew: true },
-      { id: ncNanoId(), href: "/", name: "Header  1" },
-      { id: ncNanoId(), href: "/home2", name: "Header  2", isNew: true },
-      { id: ncNanoId(), href: "/", name: "Coming Soon" },
+      { id: ncNanoId(), href: "/", name: "Vibrant Gems Experience" },
+      { id: ncNanoId(), href: "/home2", name: "Team members" },
+      { id: ncNanoId(), href: "/", name: "Donation and charity" },
     ],
   },
   {
     id: ncNanoId(),
     href: "/#",
-    name: "Shop Pages",
+    name: "Gemstone Guide",
     children: [
-      { id: ncNanoId(), href: "/page-collection", name: "Category Page 1" },
-      { id: ncNanoId(), href: "/page-collection-2", name: "Category Page 2" },
-      { id: ncNanoId(), href: "/product-detail", name: "Product Page 1" },
-      { id: ncNanoId(), href: "/product-detail-2", name: "Product Page 2" },
-      { id: ncNanoId(), href: "/cart", name: "Cart Page" },
-      { id: ncNanoId(), href: "/checkout", name: "Checkout Page" },
+      { id: ncNanoId(), href: "/blog", name: "Gemstone education" },
+      { id: ncNanoId(), href: "/blog-single", name: "Precious gemstones" },
+      { id: ncNanoId(), href: "/about", name: "Spinels & Garnets" },
+      { id: ncNanoId(), href: "/contact", name: "Tourmalines" },
     ],
   },
   {
     id: ncNanoId(),
     href: "/#",
-    name: "Other Pages",
+    name: "Experience Us",
     children: [
-      { id: ncNanoId(), href: "/checkout", name: "Checkout Page" },
-      { id: ncNanoId(), href: "/page-search", name: "Search Page" },
-      { id: ncNanoId(), href: "/cart", name: "Cart Page" },
-      { id: ncNanoId(), href: "/account", name: "Accout Page" },
-      { id: ncNanoId(), href: "/account-my-order", name: "Order Page" },
-      { id: ncNanoId(), href: "/subscription", name: "Subscription" },
+      {
+        id: ncNanoId(),
+        href: "/page-collection",
+        name: "360° 4K Gemstone Display",
+      },
+      { id: ncNanoId(), href: "/page-collection-2", name: "Our packaging" },
+      { id: ncNanoId(), href: "/product-detail", name: "Price matching" },
+      {
+        id: ncNanoId(),
+        href: "/product-detail-2",
+        name: "Gemstone certification service",
+      },
+      { id: ncNanoId(), href: "/cart", name: "Virtual appointment" },
     ],
   },
   {
     id: ncNanoId(),
     href: "/#",
-    name: "Blog Page",
+    name: "Easy Access",
     children: [
-      { id: ncNanoId(), href: "/blog", name: "Blog Page" },
+      { id: ncNanoId(), href: "/blog", name: "Contact Us" },
       { id: ncNanoId(), href: "/blog-single", name: "Blog Single" },
       { id: ncNanoId(), href: "/about", name: "About Page" },
       { id: ncNanoId(), href: "/contact", name: "Contact Page" },
@@ -234,38 +237,34 @@ export const NAVIGATION_DEMO_2: NavItemType[] = [
   {
     id: ncNanoId(),
     href: "/#",
-    name: "Men",
+    name: "Gemstones",
     type: "megaMenu",
     children: MEGAMENU_DEMO,
   },
   {
     id: ncNanoId(),
     href: "/#",
-    name: "Women",
+    name: "Engagement",
+    type: "megaMenu",
+    children: MEGAMENU_DEMO,
+  },
+  {
+    id: ncNanoId(),
+    type: "megaMenu",
+    href: "/#",
+    name: "Wedding",
+    children: MEGAMENU_DEMO,
   },
   {
     id: ncNanoId(),
     href: "/#",
-    name: "Beauty",
-  },
-
-  {
-    id: ncNanoId(),
-    href: "/#",
-    name: "Sport",
+    name: "Jewelry",
   },
   {
     id: ncNanoId(),
     href: "/#",
-    name: "Templates",
+    name: "Explore",
     type: "megaMenu",
     children: MEGAMENU_TEMPLATES,
-  },
-  {
-    id: ncNanoId(),
-    href: "#",
-    name: "Explore",
-    type: "dropdown",
-    children: OTHER_PAGE_CHILD,
   },
 ];

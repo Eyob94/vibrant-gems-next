@@ -1,7 +1,9 @@
 import Logo from "../Logo/Logo";
 import SocialsList1 from "../SocialsList1/SocialsList1";
 import { CustomLink } from "../../data/types";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { fetchStrapi } from "../../lib/strapi";
+import { NavItemType } from "../Navigation/NavigationItem";
 
 export interface WidgetFooterMenu {
   id: string;
@@ -53,6 +55,18 @@ const widgetMenus: WidgetFooterMenu[] = [
 ];
 
 const Footer: React.FC = () => {
+  const [navigation, setNavigation] = useState<WidgetFooterMenu[]>();
+  const fetchHeaderBuilder = async () => {
+    const rawNavigationBuilders = await fetchStrapi("/navigation-builders", {
+      filters: {
+        active: true,
+      },
+    });
+    setNavigation(rawNavigationBuilders.data[0].attributes.footerJson);
+  };
+  useEffect(() => {
+    fetchHeaderBuilder();
+  }, []);
   const renderWidgetMenuItem = (menu: WidgetFooterMenu, index: number) => {
     return (
       <div key={index} className="text-sm">
@@ -89,7 +103,7 @@ const Footer: React.FC = () => {
             <SocialsList1 className="flex items-center space-x-2 lg:space-x-0 lg:flex-col lg:space-y-3 lg:items-start" />
           </div>
         </div>
-        {widgetMenus.map(renderWidgetMenuItem)}
+        {navigation ? navigation.map(renderWidgetMenuItem) : <>loading</>}
       </div>
     </div>
   );
