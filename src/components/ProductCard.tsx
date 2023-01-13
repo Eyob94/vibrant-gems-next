@@ -38,7 +38,6 @@ const ProductCard: FC<ProductCardProps> = ({
     status,
     image,
   } = data;
-  console.log(data, "where");
   const [variantActive, setVariantActive] = React.useState(0);
   const [showModalQuickView, setShowModalQuickView] = React.useState(false);
 

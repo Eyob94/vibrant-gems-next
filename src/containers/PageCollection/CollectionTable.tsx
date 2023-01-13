@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import React, { FC, useEffect, useRef, useState } from "react";
 import ProductCard from "../../components/ProductCard";
 import { fetchStrapi } from "../../lib/strapi";
@@ -7,10 +8,21 @@ import Pagination from "../../shared/Pagination/Pagination";
 import TabFilters from "../TabFilters";
 
 const CollectionTable = () => {
+  const router = useRouter();
+
   const take = 28;
   const firstRender = useRef(null);
+  const [collection, setCollection] = useState({
+    name: "",
+    description: "",
+  });
   const [categories, setCategories] = useState<
-    { name: string; active: boolean }[]
+    {
+      name: string;
+      active: boolean;
+      collectionName: string;
+      collectionDescription: string;
+    }[]
   >([]);
   const [metals, setMetals] = useState<{ name: string; active: boolean }[]>([]);
   const [products, setProducts] = useState<Product[]>();
@@ -22,7 +34,7 @@ const CollectionTable = () => {
 
   const fetchProducts = async () => {
     const products = await fetchStrapi(`/products`, {
-      populate: ["category", "image"],
+      populate: ["category", "image", "category.collection"],
       pagination: {
         page: paginationPage,
         pageSize: take,
@@ -33,6 +45,9 @@ const CollectionTable = () => {
         },
         category: {
           name: selectedCategories,
+          collection: {
+            name: router.query.collection || [],
+          },
         },
         // productItem: {
         //   metal: {
@@ -66,10 +81,22 @@ const CollectionTable = () => {
     setMetals(mappedMetalData);
   };
   const getAllCategories = async () => {
-    const categories = await fetchStrapi("/categories");
+    const categories = await fetchStrapi("/categories", {
+      populate: ["collection"],
+      filters: {
+        collection: {
+          name: router.query.collection || [],
+        },
+      },
+    });
+    console.log(categories, "heree");
     const mappedCategoriesData = categories.data.map((category: any) => ({
       name: category.attributes.name as string,
       active: false,
+      collectionName:
+        category.attributes.collection?.data?.attributes.name || "",
+      collectionDescription:
+        category.attributes.collection?.data?.attributes.name || "",
     }));
     setCategories(mappedCategoriesData);
   };
@@ -93,18 +120,25 @@ const CollectionTable = () => {
       // getMetalTypes();
     }
     fetchProducts();
-  }, [paginationPage, rangePrice, selectedCategories, selectedMetals]);
+  }, [paginationPage, rangePrice, selectedCategories, selectedMetals, router]);
 
   return (
     <div ref={firstRender.current} className="space-y-10 lg:space-y-14">
       {/* HEADING */}
       <div className="max-w-screen-sm">
         <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold">
-          Man collection
+          {
+            categories.find(
+              (category) => category.name === selectedCategories[0]
+            )?.collectionName
+          }
         </h2>
         <span className="block mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
-          We not only help you design exceptional products, but also make it
-          easy for you to share your designs with more like-minded people.
+          {
+            categories.find(
+              (category) => category.name === selectedCategories[0]
+            )?.collectionDescription
+          }
         </span>
       </div>
 

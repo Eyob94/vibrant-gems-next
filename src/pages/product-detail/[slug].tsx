@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import {
   SparklesIcon,
   NoSymbolIcon,
@@ -21,9 +21,9 @@ import Policy from "../../containers/ProductDetailPage/Policy";
 import { Product, PRODUCTS } from "../../data/data";
 import ButtonPrimary from "../../shared/Button/ButtonPrimary";
 import ButtonSecondary from "../../shared/Button/ButtonSecondary";
-import { useRouter } from "next/router";
+// import { useRouter } from "next/router";
 import { fetchStrapi } from "../../lib/strapi";
-import { getSingleProductWithId } from "../../lib/strapiQueries";
+// import { getSingleProductWithId } from "../../lib/strapiQueries";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Image from "next/image";
 import { getStrapiMedia } from "../../lib/media";
@@ -34,26 +34,38 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
       filters: {
         slug: query.slug,
       },
-      populate: ["image", "variantImages"],
+      populate: [
+        "image",
+        "variantImages",
+        "productVariants",
+        "productVariants.carat",
+        "productVariants.metal",
+      ],
     });
     const productData = data[0];
-    // console.log(productData.attributes.variantImages, "hereee");
-    const variants = Array.isArray(productData.attributes.variants?.data)
-      ? productData.attributes.variantImages?.data.map((variant: any) =>
-          getStrapiMedia(variant)
-        )
-      : [];
+
     const product: Product = {
       id: productData.id,
       name: productData.attributes.name,
       price: productData.attributes.price,
       image: getStrapiMedia(productData.attributes.image),
-      variants,
       description: productData.attributes.description,
       category: "category",
+      type: productData.attributes.type,
+      productVariants: productData.attributes.productVariants.data?.map(
+        ({ attributes }: any) => ({
+          inStock: attributes.inStock,
+          metal: {
+            name: attributes.metal.data?.attributes.name,
+          },
+          carat: {
+            name: attributes.carat.data?.attributes.name,
+          },
+        })
+      ),
       tags: productData.attributes.name,
       slug: productData.attributes.name,
-      status: productData.attributes.name,
+      status: productData.attributes.status,
     };
     if (!product) {
       return {
@@ -63,7 +75,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 
     return {
       props: {
-        product,
+        product: JSON.parse(JSON.stringify(product)),
       },
     };
   } catch (error) {
@@ -82,7 +94,25 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
   className = "",
   product,
 }) => {
-  const { sizes, variants, status, allOfSizes } = PRODUCTS[0];
+  const { sizes, variants, allOfSizes } = PRODUCTS[0];
+  const status = product.status;
+  const [metalTypes, setMetalTypes] = useState(
+    product.productVariants
+      ?.map(({ metal }) => metal.name)
+      .filter((name) => !!name)
+  );
+  const [metalTypeSelected, setMetalTypeSelected] = useState(
+    metalTypes ? metalTypes[0] : ""
+  );
+
+  const [carat, setCarat] = useState(
+    product.productVariants
+      ?.map(({ carat }) => carat.name)
+      .filter((name) => !!name)
+  );
+  console.log(carat, metalTypes, "herrr");
+  const [caratSelected, setCaratSelected] = useState(carat ? carat[0] : "");
+
   const LIST_IMAGES_DEMO = [product.image, ...(product.variantImage || [])];
   // const LIST_IMAGES_DEMO = [
   //   "/images/products/detail1.jpg",
@@ -91,7 +121,6 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
   // ];
 
   const [variantActive, setVariantActive] = useState(0);
-  const [sizeSelected, setSizeSelected] = useState(sizes ? sizes[0] : "");
   const [qualitySelected, setQualitySelected] = useState(1);
   const [isOpenModalViewAllReviews, setIsOpenModalViewAllReviews] =
     useState(false);
@@ -103,7 +132,7 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
           productImage={product.image}
           qualitySelected={qualitySelected}
           show={t.visible}
-          sizeSelected={sizeSelected}
+          sizeSelected={metalTypeSelected}
           variantActive={variantActive}
         />
       ),
@@ -155,8 +184,8 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
     );
   };
 
-  const renderSizeList = () => {
-    if (!allOfSizes || !sizes || !sizes.length) {
+  const renderCarat = () => {
+    if (!carat || !carat.length || !product.productVariants) {
       return null;
     }
     return (
@@ -164,47 +193,90 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
         <div className="flex justify-between font-medium text-sm">
           <label htmlFor="">
             <span className="">
-              Size:
-              <span className="ml-1 font-semibold">{sizeSelected}</span>
+              Carat:
+              <span className="ml-1 font-semibold">{caratSelected}</span>
             </span>
           </label>
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="##"
-            className="text-primary-6000 hover:text-primary-500"
-          >
-            See sizing chart
-          </a>
         </div>
         <div className="grid grid-cols-5 sm:grid-cols-7 gap-2 mt-3">
-          {allOfSizes.map((size, index) => {
-            const isActive = size === sizeSelected;
-            const sizeOutStock = !sizes.includes(size);
-            return (
-              <div
-                key={index}
-                className={`relative h-10 sm:h-11 rounded-2xl border flex items-center justify-center 
-                text-sm sm:text-base uppercase font-semibold select-none overflow-hidden z-0 ${
-                  sizeOutStock
+          {product.productVariants
+            ?.map(({ carat, inStock }, index) => {
+              if (!carat.name) return;
+              const isActive = carat.name === caratSelected;
+              return (
+                <div
+                  key={index}
+                  className={`relative h-10 sm:h-11 rounded-2xl border flex items-center justify-center 
+                text-xs  sm:text-base uppercase font-semibold select-none overflow-hidden z-0 ${
+                  inStock
                     ? "text-opacity-20 dark:text-opacity-20 cursor-not-allowed"
                     : "cursor-pointer"
                 } ${
-                  isActive
-                    ? "bg-primary-6000 border-primary-6000 text-white hover:bg-primary-6000"
-                    : "border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200 hover:bg-neutral-50 dark:hover:bg-neutral-700"
-                }`}
-                onClick={() => {
-                  if (sizeOutStock) {
-                    return;
-                  }
-                  setSizeSelected(size);
-                }}
-              >
-                {size}
-              </div>
-            );
-          })}
+                    isActive
+                      ? "bg-primary-6000 border-primary-6000 text-white hover:bg-primary-6000"
+                      : "border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200 hover:bg-neutral-50 dark:hover:bg-neutral-700"
+                  }`}
+                  onClick={() => {
+                    if (inStock) {
+                      return;
+                    }
+                    setCaratSelected(carat.name);
+                  }}
+                >
+                  {carat.name}
+                </div>
+              );
+            })
+            .filter((html) => !!html)}
+        </div>
+      </div>
+    );
+  };
+  const renderMetalType = () => {
+    console.log(product);
+    if (!metalTypes || !metalTypes.length || !product.productVariants) {
+      return null;
+    }
+    return (
+      <div>
+        <div className="flex justify-between font-medium text-sm">
+          <label htmlFor="">
+            <span className="">
+              Metal Type:
+              <span className="ml-1 font-semibold">{metalTypeSelected}</span>
+            </span>
+          </label>
+        </div>
+        <div className="grid grid-cols-5 sm:grid-cols-7 gap-2 mt-3">
+          {product.productVariants
+            ?.map(({ metal, inStock }, index) => {
+              if (!metal.name) return;
+              const isActive = metal.name === metalTypeSelected;
+              return (
+                <div
+                  key={index}
+                  className={`relative h-10 sm:h-11 rounded-2xl border flex items-center justify-center 
+                text-sm sm:text-base uppercase font-semibold select-none overflow-hidden z-0 ${
+                  inStock
+                    ? "text-opacity-20 dark:text-opacity-20 cursor-not-allowed"
+                    : "cursor-pointer"
+                } ${
+                    isActive
+                      ? "bg-primary-6000 border-primary-6000 text-white hover:bg-primary-6000"
+                      : "border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200 hover:bg-neutral-50 dark:hover:bg-neutral-700"
+                  }`}
+                  onClick={() => {
+                    if (inStock) {
+                      return;
+                    }
+                    setMetalTypeSelected(metal.name);
+                  }}
+                >
+                  {metal.name}
+                </div>
+              );
+            })
+            .filter((html) => !!html)}
         </div>
       </div>
     );
@@ -223,32 +295,35 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
           <span className="ml-1 leading-none">{status}</span>
         </div>
       );
-    }
-    if (status === "50% Discount") {
+    } else if (status === "50% Discount") {
       return (
         <div className={CLASSES}>
           <IconDiscount className="w-3.5 h-3.5" />
           <span className="ml-1 leading-none">{status}</span>
         </div>
       );
-    }
-    if (status === "Sold Out") {
+    } else if (status === "Sold Out") {
       return (
         <div className={CLASSES}>
           <NoSymbolIcon className="w-3.5 h-3.5" />
           <span className="ml-1 leading-none">{status}</span>
         </div>
       );
-    }
-    if (status === "limited edition") {
+    } else if (status === "limited edition") {
       return (
         <div className={CLASSES}>
           <ClockIcon className="w-3.5 h-3.5" />
           <span className="ml-1 leading-none">{status}</span>
         </div>
       );
+    } else {
+      return (
+        <div className={CLASSES}>
+          <SparklesIcon className="w-3.5 h-3.5" />
+          <span className="ml-1 leading-none">{status}</span>
+        </div>
+      );
     }
-    return null;
   };
 
   const renderSectionContent = () => {
@@ -293,17 +368,20 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
         </div>
 
         {/* ---------- 3 VARIANTS AND SIZE LIST ----------  */}
-        <div className="">{renderVariants()}</div>
-        {/* <div className="">{renderSizeList()}</div> */}
+        {/* <div className="">{renderVariants()}</div> */}
+        {/* {product.type === "JEWLERY" || ( */}
+        <div className="">{renderMetalType()}</div>
+        <div className="">{renderCarat()}</div>
+        {/* )} */}
 
         {/*  ---------- 4  QTY AND ADD TO CART BUTTON */}
         <div className="flex space-x-3.5">
-          <div className="flex items-center justify-center bg-slate-100/70 dark:bg-slate-800/70 px-2 py-3 sm:p-3.5 rounded-full">
+          {/* <div className="flex items-center justify-center bg-slate-100/70 dark:bg-slate-800/70 px-2 py-3 sm:p-3.5 rounded-full">
             <NcInputNumber
               defaultValue={qualitySelected}
               onChange={setQualitySelected}
             />
-          </div>
+          </div> */}
           <ButtonPrimary
             className="flex-1 flex-shrink-0"
             onClick={notifyAddTocart}
@@ -471,7 +549,7 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
 
           <hr className="border-slate-200 dark:border-slate-700" />
 
-          {renderReviews()}
+          {/* {renderReviews()} */}
 
           <hr className="border-slate-200 dark:border-slate-700" />
 
@@ -481,12 +559,13 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
             subHeading=""
             headingFontClassName="text-2xl font-semibold"
             headingClassName="mb-10 text-neutral-900 dark:text-neutral-50"
+            // data={produ}
           />
 
           {/* SECTION */}
-          <div className="pb-20 xl:pb-28 lg:pt-14">
+          {/* <div className="pb-20 xl:pb-28 lg:pt-14">
             <SectionPromo2 />
-          </div>
+          </div> */}
         </div>
       </main>
 

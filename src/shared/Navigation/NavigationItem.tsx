@@ -8,8 +8,8 @@ import Link from "next/link";
 export interface NavItemType {
   id: string;
   name: string;
-  href: string;
   targetBlank?: boolean;
+  collection: string;
   children?: NavItemType[];
   type?: "dropdown" | "megaMenu" | "none";
   isNew?: boolean;
@@ -79,9 +79,7 @@ const NavigationItem: FC<NavigationItemProps> = ({ menuItem }) => {
           target={item.targetBlank ? "_blank" : undefined}
           rel="noopener noreferrer"
           className="font-normal text-slate-600 hover:text-black dark:text-slate-400 dark:hover:text-white "
-          href={{
-            pathname: item.href || undefined,
-          }}
+          href={`/product-collection?collection=${item.collection}&category=${item.name}`}
         >
           {item.name}
         </Link>
@@ -195,9 +193,7 @@ const NavigationItem: FC<NavigationItemProps> = ({ menuItem }) => {
         target={item.targetBlank ? "_blank" : undefined}
         rel="noopener noreferrer"
         className="flex items-center font-normal text-neutral-6000 dark:text-neutral-400 py-2 px-4 rounded-md hover:text-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
-        href={{
-          pathname: item.href || undefined,
-        }}
+        href={`/product-collection?collection=${item.collection}&category=${item.name}`}
         // activeClassName="!font-medium !text-neutral-900 dark:!text-neutral-100"
       >
         {item.name}
@@ -219,9 +215,10 @@ const NavigationItem: FC<NavigationItemProps> = ({ menuItem }) => {
           target={item.targetBlank ? "_blank" : undefined}
           rel="noopener noreferrer"
           className="inline-flex items-center text-sm lg:text-[15px] font-medium text-slate-700 dark:text-slate-300 py-2.5 px-4 xl:px-5 rounded-full hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-          href={{
-            pathname: item.href || undefined,
-          }}
+          href={`/product-collection?collection=${item.collection}&category=${item.name}`}
+          // href={{
+          //   pathname: item.href || undefined,
+          // }}
         >
           {item.name}
           {item.type && (

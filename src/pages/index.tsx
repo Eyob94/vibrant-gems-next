@@ -12,7 +12,7 @@ import SectionSliderLargeProduct from "../components/SectionSliderLargeProduct";
 import SectionSliderProductCard from "../components/SectionSliderProductCard";
 import SectionGridFeatureItems from "../containers/PageHome/SectionGridFeatureItems";
 import { fetchStrapi } from "../lib/strapi";
-import { getStrapiMedia } from "../lib/media";
+import { getStrapiMedia, getStrapiMedias } from "../lib/media";
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const rawCollections = await fetchStrapi("/collections", {
@@ -64,7 +64,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     },
   });
   const rawExpertRecomentedJewleryProducts = await fetchStrapi("/products", {
-    populate: ["image", "productVariants", "productVariants.image"],
+    populate: ["image", "altImage"],
     sort: ["expertRecommendedOrder:asc"],
     filters: {
       type: "JEWLERY",
@@ -116,9 +116,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
       name: attributes.name,
       price: attributes.price,
       image: getStrapiMedia(attributes.image),
-      variantImages: attributes.productVariants?.data?.map(
-        ({ attributes }: any) => getStrapiMedia(attributes.image)
-      ),
+      variantImages: getStrapiMedias(attributes.altImage),
       description: attributes.description,
       rating: attributes.rating,
       status: attributes.status,
