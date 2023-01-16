@@ -4,10 +4,23 @@ import Input from "../shared/Input/Input";
 import ButtonPrimary from "../shared/Button/ButtonPrimary";
 import Link from "next/link";
 import Image from "next/image";
-import { useSession, signIn, signOut } from "next-auth/react";
+import {
+  useSession,
+  signIn,
+  signOut,
+  getProviders,
+  ClientSafeProvider,
+  LiteralUnion,
+} from "next-auth/react";
+import { GetServerSideProps } from "next";
+import { BuiltInProviderType } from "next-auth/providers";
 
 export interface PageSignUpProps {
   className?: string;
+  providers: Record<
+    LiteralUnion<BuiltInProviderType, string>,
+    ClientSafeProvider
+  > | null;
 }
 const loginSocials = [
   // {
@@ -27,7 +40,7 @@ const loginSocials = [
   },
 ];
 
-const PageSignUp: FC<PageSignUpProps> = ({ className = "" }) => {
+const PageSignUp: FC<PageSignUpProps> = ({ className = "", providers }) => {
   return (
     <div className={`nc-PageSignUp  ${className}`} data-nc-id="PageSignUp">
       <Head>
@@ -43,8 +56,8 @@ const PageSignUp: FC<PageSignUpProps> = ({ className = "" }) => {
               <a
                 key={index}
                 // href={item.href}
-                onClick={() => signIn()}
-                className=" flex w-full rounded-lg bg-primary-50 dark:bg-neutral-800 px-4 py-3 transform transition-transform sm:px-6 hover:translate-y-[-2px]"
+                onClick={() => signIn(providers?.google.id)}
+                className="cursor-pointer flex w-full rounded-lg bg-primary-50 dark:bg-neutral-800 px-4 py-3 transform transition-transform sm:px-6 hover:translate-y-[-2px]"
               >
                 <Image
                   className="flex-shrink-0"
@@ -101,3 +114,10 @@ const PageSignUp: FC<PageSignUpProps> = ({ className = "" }) => {
 };
 
 export default PageSignUp;
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const providers = await getProviders();
+  return {
+    props: { providers },
+  };
+};

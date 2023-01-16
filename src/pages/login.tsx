@@ -4,9 +4,21 @@ import Input from "../shared/Input/Input";
 import Link from "next/link";
 import ButtonPrimary from "../shared/Button/ButtonPrimary";
 import Image from "next/image";
+import {
+  ClientSafeProvider,
+  getProviders,
+  LiteralUnion,
+  signIn,
+} from "next-auth/react";
+import { GetServerSideProps } from "next";
+import { BuiltInProviderType } from "next-auth/providers";
 
 export interface PageLoginProps {
   className?: string;
+  providers: Record<
+    LiteralUnion<BuiltInProviderType, string>,
+    ClientSafeProvider
+  > | null;
 }
 
 const loginSocials = [
@@ -27,7 +39,7 @@ const loginSocials = [
   },
 ];
 
-const PageLogin: FC<PageLoginProps> = ({ className = "" }) => {
+const PageLogin: FC<PageLoginProps> = ({ className = "", providers }) => {
   return (
     <div className={`nc-PageLogin ${className}`} data-nc-id="PageLogin">
       <Head>
@@ -43,7 +55,8 @@ const PageLogin: FC<PageLoginProps> = ({ className = "" }) => {
               <a
                 key={index}
                 href={item.href}
-                className="flex w-full rounded-lg bg-primary-50 dark:bg-neutral-800 px-4 py-3 transform transition-transform sm:px-6 hover:translate-y-[-2px]"
+                onClick={() => signIn(providers?.google.id)}
+                className="cursor-pointer flex w-full rounded-lg bg-primary-50 dark:bg-neutral-800 px-4 py-3 transform transition-transform sm:px-6 hover:translate-y-[-2px]"
               >
                 <Image
                   className="flex-shrink-0"
@@ -103,3 +116,10 @@ const PageLogin: FC<PageLoginProps> = ({ className = "" }) => {
 };
 
 export default PageLogin;
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const providers = await getProviders();
+  return {
+    props: { providers },
+  };
+};

@@ -8,6 +8,10 @@ const options: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     }),
   ],
+  pages: {
+    signIn: "/login",
+    newUser: "/signup",
+  },
   session: {
     strategy: "jwt",
   },
@@ -27,7 +31,6 @@ const options: NextAuthOptions = {
           `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/auth/${account?.provider}/callback?access_token=${account?.access_token}`
         );
         const data = await response.json();
-        console.log(data, "data");
         token.jwt = data.jwt;
         token.id = data.user.id;
       }
