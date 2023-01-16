@@ -26,7 +26,7 @@ export default async function handler(
             product_data: {
               name: product.name,
               description: product.description,
-              images: [`${req.headers.origin}${product.image}`],
+              // images: [`${req.headers.origin}${product.image}`],
             },
             unit_amount: product.price * 100,
           },

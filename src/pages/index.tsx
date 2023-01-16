@@ -126,6 +126,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const collections: Collection[] = rawCollections.data.map(
     ({ attributes }: any) => ({
       name: attributes.name,
+      description: attributes.description,
       slug: attributes.slug,
       image: attributes.image.data && getStrapiMedia(attributes.image),
       categories: attributes.categories?.data.map(
@@ -169,6 +170,7 @@ export type Collection = {
   name: string;
   image: string;
   categories: Category[];
+  description: string;
 };
 
 interface Props {

@@ -1,7 +1,9 @@
 import { Transition } from "@headlessui/react";
 import Prices from "./Prices";
-import React, { FC } from "react";
+import { FC } from "react";
 import { PRODUCTS } from "../data/data";
+import Image from "next/image";
+import Link from "next/link";
 
 interface Props {
   show: boolean;
@@ -24,10 +26,12 @@ const NotifyAddTocart: FC<Props> = ({
     return (
       <div className="flex ">
         <div className="h-24 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-          <img
+          <Image
             src={productImage}
             alt={name}
             className="h-full w-full object-contain object-center"
+            width={300}
+            height={300}
           />
         </div>
 
@@ -51,12 +55,14 @@ const NotifyAddTocart: FC<Props> = ({
             <p className="text-gray-500 dark:text-slate-400">{`Qty ${qualitySelected}`}</p>
 
             <div className="flex">
-              <button
-                type="button"
-                className="font-medium text-primary-6000 dark:text-primary-500 "
-              >
-                View cart
-              </button>
+              <Link href="/cart">
+                <button
+                  type="button"
+                  className="font-medium text-primary-6000 dark:text-primary-500 "
+                >
+                  View cart
+                </button>
+              </Link>
             </div>
           </div>
         </div>

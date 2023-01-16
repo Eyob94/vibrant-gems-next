@@ -31,10 +31,17 @@ const CollectionTable = () => {
   const [rangePrice, setRangePrices] = useState([0, 500000]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedMetals, setSelectedMetals] = useState<string[]>([]);
+  const [selectedCarats, setSelectedCarats] = useState<string[]>([]);
 
   const fetchProducts = async () => {
     const products = await fetchStrapi(`/products`, {
-      populate: ["category", "image", "category.collection"],
+      populate: [
+        "category",
+        "image",
+        "category.collection",
+        "productVariants",
+        "productVariants.metal",
+      ],
       pagination: {
         page: paginationPage,
         pageSize: take,
@@ -44,16 +51,22 @@ const CollectionTable = () => {
           $between: [rangePrice[0], rangePrice[1]],
         },
         category: {
-          name: selectedCategories,
+          name:
+            (selectedCategories.length > 0
+              ? selectedCategories
+              : router.query.category) || [],
           collection: {
             name: router.query.collection || [],
           },
         },
-        // productItem: {
-        //   metal: {
-        //     name: selectedMetals,
-        //   },
-        // },
+        productVariants: {
+          metal: {
+            name: selectedMetals,
+          },
+          carat: {
+            name: selectedMetals,
+          },
+        },
       },
     });
 
@@ -80,13 +93,25 @@ const CollectionTable = () => {
     }));
     setMetals(mappedMetalData);
   };
+  const getCarat = async () => {
+    const metals = await fetchStrapi("/metals");
+    const mappedMetalData = metals.data.map((metal: any) => ({
+      name: metal.attributes.name as string,
+      active: false,
+    }));
+    setMetals(mappedMetalData);
+  };
   const getAllCategories = async () => {
     const categories = await fetchStrapi("/categories", {
       populate: ["collection"],
       filters: {
+        // name: router.query.category || [],
         collection: {
           name: router.query.collection || [],
         },
+      },
+      pagination: {
+        limit: 10,
       },
     });
     console.log(categories, "heree");
@@ -117,7 +142,7 @@ const CollectionTable = () => {
   useEffect(() => {
     if (!firstRender.current) {
       getAllCategories();
-      // getMetalTypes();
+      getMetalTypes();
     }
     fetchProducts();
   }, [paginationPage, rangePrice, selectedCategories, selectedMetals, router]);

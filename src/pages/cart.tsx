@@ -5,8 +5,14 @@ import { Product, PRODUCTS } from "../data/data";
 import Head from "next/head";
 import Link from "next/link";
 import ButtonPrimary from "../shared/Button/ButtonPrimary";
+import { useShoppingCart } from "use-shopping-cart";
+import Image from "next/image";
 
 const CartPage = () => {
+  const { cartDetails } = useShoppingCart();
+
+  console.log("cartdetails", cartDetails);
+
   const renderStatusSoldout = () => {
     return (
       <div className="rounded-full flex items-center justify-center px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
@@ -34,10 +40,12 @@ const CartPage = () => {
         className="relative flex py-8 sm:py-10 xl:py-12 first:pt-0 last:pb-0"
       >
         <div className="relative h-36 w-24 sm:w-32 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-          <img
+          <Image
             src={image}
             alt={name}
             className="h-full w-full object-contain object-center"
+            width={500}
+            height={500}
           />
           <Link href="/product-detail" className="absolute inset-0"></Link>
         </div>
@@ -49,7 +57,7 @@ const CartPage = () => {
                 <h3 className="text-base font-semibold">
                   <Link href="/product-detail">{name}</Link>
                 </h3>
-                <div className="mt-1.5 sm:mt-2.5 flex text-sm text-slate-600 dark:text-slate-300">
+                {/* <div className="mt-1.5 sm:mt-2.5 flex text-sm text-slate-600 dark:text-slate-300">
                   <div className="flex items-center space-x-1.5">
                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
                       <path
@@ -130,10 +138,10 @@ const CartPage = () => {
 
                     <span>{`2XL`}</span>
                   </div>
-                </div>
+                </div> */}
 
                 <div className="mt-3 flex justify-between w-full sm:hidden relative">
-                  <select
+                  {/* <select
                     name="qty"
                     id="qty"
                     className="form-select text-sm rounded-md py-1 border-slate-200 dark:border-slate-700 relative z-10 dark:bg-slate-800 "
@@ -145,7 +153,7 @@ const CartPage = () => {
                     <option value="5">5</option>
                     <option value="6">6</option>
                     <option value="7">7</option>
-                  </select>
+                  </select> */}
                   <Prices
                     contentClass="py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium h-full"
                     price={price}
@@ -208,13 +216,10 @@ const CartPage = () => {
 
         <div className="flex flex-col lg:flex-row">
           <div className="w-full lg:w-[60%] xl:w-[55%] divide-y divide-slate-200 dark:divide-slate-700 ">
-            {[
-              PRODUCTS[0],
-              PRODUCTS[1],
-              PRODUCTS[2],
-              PRODUCTS[3],
-              PRODUCTS[4],
-            ].map(renderProduct)}
+            {cartDetails &&
+              Object.entries(cartDetails).map(([key, value]) =>
+                renderProduct({ ...(value.product_data as any) }, parseInt(key))
+              )}
           </div>
           <div className="border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-700 my-10 lg:my-0 lg:mx-10 xl:mx-16 2xl:mx-20 flex-shrink-0"></div>
           <div className="flex-1">

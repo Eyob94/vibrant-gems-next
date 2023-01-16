@@ -21,12 +21,11 @@ import Policy from "../../containers/ProductDetailPage/Policy";
 import { Product, PRODUCTS } from "../../data/data";
 import ButtonPrimary from "../../shared/Button/ButtonPrimary";
 import ButtonSecondary from "../../shared/Button/ButtonSecondary";
-// import { useRouter } from "next/router";
 import { fetchStrapi } from "../../lib/strapi";
-// import { getSingleProductWithId } from "../../lib/strapiQueries";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Image from "next/image";
 import { getStrapiMedia } from "../../lib/media";
+import { useShoppingCart } from "use-shopping-cart";
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   try {
@@ -94,6 +93,7 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
   className = "",
   product,
 }) => {
+  const { addItem } = useShoppingCart();
   const { sizes, variants, allOfSizes } = PRODUCTS[0];
   const status = product.status;
   const [metalTypes, setMetalTypes] = useState(
@@ -126,14 +126,22 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
     useState(false);
 
   const notifyAddTocart = () => {
+    addItem({
+      name: product.name,
+      currency: "USD",
+      price: product.price,
+      id: product.id,
+      product_data: product,
+      sku: "",
+    });
     toast.custom(
       (t) => (
         <NotifyAddTocart
           productImage={product.image}
           qualitySelected={qualitySelected}
           show={t.visible}
-          sizeSelected={metalTypeSelected}
-          variantActive={variantActive}
+          sizeSelected={"this"}
+          variantActive={0}
         />
       ),
       { position: "top-right", id: "nc-product-notify", duration: 3000 }
@@ -241,7 +249,7 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
       <div>
         <div className="flex justify-between font-medium text-sm">
           <label htmlFor="">
-            <span className="">
+            <span>
               Metal Type:
               <span className="ml-1 font-semibold">{metalTypeSelected}</span>
             </span>
