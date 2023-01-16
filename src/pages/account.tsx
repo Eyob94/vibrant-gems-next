@@ -1,4 +1,6 @@
+import { useSession } from "next-auth/react";
 import Head from "next/head";
+import Image from "next/image";
 import { FC } from "react";
 import Label from "../components/Label/Label";
 import CommonLayout from "../containers/AccountPage/CommonLayout";
@@ -13,6 +15,7 @@ export interface AccountPageProps {
 }
 
 const AccountPage: FC<AccountPageProps> = ({ className = "" }) => {
+  const { data } = useSession();
   return (
     <div className={`nc-AccountPage ${className}`} data-nc-id="AccountPage">
       <Head>
@@ -28,8 +31,8 @@ const AccountPage: FC<AccountPageProps> = ({ className = "" }) => {
             <div className="flex-shrink-0 flex items-start">
               {/* AVATAR */}
               <div className="relative rounded-full overflow-hidden flex">
-                <img
-                  src={avatarImgs[2]}
+                <Image
+                  src={data?.user?.image || ""}
                   alt=""
                   className="w-32 h-32 rounded-full object-cover z-0"
                 />
