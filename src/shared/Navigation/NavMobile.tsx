@@ -26,10 +26,10 @@ const NavMobile: React.FC<NavMobileProps> = ({
     return (
       <ul className="nav-mobile-sub-menu pl-6 pb-1 text-base">
         {item.children?.map((i, index) => (
-          <Disclosure key={i.href + index} as="li">
+          <Disclosure key={index} as="li">
             <Link
               href={{
-                pathname: i.href || undefined,
+                pathname: i.name || undefined,
               }}
               className={`flex text-sm rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 mt-0.5 pr-4 ${itemClass}`}
               // activeClassName="text-secondary"
@@ -81,7 +81,7 @@ const NavMobile: React.FC<NavMobileProps> = ({
         <Link
           className="flex w-full items-center py-2.5 px-4 font-medium uppercase tracking-wide text-sm hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
           href={{
-            pathname: item.href || undefined,
+            pathname: item.name || undefined,
           }}
           // activeClassName="text-secondary"
         >
