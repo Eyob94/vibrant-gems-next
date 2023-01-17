@@ -263,7 +263,7 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({ className = "" }) => {
         {/*  */}
 
         {/* ---------- 5 ----------  */}
-        <AccordionInfo />
+        {/* <AccordionInfo /> */}
 
         {/* ---------- 6 ----------  */}
         <div className="hidden xl:block">

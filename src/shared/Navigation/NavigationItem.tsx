@@ -5,7 +5,7 @@ import React, { FC, Fragment, useState } from "react";
 import Link from "next/link";
 // import { LocationStates } from "routers/types";
 
-interface NavItemChildrenType extends Omit<NavItemType, "collection"> {
+export interface NavItemChildrenType extends Omit<NavItemType, "collection"> {
   href?: string;
 }
 

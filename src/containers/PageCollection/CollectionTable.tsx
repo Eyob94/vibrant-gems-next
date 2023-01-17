@@ -160,11 +160,13 @@ const CollectionTable: FC<{
       <>
         <div className="max-w-screen-sm">
           <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold">
-            {collection}
+            {collection || "Shop through our endless Gewlery"}
           </h2>
           {categories[0] && (
             <span className="block mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
-              {categories[0].collectionDescription}
+              {collection
+                ? categories[0].collectionDescription
+                : "Description goes here"}
             </span>
           )}
         </div>

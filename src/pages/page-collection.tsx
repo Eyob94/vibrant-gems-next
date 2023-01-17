@@ -1,13 +1,6 @@
-import React, { FC, useEffect, useRef, useState } from "react";
-import Pagination from "../shared/Pagination/Pagination";
-import ButtonPrimary from "../shared/Button/ButtonPrimary";
-import SectionSliderCollections from "../components/SectionSliderLargeProduct";
+import { FC } from "react";
 import SectionPromo1 from "../components/SectionPromo1";
-import ProductCard from "../components/ProductCard";
-import TabFilters from "../containers/TabFilters";
-import { Product, PRODUCTS } from "../data/data";
 import Head from "next/head";
-import { fetchStrapi } from "../lib/strapi";
 import CollectionTable from "../containers/PageCollection/CollectionTable";
 import { GetServerSideProps } from "next";
 
@@ -21,8 +14,8 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { collection, category } = query;
   return {
     props: {
-      collection,
-      category,
+      collection: collection || null,
+      category: category || null,
     },
   };
 };

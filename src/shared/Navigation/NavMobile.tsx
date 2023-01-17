@@ -3,7 +3,7 @@ import ButtonClose from "../ButtonClose/ButtonClose";
 import Logo from "../Logo/Logo";
 import { Disclosure } from "@headlessui/react";
 import Link from "next/link";
-import { NavItemType } from "./NavigationItem";
+import { NavItemChildrenType, NavItemType } from "./NavigationItem";
 import { NAVIGATION_DEMO_2 } from "../../data/navigation";
 import ButtonPrimary from "../Button/ButtonPrimary";
 import SocialsList from "../SocialsList/SocialsList";
@@ -20,7 +20,7 @@ const NavMobile: React.FC<NavMobileProps> = ({
   onClickClose,
 }) => {
   const _renderMenuChild = (
-    item: NavItemType,
+    item: NavItemChildrenType,
     itemClass = " pl-3 text-neutral-900 dark:text-neutral-200 font-medium "
   ) => {
     return (
