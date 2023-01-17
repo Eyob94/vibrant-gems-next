@@ -21,7 +21,7 @@ function Navigation() {
     <ul className="nc-Navigation flex items-center">
       {navigation ? (
         navigation.map((item) => (
-          <NavigationItem key={item.id} menuItem={item} />
+          <NavigationItem key={item.collection} menuItem={item} />
         ))
       ) : (
         <>loading...</>

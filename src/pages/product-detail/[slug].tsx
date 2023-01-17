@@ -18,14 +18,15 @@ import SectionSliderProductCard from "../../components/SectionSliderProductCard"
 import AccordionInfo from "../../containers/ProductDetailPage/AccordionInfo";
 import ModalViewAllReviews from "../../containers/ProductDetailPage/ModalViewAllReviews";
 import Policy from "../../containers/ProductDetailPage/Policy";
-import { Product, PRODUCTS } from "../../data/data";
+// import { Product, PRODUCTS } from "../../data/data";
 import ButtonPrimary from "../../shared/Button/ButtonPrimary";
 import ButtonSecondary from "../../shared/Button/ButtonSecondary";
 import { fetchStrapi } from "../../lib/strapi";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Image from "next/image";
-import { getStrapiMedia } from "../../lib/media";
+import { getStrapiMedia, getStrapiMedias } from "../../lib/media";
 import { useShoppingCart } from "use-shopping-cart";
+import { Product } from "..";
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   try {
@@ -35,21 +36,24 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
       },
       populate: [
         "image",
-        "variantImages",
+        "altImages",
         "productVariants",
         "productVariants.carat",
         "productVariants.metal",
+        "relatedProducts",
+        "relatedProducts.image",
       ],
     });
     const productData = data[0];
+    console.log(productData);
 
     const product: Product = {
       id: productData.id,
       name: productData.attributes.name,
       price: productData.attributes.price,
       image: getStrapiMedia(productData.attributes.image),
+      variantImages: getStrapiMedias(productData.attributes.altImages),
       description: productData.attributes.description,
-      category: "category",
       type: productData.attributes.type,
       productVariants: productData.attributes.productVariants.data?.map(
         ({ attributes }: any) => ({
@@ -62,10 +66,19 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
           },
         })
       ),
-      tags: productData.attributes.name,
+      details: productData.attributes.details,
+      rating: 0,
+      relatedProducts: productData.attributes.relatedProducts.data?.map(
+        ({ attributes }: any) => ({
+          ...attributes,
+          image: getStrapiMedia(attributes.image),
+        })
+      ),
+      accordionInfo: productData.attributes.accordionInfo,
       slug: productData.attributes.name,
       status: productData.attributes.status,
     };
+    console.log(product.relatedProducts);
     if (!product) {
       return {
         notFound: true,
@@ -94,26 +107,33 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
   product,
 }) => {
   const { addItem } = useShoppingCart();
-  const { sizes, variants, allOfSizes } = PRODUCTS[0];
   const status = product.status;
   const [metalTypes, setMetalTypes] = useState(
-    product.productVariants
-      ?.map(({ metal }) => metal.name)
-      .filter((name) => !!name)
+    Array.from(
+      new Set(
+        product.productVariants
+          ?.map(({ metal }) => metal.name)
+          .filter((name) => !!name)
+      )
+    )
   );
   const [metalTypeSelected, setMetalTypeSelected] = useState(
     metalTypes ? metalTypes[0] : ""
   );
 
   const [carat, setCarat] = useState(
-    product.productVariants
-      ?.map(({ carat }) => carat.name)
-      .filter((name) => !!name)
+    Array.from(
+      new Set(
+        product.productVariants
+          ?.map(({ carat }) => carat.name)
+          .filter((name) => !!name)
+      )
+    )
   );
-  console.log(carat, metalTypes, "herrr");
+
   const [caratSelected, setCaratSelected] = useState(carat ? carat[0] : "");
 
-  const LIST_IMAGES_DEMO = [product.image, ...(product.variantImage || [])];
+  // const LIST_IMAGES_DEMO = [product.image, ...(product.variantImage || [])];
   // const LIST_IMAGES_DEMO = [
   //   "/images/products/detail1.jpg",
   //   "/images/products/detail2.jpg",
@@ -148,49 +168,49 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
     );
   };
 
-  const renderVariants = () => {
-    if (!variants || !variants.length) {
-      return null;
-    }
+  // const renderVariants = () => {
+  //   if (!variants || !variants.length) {
+  //     return null;
+  //   }
 
-    return (
-      <div>
-        <label htmlFor="">
-          <span className="text-sm font-medium">
-            Color:
-            <span className="ml-1 font-semibold">
-              {variants[variantActive].name}
-            </span>
-          </span>
-        </label>
-        <div className="flex mt-3">
-          {variants.map((variant, index) => (
-            <div
-              key={index}
-              onClick={() => setVariantActive(index)}
-              className={`relative flex-1 max-w-[75px] h-10 sm:h-11 rounded-full border-2 cursor-pointer ${
-                variantActive === index
-                  ? "border-primary-6000 dark:border-primary-500"
-                  : "border-transparent"
-              }`}
-            >
-              <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
-                {variant.thumbnail && (
-                  <Image
-                    src={variant.thumbnail}
-                    alt=""
-                    className="absolute w-full h-full object-cover"
-                    width={1000}
-                    height={1000}
-                  />
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
+  //   return (
+  //     <div>
+  //       <label htmlFor="">
+  //         <span className="text-sm font-medium">
+  //           Color:
+  //           <span className="ml-1 font-semibold">
+  //             {variants[variantActive].name}
+  //           </span>
+  //         </span>
+  //       </label>
+  //       <div className="flex mt-3">
+  //         {variants.map((variant, index) => (
+  //           <div
+  //             key={index}
+  //             onClick={() => setVariantActive(index)}
+  //             className={`relative flex-1 max-w-[75px] h-10 sm:h-11 rounded-full border-2 cursor-pointer ${
+  //               variantActive === index
+  //                 ? "border-primary-6000 dark:border-primary-500"
+  //                 : "border-transparent"
+  //             }`}
+  //           >
+  //             <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
+  //               {variant.thumbnail && (
+  //                 <Image
+  //                   src={variant.thumbnail}
+  //                   alt=""
+  //                   className="absolute w-full h-full object-cover"
+  //                   width={1000}
+  //                   height={1000}
+  //                 />
+  //               )}
+  //             </div>
+  //           </div>
+  //         ))}
+  //       </div>
+  //     </div>
+  //   );
+  // };
 
   const renderCarat = () => {
     if (!carat || !carat.length || !product.productVariants) {
@@ -207,31 +227,25 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
           </label>
         </div>
         <div className="grid grid-cols-5 sm:grid-cols-7 gap-2 mt-3">
-          {product.productVariants
-            ?.map(({ carat, inStock }, index) => {
-              if (!carat.name) return;
-              const isActive = carat.name === caratSelected;
+          {carat
+            .map((carat, index) => {
+              if (!carat) return;
+              const isActive = carat === caratSelected;
               return (
                 <div
                   key={index}
                   className={`relative h-10 sm:h-11 rounded-2xl border flex items-center justify-center 
-                text-xs  sm:text-base uppercase font-semibold select-none overflow-hidden z-0 ${
-                  inStock
-                    ? "text-opacity-20 dark:text-opacity-20 cursor-not-allowed"
-                    : "cursor-pointer"
-                } ${
-                    isActive
-                      ? "bg-primary-6000 border-primary-6000 text-white hover:bg-primary-6000"
-                      : "border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200 hover:bg-neutral-50 dark:hover:bg-neutral-700"
-                  }`}
+                text-xs  sm:text-base uppercase font-semibold select-none overflow-hidden z-0 cursor-pointer
+                 ${
+                   isActive
+                     ? "bg-primary-6000 border-primary-6000 text-white hover:bg-primary-6000"
+                     : "border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200 hover:bg-neutral-50 dark:hover:bg-neutral-700"
+                 }`}
                   onClick={() => {
-                    if (inStock) {
-                      return;
-                    }
-                    setCaratSelected(carat.name);
+                    setCaratSelected(carat);
                   }}
                 >
-                  {carat.name}
+                  {carat}
                 </div>
               );
             })
@@ -256,31 +270,24 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
           </label>
         </div>
         <div className="grid grid-cols-5 sm:grid-cols-7 gap-2 mt-3">
-          {product.productVariants
-            ?.map(({ metal, inStock }, index) => {
-              if (!metal.name) return;
-              const isActive = metal.name === metalTypeSelected;
+          {metalTypes
+            ?.map((metal, index) => {
+              if (!metal) return;
+              const isActive = metal === metalTypeSelected;
               return (
                 <div
                   key={index}
                   className={`relative h-10 sm:h-11 rounded-2xl border flex items-center justify-center 
-                text-sm sm:text-base uppercase font-semibold select-none overflow-hidden z-0 ${
-                  inStock
-                    ? "text-opacity-20 dark:text-opacity-20 cursor-not-allowed"
-                    : "cursor-pointer"
-                } ${
-                    isActive
-                      ? "bg-primary-6000 border-primary-6000 text-white hover:bg-primary-6000"
-                      : "border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200 hover:bg-neutral-50 dark:hover:bg-neutral-700"
-                  }`}
+                text-sm sm:text-base uppercase font-semibold select-none overflow-hidden z-0 cursor-pointer ${
+                  isActive
+                    ? "bg-primary-6000 border-primary-6000 text-white hover:bg-primary-6000"
+                    : "border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200 hover:bg-neutral-50 dark:hover:bg-neutral-700"
+                }`}
                   onClick={() => {
-                    if (inStock) {
-                      return;
-                    }
-                    setMetalTypeSelected(metal.name);
+                    setMetalTypeSelected(metal);
                   }}
                 >
-                  {metal.name}
+                  {metal}
                 </div>
               );
             })
@@ -404,7 +411,9 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
         {/*  */}
 
         {/* ---------- 5 ----------  */}
-        <AccordionInfo />
+        {product.accordionInfo && (
+          <AccordionInfo data={product.accordionInfo} />
+        )}
 
         {/* ---------- 6 ----------  */}
         <div className="hidden xl:block">
@@ -419,7 +428,8 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
       <div className="">
         <h2 className="text-2xl font-semibold">Product Details</h2>
         <div className="prose prose-sm sm:prose dark:prose-invert sm:max-w-4xl mt-7">
-          <p>
+          {product.details}
+          {/*  <p>
             The patented eighteen-inch hardwood Arrowhead deck --- finely
             mortised in, makes this the strongest and most rigid canoe ever
             built. You cannot buy a canoe that will afford greater satisfaction.
@@ -438,7 +448,7 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
               GOTS certified
             </li>
             <li>Soft touch water based printed in the USA</li>
-          </ul>
+          </ul> */}
         </div>
       </div>
     );
@@ -520,7 +530,7 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
               <LikeButton className="absolute right-3 top-3 " />
             </div>
             <div className="grid grid-cols-2 gap-3 mt-3 sm:gap-6 sm:mt-6 xl:gap-8 xl:mt-8">
-              {[...(product.variantImage || [])]
+              {[...(product.variantImages || [])]
                 .slice(0, 2)
                 .map((item, index) => {
                   return (
@@ -530,7 +540,7 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
                     >
                       <Image
                         src={item}
-                        className="w-full rounded-2xl object-cover"
+                        className="w-full rounded-2xl object-cover "
                         alt="product detail 1"
                         width={700}
                         height={700}
@@ -559,16 +569,18 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
 
           {/* {renderReviews()} */}
 
-          <hr className="border-slate-200 dark:border-slate-700" />
+          {/* <hr className="border-slate-200 dark:border-slate-700" /> */}
 
           {/* OTHER SECTION */}
-          <SectionSliderProductCard
-            heading="Customers also purchased"
-            subHeading=""
-            headingFontClassName="text-2xl font-semibold"
-            headingClassName="mb-10 text-neutral-900 dark:text-neutral-50"
-            // data={produ}
-          />
+          {product.relatedProducts && (
+            <SectionSliderProductCard
+              heading="Related Products"
+              subHeading=""
+              headingFontClassName="text-2xl font-semibold"
+              headingClassName="mb-10 text-neutral-900 dark:text-neutral-50"
+              data={product.relatedProducts}
+            />
+          )}
 
           {/* SECTION */}
           {/* <div className="pb-20 xl:pb-28 lg:pt-14">

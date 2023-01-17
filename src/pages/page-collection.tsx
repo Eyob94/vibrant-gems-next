@@ -9,12 +9,29 @@ import { Product, PRODUCTS } from "../data/data";
 import Head from "next/head";
 import { fetchStrapi } from "../lib/strapi";
 import CollectionTable from "../containers/PageCollection/CollectionTable";
+import { GetServerSideProps } from "next";
 
 export interface PageCollectionProps {
   className?: string;
+  collection: string;
+  category: string;
 }
 
-const PageCollection: FC<PageCollectionProps> = ({ className = "" }) => {
+export const getServerSideProps: GetServerSideProps = async ({ query }) => {
+  const { collection, category } = query;
+  return {
+    props: {
+      collection,
+      category,
+    },
+  };
+};
+
+const PageCollection: FC<PageCollectionProps> = ({
+  className = "",
+  collection,
+  category,
+}) => {
   return (
     <div
       className={`nc-PageCollection ${className}`}
@@ -26,7 +43,7 @@ const PageCollection: FC<PageCollectionProps> = ({ className = "" }) => {
 
       <div className="container py-16 lg:pb-28 lg:pt-20 space-y-16 sm:space-y-20 lg:space-y-28">
         {/* === SECTION 5 === */}
-        <CollectionTable />
+        <CollectionTable category={category} collection={collection} />
         <hr className="border-slate-200 dark:border-slate-700" />
         {/* 
         <SectionSliderCollections data={[]} />

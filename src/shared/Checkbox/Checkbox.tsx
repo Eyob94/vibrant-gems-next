@@ -7,6 +7,7 @@ export interface CheckboxProps {
   sizeClassName?: string;
   labelClassName?: string;
   name: string;
+  checked?: boolean;
   defaultChecked?: boolean;
   onChange?: (checked: boolean) => void;
 }
@@ -16,6 +17,7 @@ const Checkbox: FC<CheckboxProps> = ({
   label = "",
   name,
   className = "",
+  checked = false,
   sizeClassName = "w-6 h-6",
   labelClassName = "",
   defaultChecked,
@@ -27,6 +29,7 @@ const Checkbox: FC<CheckboxProps> = ({
         id={name}
         name={name}
         type="checkbox"
+        checked={checked}
         className={`focus:ring-action-primary text-primary-500 rounded border-slate-400 hover:border-slate-700 bg-transparent dark:border-slate-700 dark:hover:border-slate-500 dark:checked:bg-primary-500 focus:ring-primary-500 ${sizeClassName}`}
         defaultChecked={defaultChecked}
         onChange={(e) => onChange && onChange(e.target.checked)}

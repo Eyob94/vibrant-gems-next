@@ -8,7 +8,7 @@ export function getStrapiMedia(media: any) {
 
 export function getStrapiMedias(media: any) {
   const urls: string[] = [];
-  media.data.forEach(({ attributes }: any) => {
+  media.data?.forEach(({ attributes }: any) => {
     const { url } = attributes;
     const imageUrl = url.startsWith("/") ? getStrapiURL(url) : url;
     urls.push(imageUrl);

@@ -33,21 +33,25 @@ interface Props {
   categories: { name: string; active: boolean }[];
   handleCategoriesFilter: (selectedCategories: string[]) => void;
   metals: { name: string; active: boolean }[];
+  carat: { name: string; active: boolean }[];
   handleMetalsFilter: (selectedMetals: string[]) => void;
+  handleCaratFilter: (selectedMetals: string[]) => void;
 }
 const TabFilters: React.FC<Props> = ({
   handlePriceFilter,
   categories,
   handleCategoriesFilter,
   metals,
+  carat,
   handleMetalsFilter,
+  handleCaratFilter,
 }) => {
   const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
   const [isOnSale, setIsIsOnSale] = useState(true);
   const [rangePrices, setRangePrices] = useState([100, 500]);
   const [categoriesState, setCategoriesState] = useState<string[]>([]);
   const [metalsState, setMetalsState] = useState<string[]>([]);
-  const [sizesState, setSizesState] = useState<string[]>([]);
+  const [caratsState, setCaratsState] = useState<string[]>([]);
   const [sortOrderStates, setSortOrderStates] = useState<string>("");
 
   //
@@ -67,10 +71,10 @@ const TabFilters: React.FC<Props> = ({
       : setMetalsState(metalsState.filter((i) => i !== name));
   };
 
-  const handleChangeSizes = (checked: boolean, name: string) => {
+  const handleChangeCarats = (checked: boolean, name: string) => {
     checked
-      ? setSizesState([...sizesState, name])
-      : setSizesState(sizesState.filter((i) => i !== name));
+      ? setCaratsState([...caratsState, name])
+      : setCaratsState(caratsState.filter((i) => i !== name));
   };
 
   //
@@ -360,7 +364,7 @@ const TabFilters: React.FC<Props> = ({
   };
 
   // OK
-  const renderTabsColor = () => {
+  const renderTabsMetal = () => {
     return (
       <Popover className="relative">
         {({ open, close }) => (
@@ -482,9 +486,8 @@ const TabFilters: React.FC<Props> = ({
       </Popover>
     );
   };
-
   // OK
-  const renderTabsSize = () => {
+  const renderTabsCarat = () => {
     return (
       <Popover className="relative">
         {({ open, close }) => (
@@ -493,7 +496,7 @@ const TabFilters: React.FC<Props> = ({
               className={`flex items-center justify-center px-4 py-2 text-sm rounded-full border focus:outline-none select-none
               ${open ? "!border-primary-500 " : ""}
                 ${
-                  !!sizesState.length
+                  !!caratsState.length
                     ? "!border-primary-500 bg-primary-50 text-primary-900"
                     : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
                 }
@@ -535,11 +538,11 @@ const TabFilters: React.FC<Props> = ({
                 />
               </svg>
 
-              <span className="ml-2">Sizes</span>
-              {!sizesState.length ? (
+              <span className="ml-2">Carats</span>
+              {!caratsState.length ? (
                 <ChevronDownIcon className="w-4 h-4 ml-3" />
               ) : (
-                <span onClick={() => setSizesState([])}>{renderXClear()}</span>
+                <span onClick={() => setCaratsState([])}>{renderXClear()}</span>
               )}
             </Popover.Button>
             <Transition
@@ -554,14 +557,14 @@ const TabFilters: React.FC<Props> = ({
               <Popover.Panel className="absolute z-40 w-screen max-w-sm px-4 mt-3 left-0 sm:px-0 lg:max-w-sm">
                 <div className="overflow-hidden rounded-2xl shadow-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
                   <div className="relative flex flex-col px-5 py-6 space-y-5">
-                    {DATA_sizes.map((item) => (
+                    {carat.map((item) => (
                       <div key={item.name} className="">
                         <Checkbox
                           name={item.name}
                           label={item.name}
-                          defaultChecked={sizesState.includes(item.name)}
+                          defaultChecked={caratsState.includes(item.name)}
                           onChange={(checked) =>
-                            handleChangeSizes(checked, item.name)
+                            handleChangeCarats(checked, item.name)
                           }
                         />
                       </div>
@@ -571,14 +574,17 @@ const TabFilters: React.FC<Props> = ({
                     <ButtonThird
                       onClick={() => {
                         close();
-                        setSizesState([]);
+                        setCaratsState([]);
                       }}
                       sizeClass="px-4 py-2 sm:px-5"
                     >
                       Clear
                     </ButtonThird>
                     <ButtonPrimary
-                      onClick={close}
+                      onClick={() => {
+                        handleCaratFilter(metalsState);
+                        close();
+                      }}
                       sizeClass="px-4 py-2 sm:px-5"
                     >
                       Apply
@@ -980,7 +986,7 @@ const TabFilters: React.FC<Props> = ({
                       {/* --------- */}
                       {/* ---- */}
                       <div className="py-7">
-                        <h3 className="text-xl font-medium">Size</h3>
+                        <h3 className="text-xl font-medium">Carat</h3>
                         <div className="mt-6 relative ">
                           {renderMoreFilterItem(DATA_sizes)}
                         </div>
@@ -1110,6 +1116,7 @@ const TabFilters: React.FC<Props> = ({
                         setRangePrices(PRICE_RANGE);
                         setCategoriesState([]);
                         setMetalsState([]);
+                        setCaratsState([]);
                         setSortOrderStates("");
                         closeModalMoreFilter();
                       }}
@@ -1139,8 +1146,8 @@ const TabFilters: React.FC<Props> = ({
       <div className="hidden lg:flex flex-1 space-x-4">
         {renderTabsPriceRage()}
         {renderTabsCategories()}
-        {renderTabsColor()}
-        {renderTabsSize()}
+        {metals.length > 0 && renderTabsMetal()}
+        {carat.length > 0 && renderTabsCarat()}
         {renderTabIsOnsale()}
         <div className="!ml-auto">{renderTabsSortOrder()}</div>
       </div>

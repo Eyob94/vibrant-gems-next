@@ -1,5 +1,4 @@
-import { useRouter } from "next/router";
-import React, { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import ProductCard from "../../components/ProductCard";
 import { fetchStrapi } from "../../lib/strapi";
 import { Product } from "../../pages";
@@ -7,15 +6,13 @@ import ButtonPrimary from "../../shared/Button/ButtonPrimary";
 import Pagination from "../../shared/Pagination/Pagination";
 import TabFilters from "../TabFilters";
 
-const CollectionTable = () => {
-  const router = useRouter();
-
+const CollectionTable: FC<{
+  collection?: string | [];
+  category?: string | [];
+}> = ({ category = [], collection = [] }) => {
   const take = 28;
   const firstRender = useRef(null);
-  const [collection, setCollection] = useState({
-    name: "",
-    description: "",
-  });
+
   const [categories, setCategories] = useState<
     {
       name: string;
@@ -25,11 +22,14 @@ const CollectionTable = () => {
     }[]
   >([]);
   const [metals, setMetals] = useState<{ name: string; active: boolean }[]>([]);
+  const [carat, setCarat] = useState<{ name: string; active: boolean }[]>([]);
   const [products, setProducts] = useState<Product[]>();
   const [paginationPage, setPaginationPage] = useState(1);
   const [productsLength, setProductLength] = useState(0);
   const [rangePrice, setRangePrices] = useState([0, 500000]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    typeof category === "string" ? [category] : []
+  );
   const [selectedMetals, setSelectedMetals] = useState<string[]>([]);
   const [selectedCarats, setSelectedCarats] = useState<string[]>([]);
 
@@ -41,6 +41,7 @@ const CollectionTable = () => {
         "category.collection",
         "productVariants",
         "productVariants.metal",
+        "productVariants.carat",
       ],
       pagination: {
         page: paginationPage,
@@ -52,11 +53,10 @@ const CollectionTable = () => {
         },
         category: {
           name:
-            (selectedCategories.length > 0
-              ? selectedCategories
-              : router.query.category) || [],
+            (selectedCategories.length > 0 ? selectedCategories : category) ||
+            [],
           collection: {
-            name: router.query.collection || [],
+            name: collection || [],
           },
         },
         productVariants: {
@@ -64,7 +64,7 @@ const CollectionTable = () => {
             name: selectedMetals,
           },
           carat: {
-            name: selectedMetals,
+            name: selectedCarats,
           },
         },
       },
@@ -94,34 +94,31 @@ const CollectionTable = () => {
     setMetals(mappedMetalData);
   };
   const getCarat = async () => {
-    const metals = await fetchStrapi("/metals");
-    const mappedMetalData = metals.data.map((metal: any) => ({
+    const carat = await fetchStrapi("/carats");
+    const mappedMetalData = carat.data.map((metal: any) => ({
       name: metal.attributes.name as string,
       active: false,
     }));
-    setMetals(mappedMetalData);
+    setCarat(mappedMetalData);
   };
   const getAllCategories = async () => {
     const categories = await fetchStrapi("/categories", {
       populate: ["collection"],
       filters: {
-        // name: router.query.category || [],
         collection: {
-          name: router.query.collection || [],
+          name: collection || [],
         },
       },
       pagination: {
-        limit: 10,
+        limit: 6,
       },
     });
-    console.log(categories, "heree");
-    const mappedCategoriesData = categories.data.map((category: any) => ({
-      name: category.attributes.name as string,
-      active: false,
-      collectionName:
-        category.attributes.collection?.data?.attributes.name || "",
+    const mappedCategoriesData = categories.data.map((cat: any) => ({
+      name: cat.attributes.name as string,
+      active: cat.attributes.name === category,
+      collectionName: cat.attributes.collection?.data?.attributes.name || "",
       collectionDescription:
-        category.attributes.collection?.data?.attributes.name || "",
+        cat.attributes.collection?.data?.attributes.description || "",
     }));
     setCategories(mappedCategoriesData);
   };
@@ -138,36 +135,42 @@ const CollectionTable = () => {
   const handleMetalsFilter = (selectedMetals: string[]) => {
     setSelectedMetals(selectedMetals);
   };
+  const handleCaratFilter = (selectedCarats: string[]) => {
+    setSelectedCarats(selectedCarats);
+  };
 
   useEffect(() => {
     if (!firstRender.current) {
       getAllCategories();
       getMetalTypes();
+      getCarat();
     }
     fetchProducts();
-  }, [paginationPage, rangePrice, selectedCategories, selectedMetals, router]);
+  }, [
+    paginationPage,
+    rangePrice,
+    selectedCategories,
+    selectedMetals,
+    selectedCarats,
+  ]);
 
   return (
     <div ref={firstRender.current} className="space-y-10 lg:space-y-14">
       {/* HEADING */}
-      <div className="max-w-screen-sm">
-        <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold">
-          {
-            categories.find(
-              (category) => category.name === selectedCategories[0]
-            )?.collectionName
-          }
-        </h2>
-        <span className="block mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
-          {
-            categories.find(
-              (category) => category.name === selectedCategories[0]
-            )?.collectionDescription
-          }
-        </span>
-      </div>
+      <>
+        <div className="max-w-screen-sm">
+          <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold">
+            {collection}
+          </h2>
+          {categories[0] && (
+            <span className="block mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
+              {categories[0].collectionDescription}
+            </span>
+          )}
+        </div>
 
-      <hr className="border-slate-200 dark:border-slate-700" />
+        <hr className="border-slate-200 dark:border-slate-700" />
+      </>
       <main>
         {/* TABS FILTER */}
         <TabFilters
@@ -175,7 +178,9 @@ const CollectionTable = () => {
           categories={categories}
           handleCategoriesFilter={handleCategoryFilter}
           metals={metals}
+          carat={carat}
           handleMetalsFilter={handleMetalsFilter}
+          handleCaratFilter={handleCaratFilter}
         />
 
         {/* LOOP ITEMS */}

@@ -64,7 +64,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     },
   });
   const rawExpertRecomentedJewleryProducts = await fetchStrapi("/products", {
-    populate: ["image", "altImage"],
+    populate: ["image", "altImages"],
     sort: ["expertRecommendedOrder:asc"],
     filters: {
       type: "JEWLERY",
@@ -116,7 +116,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
       name: attributes.name,
       price: attributes.price,
       image: getStrapiMedia(attributes.image),
-      variantImages: getStrapiMedias(attributes.altImage),
+      variantImages: getStrapiMedias(attributes.altImages),
       description: attributes.description,
       rating: attributes.rating,
       status: attributes.status,
@@ -161,7 +161,20 @@ export type Product = {
   price: number;
   image: string;
   variantImages?: string[];
+  type: "GEMSTONE" | "JEWLERY";
+  productVariants?: {
+    inStock: number;
+    metal: {
+      name: string;
+    };
+    carat: {
+      name: string;
+    };
+  }[];
   description: string;
+  details?: string;
+  accordionInfo?: { name: string; content: string }[];
+  relatedProducts?: Product[];
   rating: number;
   status: string;
 };

@@ -32,6 +32,9 @@ export interface Product {
   variants?: ProductVariant[];
   variantType?: "color" | "image";
   sizes?: string[];
+  details?: string;
+  accordionInfo?: { name: string; content: string }[];
+  relatedProducts?: Product[];
   allOfSizes?: string[];
   status?: "New in" | "limited edition" | "Sold Out" | "50% Discount";
 }

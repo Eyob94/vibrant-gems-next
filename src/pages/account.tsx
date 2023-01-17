@@ -1,6 +1,7 @@
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import { FC } from "react";
 import Label from "../components/Label/Label";
 import CommonLayout from "../containers/AccountPage/CommonLayout";
@@ -15,7 +16,18 @@ export interface AccountPageProps {
 }
 
 const AccountPage: FC<AccountPageProps> = ({ className = "" }) => {
-  const { data } = useSession();
+  const router = useRouter();
+  const { data: session, status } = useSession();
+  console.log(session, "session");
+
+  if (status === "loading") {
+    return <p>Loading...</p>;
+  }
+
+  if (status === "unauthenticated") {
+    router.push("/login");
+  }
+
   return (
     <div className={`nc-AccountPage ${className}`} data-nc-id="AccountPage">
       <Head>
@@ -32,7 +44,7 @@ const AccountPage: FC<AccountPageProps> = ({ className = "" }) => {
               {/* AVATAR */}
               <div className="relative rounded-full overflow-hidden flex">
                 <Image
-                  src={data?.user?.image || ""}
+                  src={session?.user?.image || ""}
                   alt=""
                   className="w-32 h-32 rounded-full object-cover z-0"
                 />
