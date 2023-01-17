@@ -7,6 +7,7 @@ import TemplatesDropdown from "./TemplatesDropdown";
 import DropdownCategories from "./DropdownCategories";
 import CartDropdown from "./CartDropdown";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import { useSession } from "next-auth/react";
 
 export interface MainNav2Props {
   className?: string;
@@ -14,6 +15,7 @@ export interface MainNav2Props {
 
 const MainNav2: FC<MainNav2Props> = ({ className = "" }) => {
   const [showSearchForm, setShowSearchForm] = useState(false);
+  const { status } = useSession();
 
   const renderMagnifyingGlassIcon = () => {
     return (
@@ -103,7 +105,10 @@ const MainNav2: FC<MainNav2Props> = ({ className = "" }) => {
                 {renderMagnifyingGlassIcon()}
               </button>
             )}
-            <AvatarDropdown />
+            {/* {status === "authenticated" ? (
+              <AvatarDropdown />
+            ) : (
+            )} */}
             <CartDropdown />
             {/* <MenuBar /> */}
           </div>

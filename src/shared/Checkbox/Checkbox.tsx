@@ -7,6 +7,7 @@ export interface CheckboxProps {
   sizeClassName?: string;
   labelClassName?: string;
   name: string;
+  checked?: boolean;
   defaultChecked?: boolean;
   onChange?: (checked: boolean) => void;
 }

@@ -5,12 +5,15 @@ import React, { FC, Fragment, useState } from "react";
 import Link from "next/link";
 // import { LocationStates } from "routers/types";
 
+export interface NavItemChildrenType extends Omit<NavItemType, "collection"> {
+  href?: string;
+}
+
 export interface NavItemType {
-  id: string;
   name: string;
-  href: string;
   targetBlank?: boolean;
-  children?: NavItemType[];
+  collection: string;
+  children?: NavItemChildrenType[];
   type?: "dropdown" | "megaMenu" | "none";
   isNew?: boolean;
 }
@@ -22,14 +25,14 @@ export interface NavigationItemProps {
 const NavigationItem: FC<NavigationItemProps> = ({ menuItem }) => {
   const [menuCurrentHovers, setMenuCurrentHovers] = useState<string[]>([]);
 
-  const onMouseEnterMenu = (id: string) => {
-    setMenuCurrentHovers((state) => [...state, id]);
+  const onMouseEnterMenu = (name: string) => {
+    setMenuCurrentHovers((state) => [...state, name]);
   };
 
-  const onMouseLeaveMenu = (id: string) => {
+  const onMouseLeaveMenu = (name: string) => {
     setMenuCurrentHovers((state) => {
       return state.filter((item, index) => {
-        return item !== id && index < state.indexOf(id);
+        return item !== name && index < state.indexOf(name);
       });
     });
   };
@@ -57,6 +60,7 @@ const NavigationItem: FC<NavigationItemProps> = ({ menuItem }) => {
                       </p>
                       <ul className="grid space-y-4 mt-4">
                         {item.children?.map(renderMegaMenuNavlink)}
+                        {}
                       </ul>
                     </div>
                   ))}
@@ -72,16 +76,18 @@ const NavigationItem: FC<NavigationItemProps> = ({ menuItem }) => {
     );
   };
 
-  const renderMegaMenuNavlink = (item: NavItemType) => {
+  const renderMegaMenuNavlink = (item: NavItemChildrenType) => {
     return (
-      <li key={item.id} className={`${item.isNew ? "menuIsNew" : ""}`}>
+      <li key={item.name} className={`${item.isNew ? "menuIsNew" : ""}`}>
         <Link
           target={item.targetBlank ? "_blank" : undefined}
           rel="noopener noreferrer"
           className="font-normal text-slate-600 hover:text-black dark:text-slate-400 dark:hover:text-white "
-          href={{
-            pathname: item.href || undefined,
-          }}
+          href={
+            item.href
+              ? item.href
+              : `/page-collection?collection=${menuItem.collection}&category=${item.name}`
+          }
         >
           {item.name}
         </Link>
@@ -91,13 +97,13 @@ const NavigationItem: FC<NavigationItemProps> = ({ menuItem }) => {
 
   // ===================== MENU DROPDOW =====================
   const renderDropdownMenu = (menuDropdown: NavItemType) => {
-    const isHover = menuCurrentHovers.includes(menuDropdown.id);
+    const isHover = menuCurrentHovers.includes(menuDropdown.name);
     return (
       <Popover
         as="li"
         className="menu-item menu-dropdown relative"
-        onMouseEnter={() => onMouseEnterMenu(menuDropdown.id)}
-        onMouseLeave={() => onMouseLeaveMenu(menuDropdown.id)}
+        onMouseEnter={() => onMouseEnterMenu(menuDropdown.name)}
+        onMouseLeave={() => onMouseLeaveMenu(menuDropdown.name)}
       >
         {() => (
           <>
@@ -124,7 +130,7 @@ const NavigationItem: FC<NavigationItemProps> = ({ menuItem }) => {
                       return renderDropdownMenuNavlinkHasChild(i);
                     } else {
                       return (
-                        <li key={i.id} className="px-2">
+                        <li key={i.name} className="px-2">
                           {renderDropdownMenuNavlink(i)}
                         </li>
                       );
@@ -139,15 +145,15 @@ const NavigationItem: FC<NavigationItemProps> = ({ menuItem }) => {
     );
   };
 
-  const renderDropdownMenuNavlinkHasChild = (item: NavItemType) => {
-    const isHover = menuCurrentHovers.includes(item.id);
+  const renderDropdownMenuNavlinkHasChild = (item: NavItemChildrenType) => {
+    const isHover = menuCurrentHovers.includes(item.name);
     return (
       <Popover
         as="li"
-        key={item.id}
+        key={item.name}
         className="menu-item menu-dropdown relative px-2"
-        onMouseEnter={() => onMouseEnterMenu(item.id)}
-        onMouseLeave={() => onMouseLeaveMenu(item.id)}
+        onMouseEnter={() => onMouseEnterMenu(item.name)}
+        onMouseLeave={() => onMouseLeaveMenu(item.name)}
       >
         {() => (
           <>
@@ -174,7 +180,7 @@ const NavigationItem: FC<NavigationItemProps> = ({ menuItem }) => {
                       return renderDropdownMenuNavlinkHasChild(i);
                     } else {
                       return (
-                        <li key={i.id} className="px-2">
+                        <li key={i.name} className="px-2">
                           {renderDropdownMenuNavlink(i)}
                         </li>
                       );
@@ -189,15 +195,13 @@ const NavigationItem: FC<NavigationItemProps> = ({ menuItem }) => {
     );
   };
 
-  const renderDropdownMenuNavlink = (item: NavItemType) => {
+  const renderDropdownMenuNavlink = (item: NavItemChildrenType) => {
     return (
       <Link
         target={item.targetBlank ? "_blank" : undefined}
         rel="noopener noreferrer"
         className="flex items-center font-normal text-neutral-6000 dark:text-neutral-400 py-2 px-4 rounded-md hover:text-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
-        href={{
-          pathname: item.href || undefined,
-        }}
+        href={`/page-collection?category=${item.name}`}
         // activeClassName="!font-medium !text-neutral-900 dark:!text-neutral-100"
       >
         {item.name}
@@ -219,9 +223,10 @@ const NavigationItem: FC<NavigationItemProps> = ({ menuItem }) => {
           target={item.targetBlank ? "_blank" : undefined}
           rel="noopener noreferrer"
           className="inline-flex items-center text-sm lg:text-[15px] font-medium text-slate-700 dark:text-slate-300 py-2.5 px-4 xl:px-5 rounded-full hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-          href={{
-            pathname: item.href || undefined,
-          }}
+          href={`/page-collection?collection=${item.collection}`}
+          // href={{
+          //   pathname: item.href || undefined,
+          // }}
         >
           {item.name}
           {item.type && (

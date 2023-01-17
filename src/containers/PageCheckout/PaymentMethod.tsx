@@ -407,10 +407,10 @@ const PaymentMethod: FC<Props> = ({
           <div>{renderDebitCredit()}</div>
 
           {/* ==================== */}
-          <div>{renderInterNetBanking()}</div>
+          {/* <div>{renderInterNetBanking()}</div> */}
 
           {/* ==================== */}
-          <div>{renderWallet()}</div>
+          {/* <div>{renderWallet()}</div> */}
 
           <div className="flex pt-6">
             <ButtonPrimary

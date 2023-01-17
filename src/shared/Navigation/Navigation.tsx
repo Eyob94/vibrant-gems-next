@@ -12,7 +12,7 @@ function Navigation() {
 				active: true,
 			},
 		});
-		setNavigation(rawHeaderBuilder.data[0]?.attributes.headerJson);
+		setNavigation(rawHeaderBuilder.data[0].attributes.headerJson);
 	};
 	useEffect(() => {
 		fetchHeaderBuilder();
@@ -21,7 +21,7 @@ function Navigation() {
 		<ul className="flex items-center nc-Navigation">
 			{navigation ? (
 				navigation.map((item) => (
-					<NavigationItem key={item.id} menuItem={item} />
+					<NavigationItem key={item.collection} menuItem={item} />
 				))
 			) : (
 				<>loading...</>

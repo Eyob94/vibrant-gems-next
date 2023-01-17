@@ -12,7 +12,7 @@ import SectionSliderLargeProduct from "../components/SectionSliderLargeProduct";
 import SectionSliderProductCard from "../components/SectionSliderProductCard";
 import SectionGridFeatureItems from "../containers/PageHome/SectionGridFeatureItems";
 import { fetchStrapi } from "../lib/strapi";
-import { getStrapiMedia } from "../lib/media";
+import { getStrapiMedia, getStrapiMedias } from "../lib/media";
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const rawCollections = await fetchStrapi("/collections", {
@@ -64,7 +64,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     },
   });
   const rawExpertRecomentedJewleryProducts = await fetchStrapi("/products", {
-    populate: ["image", "productVariants", "productVariants.image"],
+    populate: ["image", "altImages"],
     sort: ["expertRecommendedOrder:asc"],
     filters: {
       type: "JEWLERY",
@@ -116,9 +116,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
       name: attributes.name,
       price: attributes.price,
       image: getStrapiMedia(attributes.image),
-      variantImages: attributes.productVariants?.data?.map(
-        ({ attributes }: any) => getStrapiMedia(attributes.image)
-      ),
+      variantImages: getStrapiMedias(attributes.altImages),
       description: attributes.description,
       rating: attributes.rating,
       status: attributes.status,
@@ -128,6 +126,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const collections: Collection[] = rawCollections.data.map(
     ({ attributes }: any) => ({
       name: attributes.name,
+      description: attributes.description,
       slug: attributes.slug,
       image: attributes.image.data && getStrapiMedia(attributes.image),
       categories: attributes.categories?.data.map(
@@ -162,7 +161,20 @@ export type Product = {
   price: number;
   image: string;
   variantImages?: string[];
+  type: "GEMSTONE" | "JEWLERY";
+  productVariants?: {
+    inStock: number;
+    metal: {
+      name: string;
+    };
+    carat: {
+      name: string;
+    };
+  }[];
   description: string;
+  details?: string;
+  accordionInfo?: { name: string; content: string }[];
+  relatedProducts?: Product[];
   rating: number;
   status: string;
 };
@@ -171,6 +183,7 @@ export type Collection = {
   name: string;
   image: string;
   categories: Category[];
+  description: string;
 };
 
 interface Props {

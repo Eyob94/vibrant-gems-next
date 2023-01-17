@@ -6,14 +6,12 @@ import { fetchStrapi } from "../../lib/strapi";
 import { NavItemType } from "../Navigation/NavigationItem";
 
 export interface WidgetFooterMenu {
-	id: string;
 	title: string;
 	menus: CustomLink[];
 }
 
 const widgetMenus: WidgetFooterMenu[] = [
 	{
-		id: "5",
 		title: "Getting started",
 		menus: [
 			{ href: "#", label: "Release Notes" },
@@ -23,7 +21,6 @@ const widgetMenus: WidgetFooterMenu[] = [
 		],
 	},
 	{
-		id: "1",
 		title: "Explore",
 		menus: [
 			{ href: "#", label: "Prototyping" },
@@ -33,7 +30,6 @@ const widgetMenus: WidgetFooterMenu[] = [
 		],
 	},
 	{
-		id: "2",
 		title: "Resources",
 		menus: [
 			{ href: "#", label: "Best practices" },
@@ -43,7 +39,6 @@ const widgetMenus: WidgetFooterMenu[] = [
 		],
 	},
 	{
-		id: "4",
 		title: "Community",
 		menus: [
 			{ href: "#", label: "Discussion Forums" },

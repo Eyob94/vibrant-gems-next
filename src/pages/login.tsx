@@ -1,12 +1,27 @@
-import React, { FC } from "react";
+import React, { FC, FormEventHandler, useState } from "react";
 import Head from "next/head";
 import Input from "../shared/Input/Input";
 import Link from "next/link";
 import ButtonPrimary from "../shared/Button/ButtonPrimary";
 import Image from "next/image";
+import {
+  ClientSafeProvider,
+  getCsrfToken,
+  getProviders,
+  LiteralUnion,
+  signIn,
+} from "next-auth/react";
+import { GetServerSideProps } from "next";
+import { BuiltInProviderType } from "next-auth/providers";
+import router from "next/router";
 
 export interface PageLoginProps {
   className?: string;
+  providers: Record<
+    LiteralUnion<BuiltInProviderType, string>,
+    ClientSafeProvider
+  > | null;
+  csrfToken: string | null;
 }
 
 const loginSocials = [
@@ -27,7 +42,33 @@ const loginSocials = [
   },
 ];
 
-const PageLogin: FC<PageLoginProps> = ({ className = "" }) => {
+const PageLogin: FC<PageLoginProps> = ({
+  className = "",
+  providers,
+  csrfToken,
+}) => {
+  const [credentials, setCredentials] = useState({
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
+
+  const onSubmit: FormEventHandler = async (event) => {
+    event.preventDefault();
+    const res = await signIn("credentials", {
+      redirect: false,
+      email: credentials.email,
+      password: credentials.password,
+      callbackUrl: `${window.location.origin}`,
+    });
+    if (res?.error) {
+      setError(res.error);
+    } else {
+      setError("");
+    }
+    if (res?.url) router.push(res.url);
+    // setSubmitting(false);
+  };
   return (
     <div className={`nc-PageLogin ${className}`} data-nc-id="PageLogin">
       <Head>
@@ -42,8 +83,9 @@ const PageLogin: FC<PageLoginProps> = ({ className = "" }) => {
             {loginSocials.map((item, index) => (
               <a
                 key={index}
-                href={item.href}
-                className="flex w-full rounded-lg bg-primary-50 dark:bg-neutral-800 px-4 py-3 transform transition-transform sm:px-6 hover:translate-y-[-2px]"
+                // href={item.href}
+                onClick={() => signIn(providers?.google.id)}
+                className="cursor-pointer flex w-full rounded-lg bg-primary-50 dark:bg-neutral-800 px-4 py-3 transform transition-transform sm:px-6 hover:translate-y-[-2px]"
               >
                 <Image
                   className="flex-shrink-0"
@@ -66,15 +108,24 @@ const PageLogin: FC<PageLoginProps> = ({ className = "" }) => {
             <div className="absolute left-0 w-full top-1/2 transform -translate-y-1/2 border border-neutral-100 dark:border-neutral-800"></div>
           </div> */}
           {/* FORM */}
-          {/* <form className="grid grid-cols-1 gap-6" action="#" method="post">
+          <form className="grid grid-cols-1 gap-6" onSubmit={onSubmit}>
+            <input
+              name="csrfToken"
+              type="hidden"
+              defaultValue={csrfToken || ""}
+            />
             <label className="block">
               <span className="text-neutral-800 dark:text-neutral-200">
                 Email address
               </span>
               <Input
+                name="email"
                 type="email"
                 placeholder="example@example.com"
                 className="mt-1"
+                onChange={(e) =>
+                  setCredentials({ ...credentials, email: e.target.value })
+                }
               />
             </label>
             <label className="block">
@@ -84,10 +135,17 @@ const PageLogin: FC<PageLoginProps> = ({ className = "" }) => {
                   Forgot password?
                 </Link>
               </span>
-              <Input type="password" className="mt-1" />
+              <Input
+                name="password"
+                type="password"
+                className="mt-1"
+                onChange={(e) =>
+                  setCredentials({ ...credentials, password: e.target.value })
+                }
+              />
             </label>
             <ButtonPrimary type="submit">Continue</ButtonPrimary>
-          </form> */}
+          </form>
 
           {/* ==== */}
           <span className="block text-center text-neutral-700 dark:text-neutral-300">
@@ -103,3 +161,11 @@ const PageLogin: FC<PageLoginProps> = ({ className = "" }) => {
 };
 
 export default PageLogin;
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const providers = await getProviders();
+
+  return {
+    props: { providers, csrfToken: await getCsrfToken(context) },
+  };
+};

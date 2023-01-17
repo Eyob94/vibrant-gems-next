@@ -50,12 +50,12 @@ const DEMO_DATA = [
 
 interface Props {
   panelClassName?: string;
-  data?: typeof DEMO_DATA;
+  data: typeof DEMO_DATA;
 }
 
 const AccordionInfo: FC<Props> = ({
   panelClassName = "p-4 pt-3 last:pb-0 text-slate-600 text-sm dark:text-slate-300 leading-6",
-  data = DEMO_DATA,
+  data,
 }) => {
   return (
     <div className="w-full rounded-2xl space-y-2.5">

@@ -16,6 +16,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import Image from "next/image";
 import { Product } from "../pages";
+import { useShoppingCart } from "use-shopping-cart";
 
 export interface ProductCardProps {
   className?: string;
@@ -29,6 +30,7 @@ const ProductCard: FC<ProductCardProps> = ({
   isLiked,
 }) => {
   const {
+    id,
     name,
     price,
     description,
@@ -38,13 +40,21 @@ const ProductCard: FC<ProductCardProps> = ({
     status,
     image,
   } = data;
-  console.log(data, "where");
+  const { addItem } = useShoppingCart();
   const [variantActive, setVariantActive] = React.useState(0);
   const [showModalQuickView, setShowModalQuickView] = React.useState(false);
 
   const router = useRouter();
 
   const notifyAddTocart = ({ size }: { size?: string }) => {
+    addItem({
+      name,
+      currency: "USD",
+      price,
+      id,
+      product_data: data,
+      sku: "",
+    });
     toast.custom(
       (t) => (
         <Transition

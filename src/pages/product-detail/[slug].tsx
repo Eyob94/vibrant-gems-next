@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import {
   SparklesIcon,
   NoSymbolIcon,
@@ -18,15 +18,15 @@ import SectionSliderProductCard from "../../components/SectionSliderProductCard"
 import AccordionInfo from "../../containers/ProductDetailPage/AccordionInfo";
 import ModalViewAllReviews from "../../containers/ProductDetailPage/ModalViewAllReviews";
 import Policy from "../../containers/ProductDetailPage/Policy";
-import { Product, PRODUCTS } from "../../data/data";
+// import { Product, PRODUCTS } from "../../data/data";
 import ButtonPrimary from "../../shared/Button/ButtonPrimary";
 import ButtonSecondary from "../../shared/Button/ButtonSecondary";
-import { useRouter } from "next/router";
 import { fetchStrapi } from "../../lib/strapi";
-import { getSingleProductWithId } from "../../lib/strapiQueries";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Image from "next/image";
-import { getStrapiMedia } from "../../lib/media";
+import { getStrapiMedia, getStrapiMedias } from "../../lib/media";
+import { useShoppingCart } from "use-shopping-cart";
+import { Product } from "..";
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   try {
@@ -34,27 +34,51 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
       filters: {
         slug: query.slug,
       },
-      populate: ["image", "variantImages"],
+      populate: [
+        "image",
+        "altImages",
+        "productVariants",
+        "productVariants.carat",
+        "productVariants.metal",
+        "relatedProducts",
+        "relatedProducts.image",
+      ],
     });
     const productData = data[0];
-    // console.log(productData.attributes.variantImages, "hereee");
-    const variants = Array.isArray(productData.attributes.variants?.data)
-      ? productData.attributes.variantImages?.data.map((variant: any) =>
-          getStrapiMedia(variant)
-        )
-      : [];
+    console.log(productData);
+
     const product: Product = {
       id: productData.id,
       name: productData.attributes.name,
       price: productData.attributes.price,
       image: getStrapiMedia(productData.attributes.image),
-      variants,
+      variantImages: getStrapiMedias(productData.attributes.altImages),
       description: productData.attributes.description,
-      category: "category",
-      tags: productData.attributes.name,
+      type: productData.attributes.type,
+      productVariants: productData.attributes.productVariants.data?.map(
+        ({ attributes }: any) => ({
+          inStock: attributes.inStock,
+          metal: {
+            name: attributes.metal.data?.attributes.name,
+          },
+          carat: {
+            name: attributes.carat.data?.attributes.name,
+          },
+        })
+      ),
+      details: productData.attributes.details,
+      rating: 0,
+      relatedProducts: productData.attributes.relatedProducts.data?.map(
+        ({ attributes }: any) => ({
+          ...attributes,
+          image: getStrapiMedia(attributes.image),
+        })
+      ),
+      accordionInfo: productData.attributes.accordionInfo,
       slug: productData.attributes.name,
-      status: productData.attributes.name,
+      status: productData.attributes.status,
     };
+    console.log(product.relatedProducts);
     if (!product) {
       return {
         notFound: true,
@@ -63,7 +87,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 
     return {
       props: {
-        product,
+        product: JSON.parse(JSON.stringify(product)),
       },
     };
   } catch (error) {
@@ -82,8 +106,34 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
   className = "",
   product,
 }) => {
-  const { sizes, variants, status, allOfSizes } = PRODUCTS[0];
-  const LIST_IMAGES_DEMO = [product.image, ...(product.variantImage || [])];
+  const { addItem } = useShoppingCart();
+  const status = product.status;
+  const [metalTypes, setMetalTypes] = useState(
+    Array.from(
+      new Set(
+        product.productVariants
+          ?.map(({ metal }) => metal.name)
+          .filter((name) => !!name)
+      )
+    )
+  );
+  const [metalTypeSelected, setMetalTypeSelected] = useState(
+    metalTypes ? metalTypes[0] : ""
+  );
+
+  const [carat, setCarat] = useState(
+    Array.from(
+      new Set(
+        product.productVariants
+          ?.map(({ carat }) => carat.name)
+          .filter((name) => !!name)
+      )
+    )
+  );
+
+  const [caratSelected, setCaratSelected] = useState(carat ? carat[0] : "");
+
+  // const LIST_IMAGES_DEMO = [product.image, ...(product.variantImage || [])];
   // const LIST_IMAGES_DEMO = [
   //   "/images/products/detail1.jpg",
   //   "/images/products/detail2.jpg",
@@ -91,72 +141,79 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
   // ];
 
   const [variantActive, setVariantActive] = useState(0);
-  const [sizeSelected, setSizeSelected] = useState(sizes ? sizes[0] : "");
   const [qualitySelected, setQualitySelected] = useState(1);
   const [isOpenModalViewAllReviews, setIsOpenModalViewAllReviews] =
     useState(false);
 
   const notifyAddTocart = () => {
+    addItem({
+      name: product.name,
+      currency: "USD",
+      price: product.price,
+      id: product.id,
+      product_data: product,
+      sku: "",
+    });
     toast.custom(
       (t) => (
         <NotifyAddTocart
           productImage={product.image}
           qualitySelected={qualitySelected}
           show={t.visible}
-          sizeSelected={sizeSelected}
-          variantActive={variantActive}
+          sizeSelected={"this"}
+          variantActive={0}
         />
       ),
       { position: "top-right", id: "nc-product-notify", duration: 3000 }
     );
   };
 
-  const renderVariants = () => {
-    if (!variants || !variants.length) {
-      return null;
-    }
+  // const renderVariants = () => {
+  //   if (!variants || !variants.length) {
+  //     return null;
+  //   }
 
-    return (
-      <div>
-        <label htmlFor="">
-          <span className="text-sm font-medium">
-            Color:
-            <span className="ml-1 font-semibold">
-              {variants[variantActive].name}
-            </span>
-          </span>
-        </label>
-        <div className="flex mt-3">
-          {variants.map((variant, index) => (
-            <div
-              key={index}
-              onClick={() => setVariantActive(index)}
-              className={`relative flex-1 max-w-[75px] h-10 sm:h-11 rounded-full border-2 cursor-pointer ${
-                variantActive === index
-                  ? "border-primary-6000 dark:border-primary-500"
-                  : "border-transparent"
-              }`}
-            >
-              <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
-                {variant.thumbnail && (
-                  <Image
-                    src={variant.thumbnail}
-                    alt=""
-                    className="absolute w-full h-full object-cover"
-                    width={1000}
-                    height={1000}
-                  />
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
+  //   return (
+  //     <div>
+  //       <label htmlFor="">
+  //         <span className="text-sm font-medium">
+  //           Color:
+  //           <span className="ml-1 font-semibold">
+  //             {variants[variantActive].name}
+  //           </span>
+  //         </span>
+  //       </label>
+  //       <div className="flex mt-3">
+  //         {variants.map((variant, index) => (
+  //           <div
+  //             key={index}
+  //             onClick={() => setVariantActive(index)}
+  //             className={`relative flex-1 max-w-[75px] h-10 sm:h-11 rounded-full border-2 cursor-pointer ${
+  //               variantActive === index
+  //                 ? "border-primary-6000 dark:border-primary-500"
+  //                 : "border-transparent"
+  //             }`}
+  //           >
+  //             <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
+  //               {variant.thumbnail && (
+  //                 <Image
+  //                   src={variant.thumbnail}
+  //                   alt=""
+  //                   className="absolute w-full h-full object-cover"
+  //                   width={1000}
+  //                   height={1000}
+  //                 />
+  //               )}
+  //             </div>
+  //           </div>
+  //         ))}
+  //       </div>
+  //     </div>
+  //   );
+  // };
 
-  const renderSizeList = () => {
-    if (!allOfSizes || !sizes || !sizes.length) {
+  const renderCarat = () => {
+    if (!carat || !carat.length || !product.productVariants) {
       return null;
     }
     return (
@@ -164,47 +221,77 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
         <div className="flex justify-between font-medium text-sm">
           <label htmlFor="">
             <span className="">
-              Size:
-              <span className="ml-1 font-semibold">{sizeSelected}</span>
+              Carat:
+              <span className="ml-1 font-semibold">{caratSelected}</span>
             </span>
           </label>
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="##"
-            className="text-primary-6000 hover:text-primary-500"
-          >
-            See sizing chart
-          </a>
         </div>
         <div className="grid grid-cols-5 sm:grid-cols-7 gap-2 mt-3">
-          {allOfSizes.map((size, index) => {
-            const isActive = size === sizeSelected;
-            const sizeOutStock = !sizes.includes(size);
-            return (
-              <div
-                key={index}
-                className={`relative h-10 sm:h-11 rounded-2xl border flex items-center justify-center 
-                text-sm sm:text-base uppercase font-semibold select-none overflow-hidden z-0 ${
-                  sizeOutStock
-                    ? "text-opacity-20 dark:text-opacity-20 cursor-not-allowed"
-                    : "cursor-pointer"
-                } ${
+          {carat
+            .map((carat, index) => {
+              if (!carat) return;
+              const isActive = carat === caratSelected;
+              return (
+                <div
+                  key={index}
+                  className={`relative h-10 sm:h-11 rounded-2xl border flex items-center justify-center 
+                text-xs  sm:text-base uppercase font-semibold select-none overflow-hidden z-0 cursor-pointer
+                 ${
+                   isActive
+                     ? "bg-primary-6000 border-primary-6000 text-white hover:bg-primary-6000"
+                     : "border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200 hover:bg-neutral-50 dark:hover:bg-neutral-700"
+                 }`}
+                  onClick={() => {
+                    setCaratSelected(carat);
+                  }}
+                >
+                  {carat}
+                </div>
+              );
+            })
+            .filter((html) => !!html)}
+        </div>
+      </div>
+    );
+  };
+  const renderMetalType = () => {
+    console.log(product);
+    if (!metalTypes || !metalTypes.length || !product.productVariants) {
+      return null;
+    }
+    return (
+      <div>
+        <div className="flex justify-between font-medium text-sm">
+          <label htmlFor="">
+            <span>
+              Metal Type:
+              <span className="ml-1 font-semibold">{metalTypeSelected}</span>
+            </span>
+          </label>
+        </div>
+        <div className="grid grid-cols-5 sm:grid-cols-7 gap-2 mt-3">
+          {metalTypes
+            ?.map((metal, index) => {
+              if (!metal) return;
+              const isActive = metal === metalTypeSelected;
+              return (
+                <div
+                  key={index}
+                  className={`relative h-10 sm:h-11 rounded-2xl border flex items-center justify-center 
+                text-sm sm:text-base uppercase font-semibold select-none overflow-hidden z-0 cursor-pointer ${
                   isActive
                     ? "bg-primary-6000 border-primary-6000 text-white hover:bg-primary-6000"
                     : "border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200 hover:bg-neutral-50 dark:hover:bg-neutral-700"
                 }`}
-                onClick={() => {
-                  if (sizeOutStock) {
-                    return;
-                  }
-                  setSizeSelected(size);
-                }}
-              >
-                {size}
-              </div>
-            );
-          })}
+                  onClick={() => {
+                    setMetalTypeSelected(metal);
+                  }}
+                >
+                  {metal}
+                </div>
+              );
+            })
+            .filter((html) => !!html)}
         </div>
       </div>
     );
@@ -223,32 +310,35 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
           <span className="ml-1 leading-none">{status}</span>
         </div>
       );
-    }
-    if (status === "50% Discount") {
+    } else if (status === "50% Discount") {
       return (
         <div className={CLASSES}>
           <IconDiscount className="w-3.5 h-3.5" />
           <span className="ml-1 leading-none">{status}</span>
         </div>
       );
-    }
-    if (status === "Sold Out") {
+    } else if (status === "Sold Out") {
       return (
         <div className={CLASSES}>
           <NoSymbolIcon className="w-3.5 h-3.5" />
           <span className="ml-1 leading-none">{status}</span>
         </div>
       );
-    }
-    if (status === "limited edition") {
+    } else if (status === "limited edition") {
       return (
         <div className={CLASSES}>
           <ClockIcon className="w-3.5 h-3.5" />
           <span className="ml-1 leading-none">{status}</span>
         </div>
       );
+    } else {
+      return (
+        <div className={CLASSES}>
+          <SparklesIcon className="w-3.5 h-3.5" />
+          <span className="ml-1 leading-none">{status}</span>
+        </div>
+      );
     }
-    return null;
   };
 
   const renderSectionContent = () => {
@@ -293,17 +383,20 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
         </div>
 
         {/* ---------- 3 VARIANTS AND SIZE LIST ----------  */}
-        <div className="">{renderVariants()}</div>
-        {/* <div className="">{renderSizeList()}</div> */}
+        {/* <div className="">{renderVariants()}</div> */}
+        {/* {product.type === "JEWLERY" || ( */}
+        <div className="">{renderMetalType()}</div>
+        <div className="">{renderCarat()}</div>
+        {/* )} */}
 
         {/*  ---------- 4  QTY AND ADD TO CART BUTTON */}
         <div className="flex space-x-3.5">
-          <div className="flex items-center justify-center bg-slate-100/70 dark:bg-slate-800/70 px-2 py-3 sm:p-3.5 rounded-full">
+          {/* <div className="flex items-center justify-center bg-slate-100/70 dark:bg-slate-800/70 px-2 py-3 sm:p-3.5 rounded-full">
             <NcInputNumber
               defaultValue={qualitySelected}
               onChange={setQualitySelected}
             />
-          </div>
+          </div> */}
           <ButtonPrimary
             className="flex-1 flex-shrink-0"
             onClick={notifyAddTocart}
@@ -318,7 +411,9 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
         {/*  */}
 
         {/* ---------- 5 ----------  */}
-        <AccordionInfo />
+        {product.accordionInfo && (
+          <AccordionInfo data={product.accordionInfo} />
+        )}
 
         {/* ---------- 6 ----------  */}
         <div className="hidden xl:block">
@@ -333,7 +428,8 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
       <div className="">
         <h2 className="text-2xl font-semibold">Product Details</h2>
         <div className="prose prose-sm sm:prose dark:prose-invert sm:max-w-4xl mt-7">
-          <p>
+          {product.details}
+          {/*  <p>
             The patented eighteen-inch hardwood Arrowhead deck --- finely
             mortised in, makes this the strongest and most rigid canoe ever
             built. You cannot buy a canoe that will afford greater satisfaction.
@@ -352,7 +448,7 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
               GOTS certified
             </li>
             <li>Soft touch water based printed in the USA</li>
-          </ul>
+          </ul> */}
         </div>
       </div>
     );
@@ -434,7 +530,7 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
               <LikeButton className="absolute right-3 top-3 " />
             </div>
             <div className="grid grid-cols-2 gap-3 mt-3 sm:gap-6 sm:mt-6 xl:gap-8 xl:mt-8">
-              {[...(product.variantImage || [])]
+              {[...(product.variantImages || [])]
                 .slice(0, 2)
                 .map((item, index) => {
                   return (
@@ -444,7 +540,7 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
                     >
                       <Image
                         src={item}
-                        className="w-full rounded-2xl object-cover"
+                        className="w-full rounded-2xl object-cover "
                         alt="product detail 1"
                         width={700}
                         height={700}
@@ -471,22 +567,25 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({
 
           <hr className="border-slate-200 dark:border-slate-700" />
 
-          {renderReviews()}
+          {/* {renderReviews()} */}
 
-          <hr className="border-slate-200 dark:border-slate-700" />
+          {/* <hr className="border-slate-200 dark:border-slate-700" /> */}
 
           {/* OTHER SECTION */}
-          <SectionSliderProductCard
-            heading="Customers also purchased"
-            subHeading=""
-            headingFontClassName="text-2xl font-semibold"
-            headingClassName="mb-10 text-neutral-900 dark:text-neutral-50"
-          />
+          {product.relatedProducts && (
+            <SectionSliderProductCard
+              heading="Related Products"
+              subHeading=""
+              headingFontClassName="text-2xl font-semibold"
+              headingClassName="mb-10 text-neutral-900 dark:text-neutral-50"
+              data={product.relatedProducts}
+            />
+          )}
 
           {/* SECTION */}
-          <div className="pb-20 xl:pb-28 lg:pt-14">
+          {/* <div className="pb-20 xl:pb-28 lg:pt-14">
             <SectionPromo2 />
-          </div>
+          </div> */}
         </div>
       </main>
 

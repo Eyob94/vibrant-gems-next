@@ -1,44 +1,88 @@
-import React, { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import ProductCard from "../../components/ProductCard";
 import { fetchStrapi } from "../../lib/strapi";
 import { Product } from "../../pages";
 import ButtonPrimary from "../../shared/Button/ButtonPrimary";
 import Pagination from "../../shared/Pagination/Pagination";
-import TabFilters from "../TabFilters";
+import TabFilters, { SortingTypes } from "../TabFilters";
 
-const CollectionTable = () => {
+const CollectionTable: FC<{
+  collection?: string | [];
+  category?: string | [];
+}> = ({ category = [], collection = [] }) => {
   const take = 28;
   const firstRender = useRef(null);
+
   const [categories, setCategories] = useState<
-    { name: string; active: boolean }[]
+    {
+      name: string;
+      active: boolean;
+      collectionName: string;
+      collectionDescription: string;
+    }[]
   >([]);
   const [metals, setMetals] = useState<{ name: string; active: boolean }[]>([]);
+  const [carat, setCarat] = useState<{ name: string; active: boolean }[]>([]);
   const [products, setProducts] = useState<Product[]>();
   const [paginationPage, setPaginationPage] = useState(1);
   const [productsLength, setProductLength] = useState(0);
   const [rangePrice, setRangePrices] = useState([0, 500000]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    typeof category === "string" ? [category] : []
+  );
   const [selectedMetals, setSelectedMetals] = useState<string[]>([]);
+  const [selectedCarats, setSelectedCarats] = useState<string[]>([]);
+  const [selectedSort, setSelectedSort] = useState<SortingTypes | "">("");
+  const [isOnSale, setIsOnSale] = useState(true);
 
   const fetchProducts = async () => {
     const products = await fetchStrapi(`/products`, {
-      populate: ["category", "image"],
+      populate: [
+        "category",
+        "image",
+        "category.collection",
+        "productVariants",
+        "productVariants.metal",
+        "productVariants.carat",
+      ],
       pagination: {
         page: paginationPage,
         pageSize: take,
       },
+      sort: [
+        selectedSort === "price-hight-low"
+          ? "price:desc"
+          : selectedSort === "price-low-hight"
+          ? "price:asc"
+          : undefined,
+        selectedSort === "newest" ? "createdAt:desc" : undefined,
+        selectedSort === "best-rating" ? "rating:desc" : undefined,
+      ],
       filters: {
         price: {
           $between: [rangePrice[0], rangePrice[1]],
         },
+        status: isOnSale
+          ? "On Sale"
+          : selectedSort === "most-popular"
+          ? "Popular"
+          : [],
         category: {
-          name: selectedCategories,
+          name:
+            (selectedCategories.length > 0 ? selectedCategories : category) ||
+            [],
+          collection: {
+            name: collection || [],
+          },
         },
-        // productItem: {
-        //   metal: {
-        //     name: selectedMetals,
-        //   },
-        // },
+        productVariants: {
+          metal: {
+            name: selectedMetals,
+          },
+          carat: {
+            name: selectedCarats,
+          },
+        },
       },
     });
 
@@ -65,11 +109,32 @@ const CollectionTable = () => {
     }));
     setMetals(mappedMetalData);
   };
-  const getAllCategories = async () => {
-    const categories = await fetchStrapi("/categories");
-    const mappedCategoriesData = categories.data.map((category: any) => ({
-      name: category.attributes.name as string,
+  const getCarat = async () => {
+    const carat = await fetchStrapi("/carats");
+    const mappedMetalData = carat.data.map((metal: any) => ({
+      name: metal.attributes.name as string,
       active: false,
+    }));
+    setCarat(mappedMetalData);
+  };
+  const getAllCategories = async () => {
+    const categories = await fetchStrapi("/categories", {
+      populate: ["collection"],
+      filters: {
+        collection: {
+          name: collection || [],
+        },
+      },
+      pagination: {
+        limit: 6,
+      },
+    });
+    const mappedCategoriesData = categories.data.map((cat: any) => ({
+      name: cat.attributes.name as string,
+      active: cat.attributes.name === category,
+      collectionName: cat.attributes.collection?.data?.attributes.name || "",
+      collectionDescription:
+        cat.attributes.collection?.data?.attributes.description || "",
     }));
     setCategories(mappedCategoriesData);
   };
@@ -86,29 +151,49 @@ const CollectionTable = () => {
   const handleMetalsFilter = (selectedMetals: string[]) => {
     setSelectedMetals(selectedMetals);
   };
+  const handleCaratFilter = (selectedCarats: string[]) => {
+    setSelectedCarats(selectedCarats);
+  };
+  const handleSortFilter = (selectedSort: SortingTypes | "") => {
+    setSelectedSort(selectedSort);
+  };
 
   useEffect(() => {
     if (!firstRender.current) {
       getAllCategories();
-      // getMetalTypes();
+      getMetalTypes();
+      getCarat();
     }
     fetchProducts();
-  }, [paginationPage, rangePrice, selectedCategories, selectedMetals]);
+  }, [
+    paginationPage,
+    rangePrice,
+    selectedCategories,
+    selectedMetals,
+    selectedCarats,
+    selectedSort,
+    isOnSale,
+  ]);
 
   return (
     <div ref={firstRender.current} className="space-y-10 lg:space-y-14">
       {/* HEADING */}
-      <div className="max-w-screen-sm">
-        <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold">
-          Man collection
-        </h2>
-        <span className="block mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
-          We not only help you design exceptional products, but also make it
-          easy for you to share your designs with more like-minded people.
-        </span>
-      </div>
+      <>
+        <div className="max-w-screen-sm">
+          <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold">
+            {collection || "Shop through our endless Gewlery"}
+          </h2>
+          {categories[0] && (
+            <span className="block mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
+              {collection
+                ? categories[0].collectionDescription
+                : "Description goes here"}
+            </span>
+          )}
+        </div>
 
-      <hr className="border-slate-200 dark:border-slate-700" />
+        <hr className="border-slate-200 dark:border-slate-700" />
+      </>
       <main>
         {/* TABS FILTER */}
         <TabFilters
@@ -116,7 +201,14 @@ const CollectionTable = () => {
           categories={categories}
           handleCategoriesFilter={handleCategoryFilter}
           metals={metals}
+          carat={carat}
           handleMetalsFilter={handleMetalsFilter}
+          handleCaratFilter={handleCaratFilter}
+          handleSortFilter={handleSortFilter}
+          isOnSaleState={{
+            isOnSale,
+            setIsOnSale,
+          }}
         />
 
         {/* LOOP ITEMS */}

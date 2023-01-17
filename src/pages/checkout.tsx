@@ -11,8 +11,13 @@ import ContactInfo from "../containers/PageCheckout/ContactInfo";
 import PaymentMethod from "../containers/PageCheckout/PaymentMethod";
 import ShippingAddress from "../containers/PageCheckout/ShippingAddress";
 import getStripe from "../utils/get-stripejs";
+import { useShoppingCart } from "use-shopping-cart";
+import Image from "next/image";
+import { useRouter } from "next/router";
 
 const CheckoutPage = () => {
+  const { cartDetails, totalPrice, removeItem } = useShoppingCart();
+  const router = useRouter();
   const [tabActive, setTabActive] = useState<
     "ContactInfo" | "ShippingAddress" | "PaymentMethod"
   >("ShippingAddress");
@@ -24,12 +29,14 @@ const CheckoutPage = () => {
     }, 80);
   };
   const handleSubmit = async () => {
+    if (!cartDetails) return;
+    const product = Object.values(cartDetails);
+    console.log(product);
     const products = [PRODUCTS[0], PRODUCTS[2], PRODUCTS[3]];
     const response = await fetch("/api/checkout_sessions", {
       method: "POST",
-      body: JSON.stringify(products),
+      body: JSON.stringify(product.map((product) => product.product_data)),
     }).then((res) => res.json());
-    console.log(response);
     if (response.statusCode === 500) {
       console.error(response.message);
       return;
@@ -49,16 +56,18 @@ const CheckoutPage = () => {
     console.warn(error.message);
   };
 
-  const renderProduct = (item: Product, index: number) => {
+  const renderProduct = (item: Product, key: number) => {
     const { image: image, price, name } = item;
 
     return (
-      <div key={index} className="relative flex py-7 first:pt-0 last:pb-0">
+      <div key={key} className="relative flex py-7 first:pt-0 last:pb-0">
         <div className="relative h-36 w-24 sm:w-28 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-          <img
+          <Image
             src={image}
             alt={name}
             className="h-full w-full object-contain object-center"
+            width={400}
+            height={400}
           />
           <Link href="/product-detail" className="absolute inset-0"></Link>
         </div>
@@ -114,7 +123,7 @@ const CheckoutPage = () => {
                       />
                     </svg>
 
-                    <span>{`Black`}</span>
+                    <span>{`lack`}</span>
                   </div>
                   <span className="mx-4 border-l border-slate-200 dark:border-slate-700 "></span>
                   <div className="flex items-center space-x-1.5">
@@ -188,6 +197,12 @@ const CheckoutPage = () => {
             <a
               href="##"
               className="relative z-10 flex items-center mt-3 font-medium text-primary-6000 hover:text-primary-500 text-sm "
+              onClick={() => {
+                removeItem(String(key));
+                if (!cartDetails) {
+                  router.push("page-collection");
+                }
+              }}
             >
               <span>Remove</span>
             </a>
@@ -274,7 +289,14 @@ const CheckoutPage = () => {
           <div className="w-full lg:w-[36%] ">
             <h3 className="text-lg font-semibold">Order summary</h3>
             <div className="mt-8 divide-y divide-slate-200/70 dark:divide-slate-700 ">
-              {[PRODUCTS[0], PRODUCTS[2], PRODUCTS[3]].map(renderProduct)}
+              {/* {[PRODUCTS[0], PRODUCTS[2], PRODUCTS[3]].map(renderProduct)} */}
+              {cartDetails &&
+                Object.entries(cartDetails).map(([key, value]) =>
+                  renderProduct(
+                    { ...(value.product_data as any) },
+                    parseInt(key)
+                  )
+                )}
             </div>
 
             <div className="mt-10 pt-6 text-sm text-slate-500 dark:text-slate-400 border-t border-slate-200/70 dark:border-slate-700 ">
@@ -308,7 +330,7 @@ const CheckoutPage = () => {
               </div>
               <div className="flex justify-between font-semibold text-slate-900 dark:text-slate-200 text-base pt-4">
                 <span>Order total</span>
-                <span>$276.00</span>
+                <span>{totalPrice?.toFixed(2)}</span>
               </div>
             </div>
             <ButtonPrimary className="mt-8 w-full" onClick={handleSubmit}>

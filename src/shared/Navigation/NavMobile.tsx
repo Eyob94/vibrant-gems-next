@@ -3,7 +3,7 @@ import ButtonClose from "../ButtonClose/ButtonClose";
 import Logo from "../Logo/Logo";
 import { Disclosure } from "@headlessui/react";
 import Link from "next/link";
-import { NavItemType } from "./NavigationItem";
+import { NavItemChildrenType, NavItemType } from "./NavigationItem";
 import { NAVIGATION_DEMO_2 } from "../../data/navigation";
 import ButtonPrimary from "../Button/ButtonPrimary";
 import SocialsList from "../SocialsList/SocialsList";
@@ -20,16 +20,16 @@ const NavMobile: React.FC<NavMobileProps> = ({
   onClickClose,
 }) => {
   const _renderMenuChild = (
-    item: NavItemType,
+    item: NavItemChildrenType,
     itemClass = " pl-3 text-neutral-900 dark:text-neutral-200 font-medium "
   ) => {
     return (
       <ul className="nav-mobile-sub-menu pl-6 pb-1 text-base">
         {item.children?.map((i, index) => (
-          <Disclosure key={i.href + index} as="li">
+          <Disclosure key={index} as="li">
             <Link
               href={{
-                pathname: i.href || undefined,
+                pathname: i.name || undefined,
               }}
               className={`flex text-sm rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 mt-0.5 pr-4 ${itemClass}`}
               // activeClassName="text-secondary"
@@ -81,7 +81,7 @@ const NavMobile: React.FC<NavMobileProps> = ({
         <Link
           className="flex w-full items-center py-2.5 px-4 font-medium uppercase tracking-wide text-sm hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
           href={{
-            pathname: item.href || undefined,
+            pathname: item.name || undefined,
           }}
           // activeClassName="text-secondary"
         >

@@ -21,6 +21,7 @@ import ButtonSecondary from "../shared/Button/ButtonSecondary";
 import SectionPromo2 from "../components/SectionPromo2";
 import ModalViewAllReviews from "../containers/ProductDetailPage/ModalViewAllReviews";
 import NotifyAddTocart from "../components/NotifyAddTocart";
+import Image from "next/image";
 
 export interface ProductDetailPageProps {
   className?: string;
@@ -81,13 +82,17 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({ className = "" }) => {
                   : "border-transparent"
               }`}
             >
-              <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
-                <img
-                  src={variant.thumbnail}
-                  alt=""
-                  className="absolute w-full h-full object-cover"
-                />
-              </div>
+              {variant.thumbnail && (
+                <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
+                  <Image
+                    src={variant.thumbnail}
+                    alt=""
+                    className="absolute w-full h-full object-cover"
+                    width={1000}
+                    height={1000}
+                  />
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -258,7 +263,7 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({ className = "" }) => {
         {/*  */}
 
         {/* ---------- 5 ----------  */}
-        <AccordionInfo />
+        {/* <AccordionInfo /> */}
 
         {/* ---------- 6 ----------  */}
         <div className="hidden xl:block">
@@ -405,7 +410,7 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({ className = "" }) => {
 
           <hr className="border-slate-200 dark:border-slate-700" />
 
-          {renderReviews()}
+          {/* {renderReviews()} */}
 
           <hr className="border-slate-200 dark:border-slate-700" />
 
