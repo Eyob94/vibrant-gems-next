@@ -21,10 +21,10 @@ export function getStrapiURL(path = "") {
 export async function fetchStrapi(
   path: string,
   urlParamsObject: object = {},
-  options: object = {}
+  options: RequestInit = {}
 ) {
   // Merge default and user options
-  const mergedOptions = {
+  const mergedOptions: RequestInit = {
     headers: {
       "Content-Type": "application/json",
     },
@@ -45,7 +45,7 @@ export async function fetchStrapi(
   if (!response.ok) {
     console.error(response.statusText);
     console.error(response);
-    throw new Error(`An error occured please try again`);
+    // throw new Error(`An error occured please try again`);
   }
   const data = await response.json();
   return data;

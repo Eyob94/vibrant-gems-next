@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import React, { Fragment, useState } from "react";
 import { Dialog, Popover, Transition } from "@headlessui/react";
 import ButtonPrimary from "../shared/Button/ButtonPrimary";
 import ButtonThird from "../shared/Button/ButtonThird";
@@ -19,12 +19,19 @@ const DATA_sizes = [
   { name: "2XL" },
 ];
 
-const DATA_sortOrderRadios = [
-  { name: "Most Popular", id: "Most-Popular" },
-  { name: "Best Rating", id: "Best-Rating" },
-  { name: "Newest", id: "Newest" },
-  { name: "Price Low - Hight", id: "Price-low-hight" },
-  { name: "Price Hight - Low", id: "Price-hight-low" },
+export type SortingTypes =
+  | "most-popular"
+  | "best-rating"
+  | "newest"
+  | "price-low-hight"
+  | "price-hight-low";
+
+const DATA_sortOrderRadios: { name: string; id: SortingTypes }[] = [
+  { name: "Most Popular", id: "most-popular" },
+  { name: "Best Rating", id: "best-rating" },
+  { name: "Newest", id: "newest" },
+  { name: "Price Low - Hight", id: "price-low-hight" },
+  { name: "Price Hight - Low", id: "price-hight-low" },
 ];
 
 const PRICE_RANGE = [1, 500];
@@ -35,7 +42,12 @@ interface Props {
   metals: { name: string; active: boolean }[];
   carat: { name: string; active: boolean }[];
   handleMetalsFilter: (selectedMetals: string[]) => void;
-  handleCaratFilter: (selectedMetals: string[]) => void;
+  handleCaratFilter: (selectedCarat: string[]) => void;
+  handleSortFilter: (selectedSort: SortingTypes | "") => void;
+  isOnSaleState: {
+    isOnSale: boolean;
+    setIsOnSale: React.Dispatch<React.SetStateAction<boolean>>;
+  };
 }
 const TabFilters: React.FC<Props> = ({
   handlePriceFilter,
@@ -43,16 +55,17 @@ const TabFilters: React.FC<Props> = ({
   handleCategoriesFilter,
   metals,
   carat,
+  handleSortFilter,
   handleMetalsFilter,
   handleCaratFilter,
+  isOnSaleState: { isOnSale, setIsOnSale },
 }) => {
   const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
-  const [isOnSale, setIsIsOnSale] = useState(true);
   const [rangePrices, setRangePrices] = useState([100, 500]);
   const [categoriesState, setCategoriesState] = useState<string[]>([]);
   const [metalsState, setMetalsState] = useState<string[]>([]);
   const [caratsState, setCaratsState] = useState<string[]>([]);
-  const [sortOrderStates, setSortOrderStates] = useState<string>("");
+  const [sortOrderStates, setSortOrderStates] = useState<SortingTypes | "">("");
 
   //
   const closeModalMoreFilter = () => setisOpenMoreFilter(false);
@@ -333,7 +346,9 @@ const TabFilters: React.FC<Props> = ({
                         name="radioNameSort"
                         label={item.name}
                         defaultChecked={sortOrderStates === item.id}
-                        onChange={setSortOrderStates}
+                        onChange={(value: string) =>
+                          setSortOrderStates(value as SortingTypes)
+                        }
                       />
                     ))}
                   </div>
@@ -348,7 +363,10 @@ const TabFilters: React.FC<Props> = ({
                       Clear
                     </ButtonThird>
                     <ButtonPrimary
-                      onClick={close}
+                      onClick={() => {
+                        close();
+                        handleSortFilter(sortOrderStates);
+                      }}
                       sizeClass="px-4 py-2 sm:px-5"
                     >
                       Apply
@@ -765,7 +783,7 @@ const TabFilters: React.FC<Props> = ({
             ? "border-primary-500 bg-primary-50 text-primary-900"
             : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
         }`}
-        onClick={() => setIsIsOnSale(!isOnSale)}
+        onClick={() => setIsOnSale(!isOnSale)}
       >
         <svg
           className="w-4 h-4"
@@ -1087,7 +1105,9 @@ const TabFilters: React.FC<Props> = ({
                                 name="radioNameSort"
                                 label={item.name}
                                 defaultChecked={sortOrderStates === item.id}
-                                onChange={setSortOrderStates}
+                                onChange={(value: string) =>
+                                  setSortOrderStates(value as SortingTypes)
+                                }
                               />
                             ))}
                           </div>
@@ -1103,7 +1123,7 @@ const TabFilters: React.FC<Props> = ({
                             label="On sale!"
                             desc="Products currently on sale"
                             enabled={isOnSale}
-                            onChange={setIsIsOnSale}
+                            onChange={setIsOnSale}
                           />
                         </div>
                       </div>

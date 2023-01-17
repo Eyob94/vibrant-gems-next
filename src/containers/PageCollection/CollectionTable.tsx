@@ -4,7 +4,7 @@ import { fetchStrapi } from "../../lib/strapi";
 import { Product } from "../../pages";
 import ButtonPrimary from "../../shared/Button/ButtonPrimary";
 import Pagination from "../../shared/Pagination/Pagination";
-import TabFilters from "../TabFilters";
+import TabFilters, { SortingTypes } from "../TabFilters";
 
 const CollectionTable: FC<{
   collection?: string | [];
@@ -32,6 +32,8 @@ const CollectionTable: FC<{
   );
   const [selectedMetals, setSelectedMetals] = useState<string[]>([]);
   const [selectedCarats, setSelectedCarats] = useState<string[]>([]);
+  const [selectedSort, setSelectedSort] = useState<SortingTypes | "">("");
+  const [isOnSale, setIsOnSale] = useState(true);
 
   const fetchProducts = async () => {
     const products = await fetchStrapi(`/products`, {
@@ -47,10 +49,24 @@ const CollectionTable: FC<{
         page: paginationPage,
         pageSize: take,
       },
+      sort: [
+        selectedSort === "price-hight-low"
+          ? "price:desc"
+          : selectedSort === "price-low-hight"
+          ? "price:asc"
+          : undefined,
+        selectedSort === "newest" ? "createdAt:desc" : undefined,
+        selectedSort === "best-rating" ? "rating:desc" : undefined,
+      ],
       filters: {
         price: {
           $between: [rangePrice[0], rangePrice[1]],
         },
+        status: isOnSale
+          ? "On Sale"
+          : selectedSort === "most-popular"
+          ? "Popular"
+          : [],
         category: {
           name:
             (selectedCategories.length > 0 ? selectedCategories : category) ||
@@ -138,6 +154,9 @@ const CollectionTable: FC<{
   const handleCaratFilter = (selectedCarats: string[]) => {
     setSelectedCarats(selectedCarats);
   };
+  const handleSortFilter = (selectedSort: SortingTypes | "") => {
+    setSelectedSort(selectedSort);
+  };
 
   useEffect(() => {
     if (!firstRender.current) {
@@ -152,6 +171,8 @@ const CollectionTable: FC<{
     selectedCategories,
     selectedMetals,
     selectedCarats,
+    selectedSort,
+    isOnSale,
   ]);
 
   return (
@@ -183,6 +204,11 @@ const CollectionTable: FC<{
           carat={carat}
           handleMetalsFilter={handleMetalsFilter}
           handleCaratFilter={handleCaratFilter}
+          handleSortFilter={handleSortFilter}
+          isOnSaleState={{
+            isOnSale,
+            setIsOnSale,
+          }}
         />
 
         {/* LOOP ITEMS */}

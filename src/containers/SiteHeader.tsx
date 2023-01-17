@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 const SiteHeader = () => {
   let router = useRouter();
 
-  return router.pathname === "/home2" ? <Header /> : <HeaderLogged />;
+  return <HeaderLogged />;
 };
 
 export default SiteHeader;

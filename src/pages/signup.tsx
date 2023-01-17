@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, FormEventHandler, useState } from "react";
 import Head from "next/head";
 import Input from "../shared/Input/Input";
 import ButtonPrimary from "../shared/Button/ButtonPrimary";
@@ -11,9 +11,12 @@ import {
   getProviders,
   ClientSafeProvider,
   LiteralUnion,
+  getCsrfToken,
 } from "next-auth/react";
 import { GetServerSideProps } from "next";
 import { BuiltInProviderType } from "next-auth/providers";
+import { fetchStrapi } from "../lib/strapi";
+import { useRouter } from "next/router";
 
 export interface PageSignUpProps {
   className?: string;
@@ -21,6 +24,7 @@ export interface PageSignUpProps {
     LiteralUnion<BuiltInProviderType, string>,
     ClientSafeProvider
   > | null;
+  csrfToken: string | null;
 }
 const loginSocials = [
   // {
@@ -40,7 +44,61 @@ const loginSocials = [
   },
 ];
 
-const PageSignUp: FC<PageSignUpProps> = ({ className = "", providers }) => {
+const PageSignUp: FC<PageSignUpProps> = ({
+  className = "",
+  providers,
+  csrfToken,
+}) => {
+  const router = useRouter();
+  const [credentials, setCredentials] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
+
+  // const onSubmit: FormEventHandler = async (event) => {
+  //   event.preventDefault();
+  //   try {
+  //     const register = await fetchStrapi(
+  //       "/auth/local/register",
+  //       {},
+  //       {
+  //         method: "POST",
+  //         body: JSON.stringify(credentials),
+  //         mode: "cors",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Accept: "*",
+  //         },
+  //       }
+  //     );
+  //     if (register) {
+  //       router.push("/");
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  const onSubmit: FormEventHandler = async (event) => {
+    event.preventDefault();
+    const res = await signIn("credentials", {
+      redirect: false,
+      username: credentials.username,
+      email: credentials.email,
+      password: credentials.password,
+      callbackUrl: `${window.location.origin}`,
+    });
+    if (res?.error) {
+      setError(res.error);
+    } else {
+      setError("");
+    }
+    if (res?.url) router.push(res.url);
+    // setSubmitting(false);
+  };
+
   return (
     <div className={`nc-PageSignUp  ${className}`} data-nc-id="PageSignUp">
       <Head>
@@ -80,13 +138,39 @@ const PageSignUp: FC<PageSignUpProps> = ({ className = "", providers }) => {
             <div className="absolute left-0 w-full top-1/2 transform -translate-y-1/2 border border-neutral-100 dark:border-neutral-800"></div>
           </div> */}
           {/* FORM */}
-          {/* <form className="grid grid-cols-1 gap-6" action="#" method="post">
+          <form className="grid grid-cols-1 gap-6 mt-10" onSubmit={onSubmit}>
+            <label className="block">
+              <span className="text-neutral-800 dark:text-neutral-200">
+                Username
+              </span>
+              <input
+                name="csrfToken"
+                type="hidden"
+                defaultValue={csrfToken || ""}
+              />
+
+              <Input
+                name="username"
+                type="text"
+                onChange={(e) =>
+                  setCredentials({ ...credentials, username: e.target.value })
+                }
+                required
+                placeholder="Your name"
+                className="mt-1"
+              />
+            </label>
             <label className="block">
               <span className="text-neutral-800 dark:text-neutral-200">
                 Email address
               </span>
               <Input
+                name="email"
                 type="email"
+                onChange={(e) =>
+                  setCredentials({ ...credentials, email: e.target.value })
+                }
+                required
                 placeholder="example@example.com"
                 className="mt-1"
               />
@@ -95,10 +179,17 @@ const PageSignUp: FC<PageSignUpProps> = ({ className = "", providers }) => {
               <span className="flex justify-between items-center text-neutral-800 dark:text-neutral-200">
                 Password
               </span>
-              <Input type="password" className="mt-1" />
+              <Input
+                name="password"
+                onChange={(e) =>
+                  setCredentials({ ...credentials, password: e.target.value })
+                }
+                required
+                className="mt-1"
+              />
             </label>
             <ButtonPrimary type="submit">Continue</ButtonPrimary>
-          </form> */}
+          </form>
 
           {/* ==== */}
           <span className="block text-center text-neutral-700 dark:text-neutral-300">
@@ -117,7 +208,8 @@ export default PageSignUp;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const providers = await getProviders();
+
   return {
-    props: { providers },
+    props: { providers, csrfToken: await getCsrfToken(context) },
   };
 };

@@ -10,8 +10,6 @@ export interface CommonLayoutProps {
 const CommonLayout: FC<CommonLayoutProps> = ({ children }) => {
   const { data } = useSession();
 
-  console.log(data);
-
   return (
     <div className="nc-CommonLayoutProps container">
       <div className="mt-14 sm:mt-20">
@@ -22,7 +20,7 @@ const CommonLayout: FC<CommonLayoutProps> = ({ children }) => {
               <span className="text-slate-900 dark:text-slate-200 font-semibold">
                 {data?.user?.name}
               </span>{" "}
-              ciseco@gmail.com · Los Angeles, CA
+              {data?.user?.email} · Los Angeles, CA
             </span>
           </div>
           <hr className="mt-10 border-slate-200 dark:border-slate-700"></hr>
