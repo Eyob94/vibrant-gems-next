@@ -44,7 +44,7 @@ export async function fetchStrapi(
   // Handle response
   if (!response.ok) {
     console.error(response.statusText);
-    console.error(response);
+    // console.error(response);
     // throw new Error(`An error occured please try again`);
   }
   const data = await response.json();
