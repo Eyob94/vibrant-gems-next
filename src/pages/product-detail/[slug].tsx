@@ -44,6 +44,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
         "relatedProducts.image",
       ],
     });
+
     const productData = data[0];
     console.log(productData);
 
@@ -101,10 +102,12 @@ export interface ProductDetailPageProps
   extends InferGetServerSidePropsType<typeof getServerSideProps> {
   className?: string;
   product: Product;
+  maxProductPrice: number;
 }
 const ProductDetailPage: FC<ProductDetailPageProps> = ({
   className = "",
   product,
+  maxProductPrice,
 }) => {
   const { addItem } = useShoppingCart();
   const status = product.status;

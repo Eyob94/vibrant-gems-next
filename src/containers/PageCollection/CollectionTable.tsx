@@ -21,6 +21,7 @@ const CollectionTable: FC<{
       collectionDescription: string;
     }[]
   >([]);
+  const [maxProductPrice, setMaxProductPrice] = useState<number>(100);
   const [metals, setMetals] = useState<{ name: string; active: boolean }[]>([]);
   const [carat, setCarat] = useState<{ name: string; active: boolean }[]>([]);
   const [products, setProducts] = useState<Product[]>();
@@ -33,7 +34,7 @@ const CollectionTable: FC<{
   const [selectedMetals, setSelectedMetals] = useState<string[]>([]);
   const [selectedCarats, setSelectedCarats] = useState<string[]>([]);
   const [selectedSort, setSelectedSort] = useState<SortingTypes | "">("");
-  const [isOnSale, setIsOnSale] = useState(true);
+  const [isOnSale, setIsOnSale] = useState(false);
 
   const fetchProducts = async () => {
     const products = await fetchStrapi(`/products`, {
@@ -117,6 +118,19 @@ const CollectionTable: FC<{
     }));
     setCarat(mappedMetalData);
   };
+  const getMaxPrice = async () => {
+    const maxProductPriceResponse = await fetchStrapi(`/products`, {
+      sort: ["price:desc"],
+      pagination: {
+        limit: 1,
+      },
+    });
+    console.log(maxProductPriceResponse, "maxProduct");
+    if (maxProductPriceResponse.data) {
+      setMaxProductPrice(maxProductPriceResponse.data[0].attributes.price);
+      console.log(maxProductPriceResponse.data[0].attributes.price);
+    }
+  };
   const getAllCategories = async () => {
     const categories = await fetchStrapi("/categories", {
       populate: ["collection"],
@@ -161,6 +175,7 @@ const CollectionTable: FC<{
   useEffect(() => {
     if (!firstRender.current) {
       getAllCategories();
+      getMaxPrice();
       getMetalTypes();
       getCarat();
     }
@@ -200,6 +215,7 @@ const CollectionTable: FC<{
           handlePriceFilter={handlePriceFilter}
           categories={categories}
           handleCategoriesFilter={handleCategoryFilter}
+          maxProductPrice={maxProductPrice}
           metals={metals}
           carat={carat}
           handleMetalsFilter={handleMetalsFilter}

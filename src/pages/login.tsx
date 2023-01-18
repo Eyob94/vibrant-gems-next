@@ -61,6 +61,13 @@ const PageLogin: FC<PageLoginProps> = ({
       password: credentials.password,
       callbackUrl: `${window.location.origin}`,
     });
+    if (res?.status === 401) {
+      setError("Field error");
+    }
+
+    if (res?.status === 404) {
+      setError("Please try again later");
+    }
     if (res?.error) {
       setError(res.error);
     } else {
@@ -79,6 +86,7 @@ const PageLogin: FC<PageLoginProps> = ({
           Login
         </h2>
         <div className="max-w-md mx-auto space-y-6">
+          <p className="bg-red-600">{error}</p>
           <div className="grid gap-3">
             {loginSocials.map((item, index) => (
               <a
@@ -166,6 +174,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const providers = await getProviders();
 
   return {
-    props: { providers, csrfToken: await getCsrfToken(context) },
+    props: {
+      providers,
+      csrfToken: JSON.parse(JSON.stringify(await getCsrfToken(context))),
+    },
   };
 };
