@@ -1,5 +1,5 @@
 import { link } from "fs/promises";
-import React, { useState } from "react";
+import React, { FC, useState } from "react";
 import Content from "../components/why/Content";
 
 const links = [
@@ -75,77 +75,116 @@ const links = [
 	},
 ];
 
-const Why = () => {
+export const getServerSideProps = async () => {
+	const { data } = await fetch(
+		`${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/why-links?populate=*`
+	).then((res) => res.json());
+
+	console.log;
+	console.log(data?.data);
+
+	return {
+		props: {
+			links: data,
+		},
+	};
+};
+
+type WhyProps = {
+	links: link[];
+};
+
+type link = {
+	id: string;
+	attributes: {
+		Link: string;
+		parent_link: {
+			data: [];
+		};
+		sub_links: {
+			data: [];
+		};
+	};
+};
+
+const Why: FC<WhyProps> = ({ links }) => {
 	const [selectedLink, setSelectedLink] = useState<number>(0);
 	const [selectedSubLink, setSelectedSubLink] = useState<number>(0.1);
+
+	const linksWithSubLinks = [];
+
+	const parentLinks = links.filter((link: link) => {
+		if (!link?.attributes?.parent_link?.data) {
+			return link;
+		} else {
+		}
+	});
+
+	console.log(selectedLink / parentLinks.length);
 
 	return (
 		<div className="flex justify-center w-full">
 			<div className="relative flex justify-center w-full pt-48 pb-20 max-w-screen-2xl">
 				<div className="top-0 h-full pb-40 w-96">
 					<div className="sticky flex flex-col border-r-2 top-72 ">
-						{links.map(
-							(link: { id: number; link: string; subLinks?: any[] }) => {
-								return (
+						{parentLinks?.map((link: link, i) => {
+							return (
+								<div
+									onClick={() => setSelectedLink(i)}
+									className={`${
+										selectedLink === i ? "text-purple-500 font-semibold" : ""
+									} flex justify-end w-full cursor-pointer`}
+								>
 									<div
-										onClick={() => setSelectedLink(link.id)}
-										className={`${
-											selectedLink === link.id
-												? "text-purple-500 font-semibold"
-												: ""
-										} flex justify-end w-full cursor-pointer`}
+										className={` ${
+											selectedLink === i ? "" : "hover:text-violet-500"
+										} flex-col flex w-80  justify-center items-start transition-all duration-150 ${
+											selectedLink === i &&
+											link?.attributes.sub_links?.data?.length
+												? "h-44 text-purple-300"
+												: "h-12"
+										} mb-4`}
 									>
-										<div
-											className={` ${
-												selectedLink === link.id ? "" : "hover:text-violet-500"
-											} flex-col flex w-80  justify-center items-start transition-all duration-150 ${
-												selectedLink === link.id && link.subLinks
-													? "h-44 text-purple-300"
-													: "h-12"
-											} mb-4`}
-										>
-											{link.link}
+										{link.attributes.Link}
 
-											<div
-												className={`flex flex-col pl-4 mt-4 ${
-													link.subLinks && selectedLink == link.id
-														? "h-48"
-														: "h-0 opacity-0"
-												} font-normal w-full transition-all duration-300 overflow-hidden relative text-neutral-800`}
-											>
-												{link?.subLinks?.map((subLink: any) => {
-													return (
+										<div
+											className={`flex flex-col pl-4 mt-4 ${
+												link?.attributes.sub_links && selectedLink == i
+													? "h-48"
+													: "h-0 opacity-0"
+											} font-normal w-full transition-all duration-300 overflow-hidden relative text-neutral-800`}
+										>
+											{link?.attributes.sub_links?.data?.map((subLink: any) => {
+												console.log(subLink);
+												return (
+													<div
+														onClick={() => setSelectedSubLink(subLink.id)}
+														className="mb-6"
+													>
 														<div
-															onClick={() => setSelectedSubLink(subLink.id % 1)}
-															className="mb-6"
+															className={`${
+																selectedSubLink === subLink.id &&
+																"text-purple-600 border-r-2 border-purple-600 right-0 font-semibold"
+															} flex items-center justify-start w-full h-6`}
 														>
-															<div
-																className={`${
-																	selectedLink + selectedSubLink ===
-																		subLink.id &&
-																	"text-purple-600 border-r-2 border-purple-600 right-0 font-semibold"
-																} flex items-center justify-start w-full h-6`}
-															>
-																{subLink.link}
-															</div>
+															{subLink?.attributes?.Link}
 														</div>
-													);
-												})}
-											</div>
+													</div>
+												);
+											})}
 										</div>
 									</div>
-								);
-							}
-						)}
+								</div>
+							);
+						})}
 						<div
 							style={{
-								top: (selectedLink / links.length) * 100 + "%",
+								top: (selectedLink / parentLinks?.length) * 100 + "%",
 							}}
-							className={`${
-								links[selectedLink].subLinks
-									? "bg-transparent"
-									: "bg-purple-400"
-							} transition-all duration-200 absolute w-1 h-12 rounded-full -right-[3px]`}
+							className={` transition-all ${
+								parentLinks[selectedLink]?.attributes.sub_links.data &&
+								"opacity-0"
+							} bg-purple-500 duration-200 absolute w-1 h-12 rounded-full -right-[3px]`}
 						></div>
 					</div>
 				</div>
