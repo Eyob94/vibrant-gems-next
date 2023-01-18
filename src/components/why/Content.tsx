@@ -9,24 +9,43 @@ type ContentProps = {
 
 const Content: FC<ContentProps> = ({ id }) => {
 	const [pageContent, setPageContent] = useState<string>();
+	const [loading, setLoading] = useState<Boolean>();
+	const [error, setError] = useState<Boolean>();
 
 	console.log(id);
 
 	useEffect(() => {
 		const fn = async () => {
+			setLoading(true);
 			const url = `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/why-pages?filters[why_link][id][$eq]=${id}`;
 
 			console.log(url);
 
 			const { data } = await fetch(url).then((res) => res.json());
 
-			data && setPageContent(data[0]?.attributes?.Content);
+			setPageContent(data[0]?.attributes?.Content);
+			setLoading(false);
 		};
 
-		fn();
+		try {
+			fn();
+		} catch (err) {
+			setLoading(false);
+			setError(true);
+		}
 	}, [id]);
 
-	console.log(pageContent);
+	if (loading)
+		return (
+			<div className="flex items-center justify-center h-full">Loading...</div>
+		);
+
+	if (error || !pageContent)
+		return (
+			<div className="flex items-center justify-center h-full px-8">
+				Something went wrong
+			</div>
+		);
 
 	return (
 		<div>

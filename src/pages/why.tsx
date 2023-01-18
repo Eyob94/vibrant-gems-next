@@ -119,7 +119,7 @@ const Why: FC<WhyProps> = ({ links }) => {
 	});
 	useEffect(() => {
 		setIdSelected(parseInt(parentLinks[0].id));
-	});
+	}, []);
 
 	console.log(!!parentLinks[selectedLink]?.attributes.sub_links.data.length);
 
