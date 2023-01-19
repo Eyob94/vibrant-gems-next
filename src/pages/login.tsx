@@ -86,7 +86,7 @@ const PageLogin: FC<PageLoginProps> = ({
           Login
         </h2>
         <div className="max-w-md mx-auto space-y-6">
-          <p className="bg-red-600">{error}</p>
+          <p className="bg-red-600 ">{error}</p>
           <div className="grid gap-3">
             {loginSocials.map((item, index) => (
               <a
