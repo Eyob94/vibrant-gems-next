@@ -4,7 +4,7 @@ import React from "react";
 const Content = () => {
 	return (
 		<div>
-			<div className="flex flex-col gap-16 px-28">
+			<div className="block px-28">
 				<h1 className="w-full text-5xl font-semibold text-center">
 					This is the Title
 				</h1>
