@@ -35,9 +35,11 @@ export default async function handler(
         `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/products`,
         { method: "GET" }
       ).then((res) => res.json());
+
       const allProducts: Product[] = response.data;
 
-      // Create pending order id
+      // Create random order id
+      const orderId = generateRandomString();
       const pendingOrderId = generateRandomString();
 
       // Filter the order items from db items
@@ -78,11 +80,13 @@ export default async function handler(
 
         // Create pending  orders
         const pendingOrders = orderItems.map((orderItem) => ({
+          orderId,
           itemName: orderItem.attributes.name,
           unitPrice: orderItem.attributes.price,
           quantity: getOrderQuantity(orderItem),
           totalPrice: orderItem.attributes.price * getOrderQuantity(orderItem)!,
           status: "PENDING",
+          pendingOrderId,
           itemDescription: orderItem.attributes.description,
         }));
 
