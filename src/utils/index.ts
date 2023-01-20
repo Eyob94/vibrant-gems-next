@@ -7,8 +7,8 @@ interface IOrder {
   quantity: number;
   totalPrice: number;
   status: string;
+  pendingId: string;
   itemDescription: string;
-  pendingOrderId: string;
 }
 
 // Generate random string
@@ -16,21 +16,16 @@ export const generateRandomString = () =>
   crypto.randomBytes(16).toString("hex");
 
 // Get pending orders of a specific session
-export async function getPendingOrders(pendingOrderId: string) {
+export async function getPendingOrders(pendingId: string) {
   try {
-    // Get all orders
+    // Get all pending orders
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/orders`,
+      `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/orders?filters[status][$eq]=PENDING&filters[pendingId][$eq]=${pendingId}`,
       { method: "GET" }
     ).then((res) => res.json());
 
-    const orders: IOrder[] = response.data;
-
-    // Get pending orders
-    const pendingOrders = orders.filter(
-      (order) =>
-        order.status === "PENDING" && order.pendingOrderId === pendingOrderId
-    );
+    // Pending orders
+    const pendingOrders: IOrder[] = response.data;
 
     // Return pending orders
     return pendingOrders;

@@ -1,12 +1,7 @@
 import Stripe from "stripe";
+import { stripe } from "../../../config/stripe";
 import { getPendingOrders } from "../../../utils";
 import { NextApiRequest, NextApiResponse } from "next";
-
-// Configure stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  // https://github.com/stripe/stripe-node#configuration
-  apiVersion: "2022-11-15",
-});
 
 export default async function handler(
   req: NextApiRequest,
@@ -25,7 +20,7 @@ export default async function handler(
     const isCiseco = parsedMetadataDetails.company === "ciseco";
 
     // Get pending order id
-    const pendingOrderId = parsedMetadataDetails.pendingOrderId;
+    const pendingId = parsedMetadataDetails.pendingId;
 
     // Signature
     const signature = req.headers["stripe-signature"] as string;
@@ -45,7 +40,7 @@ export default async function handler(
         (event.type === "checkout.session.completed" && isCiseco)
       ) {
         // Get pending orders
-        const pendingOrders = await getPendingOrders(pendingOrderId);
+        const pendingOrders = await getPendingOrders(pendingId);
 
         if (pendingOrders) {
           // Create updated orders
@@ -80,7 +75,7 @@ export default async function handler(
         }
       } else if (event.type === "checkout.session.expired" && isCiseco) {
         // Get the pending orders
-        const pendingOrders = await getPendingOrders(pendingOrderId);
+        const pendingOrders = await getPendingOrders(pendingId);
 
         if (pendingOrders) {
           try {
@@ -114,3 +109,10 @@ export default async function handler(
     res.status(405).end("Method Not Allowed");
   }
 }
+
+// Turn body parser off
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};

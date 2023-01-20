@@ -37,7 +37,7 @@ const CheckoutPage = () => {
 
     try {
       // Make request to the backend
-      const response = await fetch("/api/checkout_sessions", {
+      const response = await fetch("/api/checkout", {
         method: "POST",
         body: JSON.stringify(product.map((product) => product.product_data)),
       }).then((res) => res.json());

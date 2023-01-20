@@ -1,13 +1,8 @@
 import Stripe from "stripe";
-import { NextApiRequest, NextApiResponse } from "next";
 import { Product } from "use-shopping-cart/core";
+import { stripe } from "../../../config/stripe";
 import { generateRandomString } from "../../../utils";
-
-// Configure stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  // https://github.com/stripe/stripe-node#configuration
-  apiVersion: "2022-11-15",
-});
+import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
   req: NextApiRequest,
@@ -24,7 +19,7 @@ export default async function handler(
       quantity: 1,
     }));
 
-    // Order quantity
+    // Find order quantity
     const getOrderQuantity = (product: Product) =>
       productsData.find((productData) => productData.id === product.id)
         ?.quantity;
@@ -36,22 +31,22 @@ export default async function handler(
         { method: "GET" }
       ).then((res) => res.json());
 
+      // All products
       const allProducts: Product[] = response.data;
 
       // Create random order id
-      const orderId = generateRandomString();
-      const pendingOrderId = generateRandomString();
+      const pendingId = generateRandomString();
 
       // Filter the order items from db items
-      const orderItems = allProducts.filter((product) =>
+      const orderProducts = allProducts.filter((product) =>
         productsData.some((productData) => productData.id === product.id)
       );
 
       // Create line items
-      const lineItems = orderItems.map((product) => ({
-        name: product.attributes.name,
-        unit_amount: product.attributes.price,
-        quantity: getOrderQuantity(product),
+      const lineItems = orderProducts.map((orderProduct) => ({
+        name: orderProduct.attributes.name,
+        unit_amount: orderProduct.attributes.price,
+        quantity: getOrderQuantity(orderProduct),
       }));
 
       try {
@@ -72,41 +67,39 @@ export default async function handler(
             };
           }),
           metadata: {
-            details: JSON.stringify({ company: "ciseco", pendingOrderId }),
+            details: JSON.stringify({ company: "ciseco", pendingId }),
           },
           success_url: `${req.headers.origin}/success`,
           cancel_url: `${req.headers.origin}/checkout`,
         });
 
-        // Create pending  orders
-        const pendingOrders = orderItems.map((orderItem) => ({
-          orderId,
-          itemName: orderItem.attributes.name,
-          unitPrice: orderItem.attributes.price,
-          quantity: getOrderQuantity(orderItem),
-          totalPrice: orderItem.attributes.price * getOrderQuantity(orderItem)!,
+        // Create the order
+        const order = {
+          pendingId,
           status: "PENDING",
-          pendingOrderId,
-          itemDescription: orderItem.attributes.description,
-        }));
+          items: JSON.stringify(
+            orderProducts.map((orderProduct) => ({
+              name: orderProduct.attributes.name,
+              price: orderProduct.attributes.price,
+              description: orderProduct.attributes.description,
+            }))
+          ),
+          totalPrice: orderProducts.reduce(
+            (acc, curr) =>
+              acc + curr.attributes.price * getOrderQuantity(curr)!,
+            0
+          ),
+        };
 
         try {
           // Make request to the backend
-          await Promise.all(
-            pendingOrders.map(
-              async (pendingOrder) =>
-                await fetch(
-                  `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/orders`,
-                  {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ data: pendingOrder }),
-                  }
-                )
-            )
-          );
+          await fetch(`${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/orders`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ data: order }),
+          });
 
           // Send the session url with response
           res.status(200).json(session.url);
