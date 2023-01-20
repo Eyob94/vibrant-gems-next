@@ -1,4 +1,3 @@
-import Stripe from "stripe";
 import { Product } from "use-shopping-cart/core";
 import { stripe } from "../../../config/stripe";
 import { generateRandomString } from "../../../utils";
@@ -67,11 +66,8 @@ export default async function handler(
               quantity: lineItem.quantity,
             };
           }),
-          metadata: {
-            details: JSON.stringify({ company: "vibrantgems", pendingId }),
-          },
-          success_url: `${req.headers.origin}/success`,
           cancel_url: `${req.headers.origin}/checkout`,
+          success_url: `${req.headers.origin}/success?session={CHECKOUT_SESSION_ID}`,
         });
 
         // Create the order
