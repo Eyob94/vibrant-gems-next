@@ -45,8 +45,9 @@ export default async function handler(
       // Create line items
       const lineItems = orderProducts.map((orderProduct) => ({
         name: orderProduct.attributes.name,
-        unit_amount: orderProduct.attributes.price,
+        price: orderProduct.attributes.price,
         quantity: getOrderQuantity(orderProduct),
+        description: orderProduct.attributes.description,
       }));
 
       try {
@@ -61,13 +62,13 @@ export default async function handler(
                 product_data: {
                   name: lineItem.name,
                 },
-                unit_amount: Math.round(Math.abs(lineItem.unit_amount) * 100),
+                unit_amount: Math.round(Math.abs(lineItem.price) * 100),
               },
               quantity: lineItem.quantity,
             };
           }),
           metadata: {
-            details: JSON.stringify({ company: "ciseco", pendingId }),
+            details: JSON.stringify({ company: "vibrantgems", pendingId }),
           },
           success_url: `${req.headers.origin}/success`,
           cancel_url: `${req.headers.origin}/checkout`,
@@ -78,15 +79,14 @@ export default async function handler(
           pendingId,
           status: "PENDING",
           items: JSON.stringify(
-            orderProducts.map((orderProduct) => ({
-              name: orderProduct.attributes.name,
-              price: orderProduct.attributes.price,
-              description: orderProduct.attributes.description,
+            lineItems.map((lineItem) => ({
+              name: lineItem.name,
+              price: lineItem.price,
+              description: lineItem.description,
             }))
           ),
-          totalPrice: orderProducts.reduce(
-            (acc, curr) =>
-              acc + curr.attributes.price * getOrderQuantity(curr)!,
+          totalPrice: lineItems.reduce(
+            (acc, curr) => acc + curr.price * curr.quantity!,
             0
           ),
         };

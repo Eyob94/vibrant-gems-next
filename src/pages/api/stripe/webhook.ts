@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import { stripe } from "../../../config/stripe";
-import { getPendingOrders } from "../../../utils";
+import { getPendingOrder } from "../../../utils";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -16,8 +16,8 @@ export default async function handler(
       parsedBody.data.object.metadata.details
     );
 
-    // Check if the company is ciseco
-    const isCiseco = parsedMetadataDetails.company === "ciseco";
+    // Check if the company is Vibrant Gems
+    const isVibrantGems = parsedMetadataDetails.company === "vibrantgems";
 
     // Get pending order id
     const pendingId = parsedMetadataDetails.pendingId;
@@ -35,36 +35,31 @@ export default async function handler(
 
       // Handle the event
       if (
-        (event.type === "charge.succeeded" && isCiseco) ||
-        (event.type === "payment_intent.succeeded" && isCiseco) ||
-        (event.type === "checkout.session.completed" && isCiseco)
+        (event.type === "charge.succeeded" && isVibrantGems) ||
+        (event.type === "payment_intent.succeeded" && isVibrantGems) ||
+        (event.type === "checkout.session.completed" && isVibrantGems)
       ) {
         // Get pending orders
-        const pendingOrders = await getPendingOrders(pendingId);
+        const pendingOrder = await getPendingOrder(pendingId);
 
-        if (pendingOrders) {
+        if (pendingOrder) {
           // Create updated orders
-          const updatedOrders = pendingOrders.map((pendingOrder) => ({
+          const updatedOrder = {
             ...pendingOrder,
             status: "PROCESSING",
-          }));
+          };
 
           try {
             // Update orders status
-            await Promise.all(
-              updatedOrders.map(
-                async (updatedOrder) =>
-                  await fetch(
-                    `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/orders/${updatedOrder.orderId}`,
-                    {
-                      method: "PUT",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                      body: JSON.stringify({ data: updatedOrder }),
-                    }
-                  )
-              )
+            await fetch(
+              `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/orders/${pendingOrder.id}`,
+              {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ data: updatedOrder }),
+              }
             );
 
             // Send the response
@@ -73,23 +68,18 @@ export default async function handler(
             console.log(err);
           }
         }
-      } else if (event.type === "checkout.session.expired" && isCiseco) {
-        // Get the pending orders
-        const pendingOrders = await getPendingOrders(pendingId);
+      } else if (event.type === "checkout.session.expired" && isVibrantGems) {
+        // Get the pending order
+        const pendingOrder = await getPendingOrder(pendingId);
 
-        if (pendingOrders) {
+        if (pendingOrder) {
           try {
-            // Delete all pending orders of a specific session
-            await Promise.all(
-              pendingOrders.map(
-                async (pendingOrder) =>
-                  await fetch(
-                    `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/orders/${pendingOrder.orderId}`,
-                    {
-                      method: "DELETE",
-                    }
-                  )
-              )
+            // Delete the pending order
+            await fetch(
+              `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/orders/${pendingOrder.id}`,
+              {
+                method: "DELETE",
+              }
             );
 
             // Send the response
