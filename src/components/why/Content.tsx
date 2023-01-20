@@ -8,11 +8,11 @@ type ContentProps = {
 };
 
 const Content: FC<ContentProps> = ({ id }) => {
-	const [pageContent, setPageContent] = useState<string>();
+	const [pageContent, setPageContent] = useState<string>("");
 	const [loading, setLoading] = useState<Boolean>();
 	const [error, setError] = useState<Boolean>();
 
-	console.log(id);
+	console.log(pageContent);
 
 	useEffect(() => {
 		const fn = async () => {
@@ -40,11 +40,16 @@ const Content: FC<ContentProps> = ({ id }) => {
 			<div className="flex items-center justify-center h-full">Loading...</div>
 		);
 
-	if (error || !pageContent)
+	if (error)
 		return (
 			<div className="flex items-center justify-center h-full px-8">
 				Something went wrong
 			</div>
+		);
+
+	if (!pageContent)
+		return (
+			<div className="flex items-center justify-center h-full px-8">Empty</div>
 		);
 
 	return (
