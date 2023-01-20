@@ -1,4 +1,5 @@
 import { buffer } from "micro";
+import getRawBody from "raw-body";
 import { stripe } from "../../../config/stripe";
 import { getPendingOrder } from "../../../utils";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -9,7 +10,7 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     // Create req buffer
-    const reqBuffer = await buffer(req);
+    const rawBody = await getRawBody(req);
 
     // // Parsed body
     // const parsedBody = JSON.parse(reqBuffer.toString());
@@ -31,7 +32,7 @@ export default async function handler(
     try {
       // Product event config
       const event = stripe.webhooks.constructEvent(
-        reqBuffer,
+        rawBody,
         signature,
         process.env.STRIPE_WEBHOOK_SECRET as string
       );
