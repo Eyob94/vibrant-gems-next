@@ -11,19 +11,19 @@ export default async function handler(
     // Create req buffer
     const reqBuffer = await buffer(req);
 
-    // Parsed body
-    const parsedBody = JSON.parse(reqBuffer.toString());
+    // // Parsed body
+    // const parsedBody = JSON.parse(reqBuffer.toString());
 
-    // Parsed metadata details
-    const parsedMetadataDetails = JSON.parse(
-      parsedBody.data.object.metadata.details
-    );
+    // // Parsed metadata details
+    // const parsedMetadataDetails = JSON.parse(
+    //   parsedBody.data.object.metadata.details
+    // );
 
-    // Get pending order id
-    const orderId = parsedMetadataDetails.orderId;
+    // // Get pending order id
+    // const orderId = parsedMetadataDetails.orderId;
 
-    // Check if the company is Vibrant Gems
-    const isVibrantGems = parsedMetadataDetails.company === "vibrantgems";
+    // // Check if the company is Vibrant Gems
+    // const isVibrantGems = parsedMetadataDetails.company === "vibrantgems";
 
     // Signature
     const signature = req.headers["stripe-signature"] as string;
@@ -35,6 +35,18 @@ export default async function handler(
         signature,
         process.env.STRIPE_WEBHOOK_SECRET as string
       );
+
+      // Parsed metadata details
+      const parsedMetadataDetails = JSON.parse(
+        //@ts-ignore
+        event.data.object.metadata.details
+      );
+
+      // Get pending order id
+      const orderId = parsedMetadataDetails.orderId;
+
+      // Check if the company is Vibrant Gems
+      const isVibrantGems = parsedMetadataDetails.company === "vibrantgems";
 
       // Handle the event
       if (
