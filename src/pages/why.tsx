@@ -117,6 +117,9 @@ const Why: FC<WhyProps> = ({ links }) => {
 		} else {
 		}
 	});
+
+	parentLinks.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+
 	useEffect(() => {
 		setIdSelected(parseInt(parentLinks[0].id));
 	}, []);

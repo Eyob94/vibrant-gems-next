@@ -49,7 +49,7 @@ const Content: FC<ContentProps> = ({ id }) => {
 
 	return (
 		<div>
-			<div className="flex flex-col gap-16 px-28">
+			<div className=" px-28">
 				<Markup markup={pageContent} />
 			</div>
 		</div>
