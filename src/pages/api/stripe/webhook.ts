@@ -1,4 +1,4 @@
-import Stripe from "stripe";
+import { buffer } from "micro";
 import { stripe } from "../../../config/stripe";
 import { getPendingOrder } from "../../../utils";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -8,6 +8,9 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
+    // Create req buffer
+    const reqBuffer = await buffer(req);
+
     // Parsed body
     const parsedBody = JSON.parse(req.body);
 
@@ -28,7 +31,7 @@ export default async function handler(
     try {
       // Product event config
       const event = stripe.webhooks.constructEvent(
-        req.body,
+        reqBuffer,
         signature,
         process.env.STRIPE_WEBHOOK_SECRET as string
       );
@@ -45,8 +48,10 @@ export default async function handler(
         if (pendingOrder) {
           // Create updated orders
           const updatedOrder = {
-            ...pendingOrder,
             status: "PROCESSING",
+            items: pendingOrder.attributes.items,
+            pendingId: pendingOrder.attributes.pendingId,
+            totalPrice: pendingOrder.attributes.totalPrice,
           };
 
           try {
