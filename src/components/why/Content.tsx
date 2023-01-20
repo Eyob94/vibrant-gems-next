@@ -1,193 +1,58 @@
 import Image from "next/image";
-import React from "react";
+import React, { FC, useEffect, useState } from "react";
+//@ts-ignore
+import { Markup } from "react-render-markup";
 
-const Content = () => {
+type ContentProps = {
+	id: number;
+};
+
+const Content: FC<ContentProps> = ({ id }) => {
+	const [pageContent, setPageContent] = useState<string>();
+	const [loading, setLoading] = useState<Boolean>();
+	const [error, setError] = useState<Boolean>();
+
+	console.log(id);
+
+	useEffect(() => {
+		const fn = async () => {
+			setLoading(true);
+			const url = `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/why-pages?filters[why_link][id][$eq]=${id}`;
+
+			console.log(url);
+
+			const { data } = await fetch(url).then((res) => res.json());
+
+			setPageContent(data[0]?.attributes?.Content);
+			setLoading(false);
+		};
+
+		try {
+			fn();
+		} catch (err) {
+			setLoading(false);
+			setError(true);
+		}
+	}, [id]);
+
+	if (loading)
+		return (
+			<div className="flex items-center justify-center h-full">Loading...</div>
+		);
+
+	if (error || !pageContent)
+		return (
+			<div className="flex items-center justify-center h-full px-8">
+				Something went wrong
+			</div>
+		);
+
 	return (
 		<div>
-			<div className="block px-28">
-				<h1 className="w-full text-5xl font-semibold text-center">
-					This is the Title
-				</h1>
-				<div className="w-full overflow-hidden rounded-xl h-[500px] drop-shadow-lg shadow-black/20">
-					<Image
-						alt="cover Image"
-						loader={({ src }) => `https://static.toiimg.com/${src}`}
-						src={
-							"thumb/msid-58515713,width-748,height-499,resizemode=4,imgsize-145905/.jpg"
-						}
-						className="rounded-xl object-fit"
-						width={1500}
-						height={300}
-					/>
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati
-					enim magnam laboriosam at eligendi perferendis fugit labore quibusdam
-					facere eaque aliquid voluptatum omnis facilis tempora qui autem illo,
-					numquam harum! Lorem ipsum dolor sit amet consectetur, adipisicing
-					elit. Maiores dolore similique esse quaerat recusandae at placeat,
-					suscipit ad tempore porro eius totam ex quam illo cumque, ut optio
-					facere consequatur!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti amet
-					in vitae voluptate voluptatum odio excepturi voluptates laboriosam
-					perspiciatis quia molestiae libero vero, at labore eligendi quaerat
-					minus obcaecati animi!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti amet
-					in vitae voluptate voluptatum odio excepturi voluptates laboriosam
-					perspiciatis quia molestiae libero vero, at labore eligendi quaerat
-					minus obcaecati animi!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati
-					enim magnam laboriosam at eligendi perferendis fugit labore quibusdam
-					facere eaque aliquid voluptatum omnis facilis tempora qui autem illo,
-					numquam harum! Lorem ipsum dolor sit amet consectetur, adipisicing
-					elit. Maiores dolore similique esse quaerat recusandae at placeat,
-					suscipit ad tempore porro eius totam ex quam illo cumque, ut optio
-					facere consequatur!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti amet
-					in vitae voluptate voluptatum odio excepturi voluptates laboriosam
-					perspiciatis quia molestiae libero vero, at labore eligendi quaerat
-					minus obcaecati animi!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti amet
-					in vitae voluptate voluptatum odio excepturi voluptates laboriosam
-					perspiciatis quia molestiae libero vero, at labore eligendi quaerat
-					minus obcaecati animi!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati
-					enim magnam laboriosam at eligendi perferendis fugit labore quibusdam
-					facere eaque aliquid voluptatum omnis facilis tempora qui autem illo,
-					numquam harum! Lorem ipsum dolor sit amet consectetur, adipisicing
-					elit. Maiores dolore similique esse quaerat recusandae at placeat,
-					suscipit ad tempore porro eius totam ex quam illo cumque, ut optio
-					facere consequatur!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti amet
-					in vitae voluptate voluptatum odio excepturi voluptates laboriosam
-					perspiciatis quia molestiae libero vero, at labore eligendi quaerat
-					minus obcaecati animi!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati
-					enim magnam laboriosam at eligendi perferendis fugit labore quibusdam
-					facere eaque aliquid voluptatum omnis facilis tempora qui autem illo,
-					numquam harum! Lorem ipsum dolor sit amet consectetur, adipisicing
-					elit. Maiores dolore similique esse quaerat recusandae at placeat,
-					suscipit ad tempore porro eius totam ex quam illo cumque, ut optio
-					facere consequatur!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti amet
-					in vitae voluptate voluptatum odio excepturi voluptates laboriosam
-					perspiciatis quia molestiae libero vero, at labore eligendi quaerat
-					minus obcaecati animi!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti amet
-					in vitae voluptate voluptatum odio excepturi voluptates laboriosam
-					perspiciatis quia molestiae libero vero, at labore eligendi quaerat
-					minus obcaecati animi!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati
-					enim magnam laboriosam at eligendi perferendis fugit labore quibusdam
-					facere eaque aliquid voluptatum omnis facilis tempora qui autem illo,
-					numquam harum! Lorem ipsum dolor sit amet consectetur, adipisicing
-					elit. Maiores dolore similique esse quaerat recusandae at placeat,
-					suscipit ad tempore porro eius totam ex quam illo cumque, ut optio
-					facere consequatur!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti amet
-					in vitae voluptate voluptatum odio excepturi voluptates laboriosam
-					perspiciatis quia molestiae libero vero, at labore eligendi quaerat
-					minus obcaecati animi!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti amet
-					in vitae voluptate voluptatum odio excepturi voluptates laboriosam
-					perspiciatis quia molestiae libero vero, at labore eligendi quaerat
-					minus obcaecati animi!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati
-					enim magnam laboriosam at eligendi perferendis fugit labore quibusdam
-					facere eaque aliquid voluptatum omnis facilis tempora qui autem illo,
-					numquam harum! Lorem ipsum dolor sit amet consectetur, adipisicing
-					elit. Maiores dolore similique esse quaerat recusandae at placeat,
-					suscipit ad tempore porro eius totam ex quam illo cumque, ut optio
-					facere consequatur!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti amet
-					in vitae voluptate voluptatum odio excepturi voluptates laboriosam
-					perspiciatis quia molestiae libero vero, at labore eligendi quaerat
-					minus obcaecati animi!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti amet
-					in vitae voluptate voluptatum odio excepturi voluptates laboriosam
-					perspiciatis quia molestiae libero vero, at labore eligendi quaerat
-					minus obcaecati animi!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati
-					enim magnam laboriosam at eligendi perferendis fugit labore quibusdam
-					facere eaque aliquid voluptatum omnis facilis tempora qui autem illo,
-					numquam harum! Lorem ipsum dolor sit amet consectetur, adipisicing
-					elit. Maiores dolore similique esse quaerat recusandae at placeat,
-					suscipit ad tempore porro eius totam ex quam illo cumque, ut optio
-					facere consequatur!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti amet
-					in vitae voluptate voluptatum odio excepturi voluptates laboriosam
-					perspiciatis quia molestiae libero vero, at labore eligendi quaerat
-					minus obcaecati animi!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti amet
-					in vitae voluptate voluptatum odio excepturi voluptates laboriosam
-					perspiciatis quia molestiae libero vero, at labore eligendi quaerat
-					minus obcaecati animi!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati
-					enim magnam laboriosam at eligendi perferendis fugit labore quibusdam
-					facere eaque aliquid voluptatum omnis facilis tempora qui autem illo,
-					numquam harum! Lorem ipsum dolor sit amet consectetur, adipisicing
-					elit. Maiores dolore similique esse quaerat recusandae at placeat,
-					suscipit ad tempore porro eius totam ex quam illo cumque, ut optio
-					facere consequatur!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti amet
-					in vitae voluptate voluptatum odio excepturi voluptates laboriosam
-					perspiciatis quia molestiae libero vero, at labore eligendi quaerat
-					minus obcaecati animi!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti amet
-					in vitae voluptate voluptatum odio excepturi voluptates laboriosam
-					perspiciatis quia molestiae libero vero, at labore eligendi quaerat
-					minus obcaecati animi!
-				</div>
-				<div className="text-lg tracking-wide">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti amet
-					in vitae voluptate voluptatum odio excepturi voluptates laboriosam
-					perspiciatis quia molestiae libero vero, at labore eligendi quaerat
-					minus obcaecati animi!
-				</div>
+
+			<div className=" px-28">
+				<Markup markup={pageContent} />
+
 			</div>
 		</div>
 	);
