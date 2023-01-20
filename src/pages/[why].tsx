@@ -110,6 +110,10 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 		};
 	}
 
+	if (why === "why") {
+		id = 1;
+	}
+
 	return {
 		props: {
 			links: data,
@@ -195,7 +199,15 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 												: "h-12"
 										} mb-4`}
 									>
-										{link.attributes.Link}
+										<span className="flex justify-start w-full gap-8">
+											{link.attributes.Link}
+
+											{!!link?.attributes.sub_links.data.length && (
+												<div className="scale-y-150 scale-x-[200%] rotate-90">
+													›
+												</div>
+											)}
+										</span>
 
 										<div
 											className={`flex flex-col pl-4 mt-4 ${
