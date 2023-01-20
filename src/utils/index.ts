@@ -11,7 +11,6 @@ export async function getPendingOrder(res: NextApiResponse, orderId: string) {
     // Return the pending order
     return response.data;
   } catch (err) {
-    console.log(err);
-    res.status(500).json("Failed to get pending order");
+    return res.status(500).json("Failed to get pending order");
   }
 }
