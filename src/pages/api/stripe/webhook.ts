@@ -12,7 +12,7 @@ export default async function handler(
     const reqBuffer = await buffer(req);
 
     // Parsed body
-    const parsedBody = JSON.parse(req.body);
+    const parsedBody = JSON.parse(reqBuffer.toString());
 
     // Parsed metadata details
     const parsedMetadataDetails = JSON.parse(
@@ -31,7 +31,7 @@ export default async function handler(
     try {
       // Product event config
       const event = stripe.webhooks.constructEvent(
-        reqBuffer,
+        reqBuffer.toString("utf8"),
         signature,
         process.env.STRIPE_WEBHOOK_SECRET as string
       );
@@ -49,9 +49,9 @@ export default async function handler(
           // Create updated orders
           const updatedOrder = {
             status: "PROCESSING",
-            items: pendingOrder.attributes.items,
             pendingId: pendingOrder.attributes.pendingId,
             totalPrice: pendingOrder.attributes.totalPrice,
+            items: JSON.stringify(pendingOrder.attributes.items),
           };
 
           try {
