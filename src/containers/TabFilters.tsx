@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { Dialog, Popover, Transition } from "@headlessui/react";
 import ButtonPrimary from "../shared/Button/ButtonPrimary";
 import ButtonThird from "../shared/Button/ButtonThird";
@@ -39,6 +39,7 @@ interface Props {
   handlePriceFilter: (min: number, max: number) => void;
   categories: { name: string; active: boolean }[];
   handleCategoriesFilter: (selectedCategories: string[]) => void;
+  maxProductPrice: number;
   metals: { name: string; active: boolean }[];
   carat: { name: string; active: boolean }[];
   handleMetalsFilter: (selectedMetals: string[]) => void;
@@ -53,6 +54,7 @@ const TabFilters: React.FC<Props> = ({
   handlePriceFilter,
   categories,
   handleCategoriesFilter,
+  maxProductPrice,
   metals,
   carat,
   handleSortFilter,
@@ -61,7 +63,7 @@ const TabFilters: React.FC<Props> = ({
   isOnSaleState: { isOnSale, setIsOnSale },
 }) => {
   const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
-  const [rangePrices, setRangePrices] = useState([100, 500]);
+  const [rangePrices, setRangePrices] = useState([0, maxProductPrice]);
   const [categoriesState, setCategoriesState] = useState<string[]>([]);
   const [metalsState, setMetalsState] = useState<string[]>([]);
   const [caratsState, setCaratsState] = useState<string[]>([]);
@@ -1020,8 +1022,8 @@ const TabFilters: React.FC<Props> = ({
                               <Slider
                                 range
                                 className="text-red-400"
-                                min={PRICE_RANGE[0]}
-                                max={PRICE_RANGE[1]}
+                                min={rangePrices[0]}
+                                max={rangePrices[1]}
                                 defaultValue={rangePrices}
                                 allowCross={false}
                                 onChange={(_input: number | number[]) =>
@@ -1159,6 +1161,9 @@ const TabFilters: React.FC<Props> = ({
       </div>
     );
   };
+  useEffect(() => {
+    setRangePrices([0, maxProductPrice]);
+  }, [maxProductPrice]);
 
   return (
     <div className="flex lg:space-x-4">
