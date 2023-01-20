@@ -2,6 +2,7 @@ import { link } from "fs/promises";
 import React, { FC, useState, useEffect } from "react";
 import Content from "../components/why/Content";
 import { GetServerSideProps } from "next";
+import { useRouter } from "next/router";
 
 const links = [
 	{
@@ -146,6 +147,8 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 	const [selectedSubLink, setSelectedSubLink] = useState<number>(0.1);
 	const [idSelected, setIdSelected] = useState<number>(id || 1);
 
+	const router = useRouter();
+
 	const linksWithSubLinks = [];
 
 	const parentLinks = links.filter((link: link) => {
@@ -184,6 +187,7 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 										if (!link?.attributes.sub_links.data.length) {
 											setIdSelected(parseInt(link.id));
 										}
+										router.push(`/${link?.attributes?.slug}`);
 									}}
 									className={`${
 										selectedLink === i ? "text-purple-500 font-semibold" : ""
