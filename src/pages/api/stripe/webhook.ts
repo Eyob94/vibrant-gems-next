@@ -31,7 +31,7 @@ export default async function handler(
     try {
       // Product event config
       const event = stripe.webhooks.constructEvent(
-        reqBuffer.toString("utf8"),
+        reqBuffer,
         signature,
         process.env.STRIPE_WEBHOOK_SECRET as string
       );
