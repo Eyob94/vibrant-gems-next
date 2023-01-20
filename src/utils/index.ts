@@ -1,5 +1,6 @@
+import { NextApiResponse } from "next";
 // Get pending order of a specific session
-export async function getPendingOrder(orderId: string) {
+export async function getPendingOrder(res: NextApiResponse, orderId: string) {
   try {
     // Make request to the backend
     const response = await fetch(
@@ -11,5 +12,6 @@ export async function getPendingOrder(orderId: string) {
     return response.data;
   } catch (err) {
     console.log(err);
+    res.status(500).json("Failed to get pending order");
   }
 }

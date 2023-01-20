@@ -43,7 +43,7 @@ export default async function handler(
         (event.type === "checkout.session.completed" && isVibrantGems)
       ) {
         // Get pending orders
-        const pendingOrder = await getPendingOrder(orderId);
+        const pendingOrder = await getPendingOrder(res, orderId);
 
         if (pendingOrder) {
           // Create updated orders
@@ -70,11 +70,12 @@ export default async function handler(
             res.status(201).json("Orders status updated");
           } catch (err) {
             console.log(err);
+            res.status(500).json("Failed update oder status");
           }
         }
       } else if (event.type === "checkout.session.expired" && isVibrantGems) {
         // Get the pending order
-        const pendingOrder = await getPendingOrder(orderId);
+        const pendingOrder = await getPendingOrder(res, orderId);
 
         if (pendingOrder) {
           try {
@@ -90,13 +91,14 @@ export default async function handler(
             res.status(201).json("Orders deleted");
           } catch (err) {
             console.log(err);
+            res.status(500).json("Failed to delete order");
           }
         }
       }
     } catch (err) {
       // If event fails to create
       console.log("Stripe event verification failed");
-      throw err;
+      res.status(500).json("Stripe event verification failed");
     }
   } else {
     res.setHeader("Allow", "POST");
