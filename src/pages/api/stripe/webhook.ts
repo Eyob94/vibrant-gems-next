@@ -114,6 +114,7 @@ export default async function handler(
       res.status(500).json("Stripe event verification failed");
     }
   } else {
+    // If method isn't post
     res.setHeader("Allow", "POST");
     res.status(405).end("Method Not Allowed");
   }
