@@ -19,11 +19,11 @@ export default async function handler(
       parsedBody.data.object.metadata.details
     );
 
+    // Get pending order id
+    const orderId = parsedMetadataDetails.orderId;
+
     // Check if the company is Vibrant Gems
     const isVibrantGems = parsedMetadataDetails.company === "vibrantgems";
-
-    // Get pending order id
-    const pendingId = parsedMetadataDetails.pendingId;
 
     // Signature
     const signature = req.headers["stripe-signature"] as string;
@@ -43,13 +43,12 @@ export default async function handler(
         (event.type === "checkout.session.completed" && isVibrantGems)
       ) {
         // Get pending orders
-        const pendingOrder = await getPendingOrder(pendingId);
+        const pendingOrder = await getPendingOrder(orderId);
 
         if (pendingOrder) {
           // Create updated orders
           const updatedOrder = {
             status: "PROCESSING",
-            pendingId: pendingOrder.attributes.pendingId,
             totalPrice: pendingOrder.attributes.totalPrice,
             items: JSON.stringify(pendingOrder.attributes.items),
           };
@@ -75,7 +74,7 @@ export default async function handler(
         }
       } else if (event.type === "checkout.session.expired" && isVibrantGems) {
         // Get the pending order
-        const pendingOrder = await getPendingOrder(pendingId);
+        const pendingOrder = await getPendingOrder(orderId);
 
         if (pendingOrder) {
           try {
