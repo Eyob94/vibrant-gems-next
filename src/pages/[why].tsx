@@ -1,6 +1,7 @@
 import { link } from "fs/promises";
 import React, { FC, useState, useEffect } from "react";
 import Content from "../components/why/Content";
+import { GetServerSideProps } from "next";
 
 const links = [
 	{
@@ -75,26 +76,58 @@ const links = [
 	},
 ];
 
-export const getServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 	const { data } = await fetch(
 		`${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/why-links?populate=*`
 	).then((res) => res.json());
 
+	//@ts-ignore
+	const { why } = params;
+
+	const parentLinks = data.filter((link: link) => {
+		if (!link?.attributes?.parent_link?.data) {
+			return link;
+		} else {
+		}
+	});
+
+	let id;
+
+	parentLinks.map((link: link) => {
+		if (link?.attributes?.slug === why) {
+			id = parseInt(link.id);
+		}
+	});
+
+	console.log("---------------");
+	console.log(id);
+
+	console.log("------------------");
+
+	if (!id && why !== "why") {
+		return {
+			notFound: true,
+		};
+	}
+
 	return {
 		props: {
 			links: data,
+			id,
 		},
 	};
 };
 
 type WhyProps = {
 	links: link[];
+	id?: number;
 };
 
 type link = {
 	id: string;
 	attributes: {
 		Link: string;
+		slug: string;
 		parent_link: {
 			data: [];
 		};
@@ -104,10 +137,10 @@ type link = {
 	};
 };
 
-const Why: FC<WhyProps> = ({ links }) => {
+const Why: FC<WhyProps> = ({ links, id }) => {
 	const [selectedLink, setSelectedLink] = useState<number>(0);
 	const [selectedSubLink, setSelectedSubLink] = useState<number>(0.1);
-	const [idSelected, setIdSelected] = useState<number>(0);
+	const [idSelected, setIdSelected] = useState<number>(id || 1);
 
 	const linksWithSubLinks = [];
 
@@ -121,7 +154,14 @@ const Why: FC<WhyProps> = ({ links }) => {
 	parentLinks.sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
 	useEffect(() => {
-		setIdSelected(parseInt(parentLinks[0].id));
+		id ? setIdSelected(id) : setIdSelected(parseInt(parentLinks[0].id));
+		if (id) {
+			parentLinks.map((link: link, i: number) => {
+				if (parseInt(link?.id) === id) {
+					setSelectedLink(i);
+				}
+			});
+		}
 	}, []);
 
 	console.log(!!parentLinks[selectedLink]?.attributes.sub_links.data.length);
