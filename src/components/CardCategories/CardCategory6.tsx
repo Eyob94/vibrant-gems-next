@@ -2,7 +2,6 @@ import React, { FC } from "react";
 import NcImage from "../../shared/NcImage/NcImage";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import Image from "next/image";
 
 export interface CardCategory6Props {
   className?: string;
@@ -33,7 +32,7 @@ const CardCategory6: FC<CardCategory6Props> = ({
 
         <div className="absolute inset-5 flex flex-col justify-between items-center">
           <div className="flex justify-center items-center">
-            <Image
+            <NcImage
               src={featuredImage}
               containerClassName={`w-20 h-20 rounded-full overflow-hidden z-0 ${color}`}
             />
