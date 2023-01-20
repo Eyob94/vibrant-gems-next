@@ -48,11 +48,7 @@ export default async function handler(
         const isVibrantGems = parsedMetadataDetails.company === "vibrantgems";
 
         // Handle the event
-        if (
-          (event.type === "charge.succeeded" && isVibrantGems) ||
-          (event.type === "payment_intent.succeeded" && isVibrantGems) ||
-          (event.type === "checkout.session.completed" && isVibrantGems)
-        ) {
+        if (event.type === "checkout.session.completed" && isVibrantGems) {
           // Get pending orders
           const pendingOrder = await getPendingOrder(res, orderId);
 
