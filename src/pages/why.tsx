@@ -3,77 +3,78 @@ import React, { FC, useState, useEffect } from "react";
 import Content from "../components/why/Content";
 
 const links = [
-	{
-		id: 0,
-		link: "100% Money back guarantee",
-	},
-	{
-		id: 1,
-		link: "24/7 Customer service",
-	},
-	{
-		id: 2,
-		link: "Encrypted Payment options",
-	},
-	{
-		id: 3,
-		link: "Free Worldwide Shipping",
-	},
-	{
-		id: 4,
-		link: "Standardized Gemstone Grading",
-	},
-	{
-		id: 5,
-		link: "360∘ 4K Gemstone Display",
-	},
-	{
-		id: 6,
-		link: "Our Packaging",
-	},
-	{
-		id: 7,
-		link: "Price Matching",
-	},
-	{
-		id: 8,
-		link: "Gemstone certification services",
-	},
-	{
-		id: 9,
-		link: "Virtual aapointment",
-	},
-	{
-		id: 10,
-		link: "Track your order",
-	},
-	{
-		id: 11,
-		link: "FAQs",
-	},
-	{
-		id: 12,
-		link: "Policies",
-		subLinks: [
-			{
-				id: 12.1,
-				link: "Privacy Policy",
-			},
-			{
-				id: 12.2,
-				link: "Return Policy",
-			},
-			{
-				id: 12.3,
-				link: "Terms and Conditions",
-			},
-		],
-	},
-	{
-		id: 13,
-		link: "Accessibility",
-	},
+  {
+    id: 0,
+    link: "100% Money back guarantee",
+  },
+  {
+    id: 1,
+    link: "24/7 Customer service",
+  },
+  {
+    id: 2,
+    link: "Encrypted Payment options",
+  },
+  {
+    id: 3,
+    link: "Free Worldwide Shipping",
+  },
+  {
+    id: 4,
+    link: "Standardized Gemstone Grading",
+  },
+  {
+    id: 5,
+    link: "360∘ 4K Gemstone Display",
+  },
+  {
+    id: 6,
+    link: "Our Packaging",
+  },
+  {
+    id: 7,
+    link: "Price Matching",
+  },
+  {
+    id: 8,
+    link: "Gemstone certification services",
+  },
+  {
+    id: 9,
+    link: "Virtual aapointment",
+  },
+  {
+    id: 10,
+    link: "Track your order",
+  },
+  {
+    id: 11,
+    link: "FAQs",
+  },
+  {
+    id: 12,
+    link: "Policies",
+    subLinks: [
+      {
+        id: 12.1,
+        link: "Privacy Policy",
+      },
+      {
+        id: 12.2,
+        link: "Return Policy",
+      },
+      {
+        id: 12.3,
+        link: "Terms and Conditions",
+      },
+    ],
+  },
+  {
+    id: 13,
+    link: "Accessibility",
+  },
 ];
+
 
 export const getServerSideProps = async () => {
 	const { data } = await fetch(
@@ -211,6 +212,7 @@ const Why: FC<WhyProps> = ({ links }) => {
 			</div>
 		</div>
 	);
+
 };
 
 export default Why;

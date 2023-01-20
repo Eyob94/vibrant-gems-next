@@ -77,7 +77,7 @@ const options: NextAuthOptions = {
     jwt: async ({ token, account, user }: any) => {
       const isSignIn = user ? true : false;
       console.log("jwt", isSignIn, token, user as any);
-      if (isSignIn) {
+      if (isSignIn || account?.provider === "google") {
         if (account?.provider === "google") {
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/auth/${account?.provider}/callback?access_token=${account?.access_token}`
@@ -103,7 +103,7 @@ const options: NextAuthOptions = {
         }
       );
       console.log(me);
-      token.id = me.user.id;
+      token.id = me.id;
 
       return token;
     },

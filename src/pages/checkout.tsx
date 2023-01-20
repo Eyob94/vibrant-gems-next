@@ -14,10 +14,12 @@ import getStripe from "../utils/get-stripejs";
 import { useShoppingCart } from "use-shopping-cart";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 
 const CheckoutPage = () => {
-  const { cartDetails, totalPrice, removeItem } = useShoppingCart();
+  const { data } = useSession();
   const router = useRouter();
+  const { cartDetails, totalPrice, removeItem } = useShoppingCart();
   const [tabActive, setTabActive] = useState<
     "ContactInfo" | "ShippingAddress" | "PaymentMethod"
   >("ShippingAddress");
@@ -30,30 +32,22 @@ const CheckoutPage = () => {
   };
   const handleSubmit = async () => {
     if (!cartDetails) return;
-    const product = Object.values(cartDetails);
-    console.log(product);
-    const products = [PRODUCTS[0], PRODUCTS[2], PRODUCTS[3]];
-    const response = await fetch("/api/checkout_sessions", {
-      method: "POST",
-      body: JSON.stringify(product.map((product) => product.product_data)),
-    }).then((res) => res.json());
-    if (response.statusCode === 500) {
-      console.error(response.message);
-      return;
-    }
 
-    // Redirect to Checkout.
-    const stripe = await getStripe();
-    const { error } = await stripe!.redirectToCheckout({
-      // Make the id field from the Checkout Session creation API response
-      // available to this file, so you can provide it as parameter here
-      // instead of the {{CHECKOUT_SESSION_ID}} placeholder.
-      sessionId: response.id,
-    });
-    // If `redirectToCheckout` fails due to a browser or network
-    // error, display the localized error message to your customer
-    // using `error.message`.
-    console.warn(error.message);
+    const product = Object.values(cartDetails);
+
+    try {
+      // Make request to the backend
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        body: JSON.stringify(product.map((product) => product.product_data)),
+      }).then((res) => res.json());
+
+      // Push to the checkout page
+      router.push(response);
+    } catch (err) {
+      // Log error
+      console.log(err);
+    }
   };
 
   const renderProduct = (item: Product, key: number) => {

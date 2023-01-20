@@ -49,8 +49,10 @@ const Content: FC<ContentProps> = ({ id }) => {
 
 	return (
 		<div>
+
 			<div className=" px-28">
 				<Markup markup={pageContent} />
+
 			</div>
 		</div>
 	);
