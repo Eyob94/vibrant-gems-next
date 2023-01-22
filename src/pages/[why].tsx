@@ -146,7 +146,7 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 	const [selectedLink, setSelectedLink] = useState<number>(0);
 	const [selectedSubLink, setSelectedSubLink] = useState<number>(0.1);
 	const [idSelected, setIdSelected] = useState<number>(id || 1);
-	const [showSidebar, setShowSidebar] = useState<boolean>(true);
+	const [showSidebar, setShowSidebar] = useState<boolean>(false);
 
 	const router = useRouter();
 
@@ -177,7 +177,7 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 	return (
 		<div className="flex justify-center w-full">
 			<div className="relative flex justify-center w-full max-w-screen-lg pb-20 pt-28 2xl:max-w-screen-xl ">
-				<div className="top-0 hidden h-full pb-40 md:block w-96">
+				<div className="top-0 hidden h-full pb-40 xl:block w-96">
 					<div className="sticky flex flex-col border-r-2 top-72 ">
 						{parentLinks?.map((link: link, i) => {
 							return (
@@ -262,14 +262,14 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 				</div>
 				<div
 					onClick={() => setShowSidebar((prev) => !prev)}
-					className="absolute top-0 left-0 flex items-center justify-center w-10 h-16 text-5xl text-purple-500 bg-white border rounded-r-lg shadow-lg md:hidden border-l-none"
+					className="absolute top-0 left-0 flex items-center justify-center w-10 h-16 text-5xl text-purple-500 bg-white border rounded-r-lg shadow-lg xl:hidden border-l-none"
 				>
 					›
 				</div>
 				<div
-					className={`fixed md:hidden top-0 z-50 bg-white  shadow-lg shadow-black/20 ${
-						showSidebar ? "right-[00%]" : " right-[100%]"
-					} w-96 h-max overflow-y-auto transition-all  duration-500`}
+					className={`fixed xl:hidden top-0 z-50 bg-white  shadow-lg shadow-black/20 ${
+						showSidebar ? "right-[0%]" : " right-[100%]  "
+					} w-screen   h-max overflow-y-auto transition-all  duration-500`}
 				>
 					<div className="relative w-full h-full py-4">
 						<div className="flex flex-col h-screen ">
