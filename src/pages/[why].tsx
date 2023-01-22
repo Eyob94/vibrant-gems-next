@@ -283,6 +283,7 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 								{parentLinks.map((link: link, i: number) => {
 									return (
 										<div
+											key={link.id}
 											onClick={() => {
 												setSelectedLink(i);
 												if (!link.attributes.sub_links.data.length) {
