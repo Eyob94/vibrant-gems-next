@@ -146,6 +146,7 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 	const [selectedLink, setSelectedLink] = useState<number>(0);
 	const [selectedSubLink, setSelectedSubLink] = useState<number>(0.1);
 	const [idSelected, setIdSelected] = useState<number>(id || 1);
+	const [showSidebar, setShowSidebar] = useState<boolean>(true);
 
 	const router = useRouter();
 
@@ -175,8 +176,8 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 
 	return (
 		<div className="flex justify-center w-full">
-			<div className="relative flex justify-center w-full max-w-screen-lg pt-48 pb-20 2xl:max-w-screen-xl ">
-				<div className="top-0 h-full pb-40 w-96">
+			<div className="relative flex justify-center w-full max-w-screen-lg pb-20 pt-28 2xl:max-w-screen-xl ">
+				<div className="top-0 hidden h-full pb-40 md:block w-96">
 					<div className="sticky flex flex-col border-r-2 top-72 ">
 						{parentLinks?.map((link: link, i) => {
 							return (
@@ -259,10 +260,99 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 						></div>
 					</div>
 				</div>
-				<div className="w-full">
-					<div>
-						<Content id={idSelected} />
+				<div
+					onClick={() => setShowSidebar((prev) => !prev)}
+					className="absolute top-0 left-0 flex items-center justify-center w-10 h-16 text-5xl text-purple-500 bg-white border rounded-r-lg shadow-lg md:hidden border-l-none"
+				>
+					›
+				</div>
+				<div
+					className={`fixed md:hidden top-0 z-50 bg-white  shadow-lg shadow-black/20 ${
+						showSidebar ? "right-[00%]" : " right-[100%]"
+					} w-96 h-max overflow-y-auto transition-all  duration-500`}
+				>
+					<div className="relative w-full h-full py-4">
+						<div className="flex flex-col h-screen ">
+							<div
+								onClick={() => setShowSidebar(false)}
+								className="flex justify-end w-full h-10 px-10 mb-6 text-4xl text-red-500 "
+							>
+								×
+							</div>
+							<div className="relative flex flex-col items-center w-full min-h-[900px]">
+								{parentLinks.map((link: link, i: number) => {
+									return (
+										<div
+											onClick={() => {
+												setSelectedLink(i);
+												if (!link.attributes.sub_links.data.length) {
+													setIdSelected(parseInt(link.id));
+													setShowSidebar(false);
+												}
+												router.push(link.attributes.slug);
+											}}
+											className={`flex justify-center items-center ${
+												idSelected == parseInt(link.id)
+													? "text-purple-500 border-r-4 border-violet-500"
+													: ""
+											} w-full ${
+												!!link.attributes.sub_links.data.length &&
+												selectedLink === i
+													? "h-48"
+													: "h-14"
+											}  text-sm`}
+										>
+											<span className="flex justify-start gap-8 w-60">
+												{link.attributes.Link}
+
+												{!!link?.attributes.sub_links.data.length && (
+													<div className="scale-y-150 scale-x-[200%] rotate-90">
+														›
+													</div>
+												)}
+											</span>
+											<div
+												className={`flex flex-col pl-4 mt-4 ${
+													!!link?.attributes.sub_links.data.length &&
+													selectedLink === i
+														? "h-48"
+														: "h-0 hidden"
+												} font-normal w-full transition-all duration-300 overflow-hidden mt-4 relative text-neutral-800`}
+											>
+												{link?.attributes.sub_links?.data?.map(
+													(subLink: any) => {
+														return (
+															<div
+																key={subLink.id}
+																onClick={() => {
+																	setShowSidebar(false);
+																	setSelectedSubLink(subLink.id);
+																	setIdSelected(subLink.id);
+																}}
+																className="mb-6"
+															>
+																<div
+																	className={`${
+																		selectedSubLink === subLink.id &&
+																		"text-purple-600 border-r-2 border-purple-600 right-0 font-semibold"
+																	} flex items-center justify-start w-full h-6`}
+																>
+																	{subLink?.attributes?.Link}
+																</div>
+															</div>
+														);
+													}
+												)}
+											</div>
+										</div>
+									);
+								})}
+							</div>
+						</div>
 					</div>
+				</div>
+				<div className="w-full">
+					<div>{<Content id={idSelected} showSidebar={showSidebar} />}</div>
 				</div>
 			</div>
 		</div>

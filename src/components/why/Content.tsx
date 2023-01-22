@@ -5,9 +5,10 @@ import { Markup } from "react-render-markup";
 
 type ContentProps = {
 	id: number;
+	showSidebar?: boolean;
 };
 
-const Content: FC<ContentProps> = ({ id }) => {
+const Content: FC<ContentProps> = ({ id, showSidebar }) => {
 	const [pageContent, setPageContent] = useState<string>("");
 	const [loading, setLoading] = useState<Boolean>();
 	const [error, setError] = useState<Boolean>();
@@ -54,10 +55,8 @@ const Content: FC<ContentProps> = ({ id }) => {
 
 	return (
 		<div>
-
-			<div className=" px-28">
-				<Markup markup={pageContent} />
-
+			<div className="px-4 md:px-28">
+				{!showSidebar && <Markup markup={pageContent} />}
 			</div>
 		</div>
 	);
