@@ -1,6 +1,6 @@
 import { Popover, Transition } from "@headlessui/react";
 import { avatarImgs } from "../../contains/fakeData";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import Link from "next/link";
 import Avatar from "../../shared/Avatar/Avatar";
 import SwitchDarkMode2 from "../../shared/SwitchDarkMode/SwitchDarkMode2";
@@ -10,6 +10,10 @@ import { useRouter } from "next/router";
 export default function AvatarDropdown() {
   const { data: session, status } = useSession();
   const router = useRouter();
+
+  useEffect(() => {
+    console.log(status, "here");
+  }, [status]);
   return (
     <div className="AvatarDropdown ">
       <Popover className="relative">
