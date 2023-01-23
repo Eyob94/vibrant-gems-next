@@ -94,7 +94,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
 	let id;
 
-	parentLinks.map((link: link) => {
+	data.map((link: link) => {
 		if (link?.attributes?.slug === why) {
 			id = parseInt(link.id);
 		}
@@ -137,7 +137,13 @@ type link = {
 			data: [];
 		};
 		sub_links: {
-			data: [];
+			data: [
+				id: string,
+				attributes: {
+					Link: string;
+					slug: string;
+				}
+			];
 		};
 	};
 };
@@ -152,14 +158,14 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 
 	const linksWithSubLinks = [];
 
-	const parentLinks = links.filter((link: link) => {
+	const parentLinks = links?.filter((link: link) => {
 		if (!link?.attributes?.parent_link?.data) {
 			return link;
 		} else {
 		}
 	});
 
-	parentLinks.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+	parentLinks?.sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
 	useEffect(() => {
 		id ? setIdSelected(id) : setIdSelected(parseInt(parentLinks[0].id));
@@ -187,8 +193,8 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 										setSelectedLink(i);
 										if (!link?.attributes.sub_links.data.length) {
 											setIdSelected(parseInt(link.id));
+											router.push(`/${link?.attributes?.slug}`);
 										}
-										router.push(`/${link?.attributes?.slug}`);
 									}}
 									className={`${
 										selectedLink === i ? "text-purple-500 font-semibold" : ""
@@ -222,27 +228,31 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 													: "h-0 hidden"
 											} font-normal w-full transition-all duration-300 overflow-hidden relative text-neutral-800`}
 										>
-											{link?.attributes.sub_links?.data?.map((subLink: any) => {
-												return (
-													<div
-														key={subLink.id}
-														onClick={() => {
-															setSelectedSubLink(subLink.id);
-															setIdSelected(subLink.id);
-														}}
-														className="mb-6"
-													>
+											{link?.attributes.sub_links?.data?.map(
+												//@ts-expect-error
+												(subLink: link) => {
+													return (
 														<div
-															className={`${
-																selectedSubLink === subLink.id &&
-																"text-purple-600 border-r-2 border-purple-600 right-0 font-semibold"
-															} flex items-center justify-start w-full h-6`}
+															key={subLink.id}
+															onClick={() => {
+																setSelectedSubLink(parseInt(subLink.id));
+																setIdSelected(parseInt(subLink.id));
+																router.push(`/${subLink.attributes.slug}`);
+															}}
+															className="mb-6"
 														>
-															{subLink?.attributes?.Link}
+															<div
+																className={`${
+																	selectedSubLink === parseInt(subLink.id) &&
+																	"text-purple-600 border-r-2 border-purple-600 right-0 font-semibold"
+																} flex items-center justify-start w-full h-6`}
+															>
+																{subLink?.attributes?.Link}
+															</div>
 														</div>
-													</div>
-												);
-											})}
+													);
+												}
+											)}
 										</div>
 									</div>
 								</div>
