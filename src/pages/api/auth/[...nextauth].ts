@@ -79,9 +79,10 @@ const options: NextAuthOptions = {
 
   callbacks: {
     session: async ({ session, user, token }) => {
-      console.log(session, user, "session");
-      (session as any).jwt = token;
-      // (session as any).id = user.id;
+      console.log(session, token, user, "session");
+      (session as any).jwt = token.jwt;
+
+      (session as any).user = token.user;
       return Promise.resolve(session);
     },
     jwt: async ({ token, account, user }: any) => {
@@ -97,7 +98,7 @@ const options: NextAuthOptions = {
           const data = await response.json();
           console.log(data, "google data");
           token.jwt = data.jwt;
-          token.id = data.user.id;
+          token.user = data.user;
           return Promise.resolve(token);
         }
 
@@ -112,28 +113,15 @@ const options: NextAuthOptions = {
         //   return null;
         // }
         // console.log(me, "me");
-        // token.id = me.user.id;
-        // token.jwt = me.jwt;
-        // console.log(token);
+        token.jwt = user.jwt;
+        token.user = user.user;
+        console.log(token, user);
+        Promise.resolve(user);
 
-        // return Promise.resolve(token);
+        return Promise.resolve(token);
       }
+      return Promise.resolve(token);
     },
-    // jwt: async ({ token, account, user }) => {
-    //   const isSignIn = user ? true : false;
-    //   if (isSignIn) {
-    //     const response = await fetch(
-    //       `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/auth/${account?.provider}/callback?access_token=${account?.access_token}`
-    //     );
-    //     console.log(
-    //       `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/auth/${account?.provider}/callback?access_token=${account?.access_token}`
-    //     );
-    //     const data = await response.json();
-    //     token.jwt = data.jwt;
-    //     token.id = data.user.id;
-    //   }
-    //   return Promise.resolve(token);
-    // },
   },
 };
 

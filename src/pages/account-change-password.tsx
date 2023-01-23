@@ -1,6 +1,5 @@
 import { GetServerSideProps } from "next";
 import { useSession } from "next-auth/react";
-import { parseCookies } from "nookies";
 import { FC, FormEventHandler, useState } from "react";
 import Label from "../components/Label/Label";
 import CommonLayout from "../containers/AccountPage/CommonLayout";
@@ -9,9 +8,9 @@ import ButtonPrimary from "../shared/Button/ButtonPrimary";
 import CheckAuth from "../shared/CheckAuth";
 import Input from "../shared/Input/Input";
 
-const AccountPass: FC<{ auth: string }> = ({ auth }) => {
-  const { data } = useSession();
-  console.log(data, "session");
+const AccountPass: FC = () => {
+  const { data: session } = useSession();
+  console.log(session, "session");
   const [error, setError] = useState("");
   const [password, setPassword] = useState({
     currentPassword: "",
@@ -21,14 +20,14 @@ const AccountPass: FC<{ auth: string }> = ({ auth }) => {
   const onSubmit: FormEventHandler = async (event) => {
     event.preventDefault();
 
-    console.log("auth", auth);
+    console.log();
     const data = await fetchStrapi(
       "/auth/change-password",
       {},
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${auth}`,
+          Authorization: `Bearer ${(session as any).jwt}`,
         },
         method: "POST",
         body: JSON.stringify({
@@ -120,14 +119,3 @@ const AccountPass: FC<{ auth: string }> = ({ auth }) => {
 };
 
 export default AccountPass;
-
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const { auth } = parseCookies({ req });
-  console.log(auth, "herere");
-
-  return {
-    props: {
-      auth: auth || null,
-    },
-  };
-};
