@@ -5,3 +5,19 @@
 @import "./header";
 
 @import "node_modules/@glidejs/glide/src/assets/sass/glide.core";
+
+
+.scroll-container{
+    scroll-snap-type: y mandatory;
+    scrollbar-width: none;
+}
+
+.scroll-container::-webkit-scrollbar{
+    display:none;
+}
+
+
+.scroll-area{
+    scroll-snap-align: start;
+    scrollbar-width: none;
+}

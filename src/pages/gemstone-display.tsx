@@ -8,8 +8,8 @@ const loader = ({ src }: { src: string }) => {
 
 const gemstoneDisplay = () => {
 	return (
-		<div className="w-full">
-			<div className="relative">
+		<div className="w-full h-screen overflow-y-auto scroll-container">
+			<div className="relative h-screen scroll-area">
 				<div className="relative flex h-[80vh] justify-center w-full">
 					<Image
 						alt="bg"
@@ -34,7 +34,7 @@ const gemstoneDisplay = () => {
 					</div>
 				</div>
 			</div>
-			<div className="flex h-screen">
+			<div className="flex h-screen scroll-area">
 				<div className="w-[50%]">
 					<div className="flex flex-col items-center justify-center w-full h-full gap-8">
 						<div className="text-2xl font-bold uppercase">
@@ -58,12 +58,12 @@ const gemstoneDisplay = () => {
 						width={1000}
 						height={500}
 						className="object-cover w-full h-full"
-						src="https://res.cloudinary.com/dqdktlbxw/image/upload/v1674396990/Vibrant/many-size-diamonds-white-background-reflection-surface-d-rendering-172598727_jnjcfr.jpg"
+						src="https://res.cloudinary.com/dqdktlbxw/image/upload/v1674484374/Vibrant/2463921_xkdnyo.jpg"
 					/>
 				</div>
 			</div>
 
-			<div className="flex h-screen">
+			<div className="flex h-screen scroll-area">
 				<div className="w-1/2">
 					<Image
 						alt="right"
@@ -86,7 +86,7 @@ const gemstoneDisplay = () => {
 					</div>
 				</div>
 			</div>
-			<div className="flex h-max bg-[#FAFAFA]">
+			<div className="flex scroll-area h-screen bg-[#FAFAFA]">
 				<div className="w-[50%]">
 					<div className="flex flex-col items-center justify-center w-full h-full gap-12">
 						<div className="text-5xl font-bold tracking-wider uppercase">
@@ -103,7 +103,7 @@ const gemstoneDisplay = () => {
 						<BlackBtn text="book a consultation" />
 					</div>
 				</div>
-				<div className="w-1/2">
+				<div className="flex items-center w-1/2 h-full">
 					<Image
 						alt="right"
 						width={1000}
