@@ -6,10 +6,12 @@ import Navigation from "../../shared/Navigation/Navigation";
 import CartDropdown from "./CartDropdown";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 
 export interface MainNav2LoggedProps {}
 
 const MainNav2Logged: FC<MainNav2LoggedProps> = () => {
+  const router = useRouter();
   const { status } = useSession();
   const inputRef = React.createRef<HTMLInputElement>();
   const [showSearchForm, setShowSearchForm] = useState(false);
@@ -95,7 +97,8 @@ const MainNav2Logged: FC<MainNav2LoggedProps> = () => {
             <AvatarDropdown />
           ) : (
             <div
-              className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none flex items-center justify-center`}
+              className={`cursor-pointer w-10 h-10 sm:w-12 sm:h-12 rounded-full text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none flex items-center justify-center`}
+              onClick={() => router.push("login")}
             >
               <svg
                 className=" w-6 h-6"
