@@ -2,6 +2,7 @@ import ProductCard from "../components/ProductCard";
 import CommonLayout from "../containers/AccountPage/CommonLayout";
 import { PRODUCTS } from "../data/data";
 import ButtonSecondary from "../shared/Button/ButtonSecondary";
+import CheckAuth from "../shared/CheckAuth";
 
 const AccountSavelists = () => {
   const renderSection1 = () => {
@@ -28,7 +29,9 @@ const AccountSavelists = () => {
 
   return (
     <div>
-      <CommonLayout>{renderSection1()}</CommonLayout>
+      <CheckAuth>
+        <CommonLayout>{renderSection1()}</CommonLayout>
+      </CheckAuth>
     </div>
   );
 };

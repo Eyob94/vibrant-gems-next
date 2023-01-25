@@ -83,20 +83,25 @@ const PageSignUp: FC<PageSignUpProps> = ({
 
   const onSubmit: FormEventHandler = async (event) => {
     event.preventDefault();
-    const res = await signIn("credentials", {
-      redirect: false,
-      username: credentials.username,
-      email: credentials.email,
-      password: credentials.password,
-      callbackUrl: `${window.location.origin}`,
-    });
-    if (res?.error) {
-      setError(res.error);
-    } else {
-      setError("");
+    try {
+      const res = await signIn("credentials", {
+        redirect: false,
+        username: credentials.username,
+        email: credentials.email,
+        password: credentials.password,
+        callbackUrl: `${window.location.origin}`,
+      });
+      console.log(res);
+      if (res?.error) {
+        setError(res.error);
+      } else {
+        setError("");
+      }
+      if (res?.url) router.push(res.url);
+      // setSubmitting(false);
+    } catch (error) {
+      console.log(error);
     }
-    if (res?.url) router.push(res.url);
-    // setSubmitting(false);
   };
 
   return (
@@ -138,6 +143,15 @@ const PageSignUp: FC<PageSignUpProps> = ({
             <div className="absolute left-0 w-full top-1/2 transform -translate-y-1/2 border border-neutral-100 dark:border-neutral-800"></div>
           </div> */}
           {/* FORM */}
+          {error && (
+            <div
+              className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg "
+              role="alert"
+            >
+              <span className="font-medium">Error: </span>
+              {error}
+            </div>
+          )}
           <form className="grid grid-cols-1 gap-6 mt-10" onSubmit={onSubmit}>
             <label className="block">
               <span className="text-neutral-800 dark:text-neutral-200">
@@ -212,7 +226,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       providers,
-      csrfToken: JSON.parse(JSON.stringify(await getCsrfToken(context))),
+      csrfToken: (await getCsrfToken(context)) || null,
     },
   };
 };

@@ -1,7 +1,5 @@
-import Stripe from "stripe";
 import { Product } from "use-shopping-cart/core";
 import { stripe } from "../../../config/stripe";
-import { generateRandomString } from "../../../utils";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -34,9 +32,6 @@ export default async function handler(
       // All products
       const allProducts: Product[] = response.data;
 
-      // Create random order id
-      const pendingId = generateRandomString();
-
       // Filter the order items from db items
       const orderProducts = allProducts.filter((product) =>
         productsData.some((productData) => productData.id === product.id)
@@ -50,55 +45,60 @@ export default async function handler(
         description: orderProduct.attributes.description,
       }));
 
+      // Create the order
+      const orderDetails = {
+        status: "PENDING",
+        items: JSON.stringify(
+          lineItems.map((lineItem) => ({
+            name: lineItem.name,
+            price: lineItem.price,
+            description: lineItem.description,
+          }))
+        ),
+        totalPrice: lineItems.reduce(
+          (acc, curr) => acc + curr.price * curr.quantity!,
+          0
+        ),
+      };
+
       try {
-        // Create a checkout session
-        const session = await stripe.checkout.sessions.create({
-          payment_method_types: ["card"],
-          mode: "payment",
-          line_items: lineItems.map((lineItem) => {
-            return {
-              price_data: {
-                currency: "usd",
-                product_data: {
-                  name: lineItem.name,
-                },
-                unit_amount: Math.round(Math.abs(lineItem.price) * 100),
-              },
-              quantity: lineItem.quantity,
-            };
-          }),
-          metadata: {
-            details: JSON.stringify({ company: "vibrantgems", pendingId }),
-          },
-          success_url: `${req.headers.origin}/success`,
-          cancel_url: `${req.headers.origin}/checkout`,
-        });
-
-        // Create the order
-        const order = {
-          pendingId,
-          status: "PENDING",
-          items: JSON.stringify(
-            lineItems.map((lineItem) => ({
-              name: lineItem.name,
-              price: lineItem.price,
-              description: lineItem.description,
-            }))
-          ),
-          totalPrice: lineItems.reduce(
-            (acc, curr) => acc + curr.price * curr.quantity!,
-            0
-          ),
-        };
-
-        try {
-          // Make request to the backend
-          await fetch(`${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/orders`, {
+        // Make request to the backend
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/orders`,
+          {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ data: order }),
+            body: JSON.stringify({ data: orderDetails }),
+          }
+        ).then((res) => res.json());
+
+        // Order id
+        const orderId = response.data.id;
+
+        try {
+          // Create a checkout session
+          const session = await stripe.checkout.sessions.create({
+            payment_method_types: ["card"],
+            mode: "payment",
+            line_items: lineItems.map((lineItem) => {
+              return {
+                price_data: {
+                  currency: "usd",
+                  product_data: {
+                    name: lineItem.name,
+                  },
+                  unit_amount: Math.round(Math.abs(lineItem.price) * 100),
+                },
+                quantity: lineItem.quantity,
+              };
+            }),
+            metadata: {
+              details: JSON.stringify({ company: "vibrantgems", orderId }),
+            },
+            cancel_url: `${req.headers.origin}/checkout`,
+            success_url: `${req.headers.origin}/success?session={CHECKOUT_SESSION_ID}`,
           });
 
           // Send the session url with response

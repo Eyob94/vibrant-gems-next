@@ -5,94 +5,95 @@ import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 
 const links = [
-	{
-		id: 0,
-		link: "100% Money back guarantee",
-	},
-	{
-		id: 1,
-		link: "24/7 Customer service",
-	},
-	{
-		id: 2,
-		link: "Encrypted Payment options",
-	},
-	{
-		id: 3,
-		link: "Free Worldwide Shipping",
-	},
-	{
-		id: 4,
-		link: "Standardized Gemstone Grading",
-	},
-	{
-		id: 5,
-		link: "360∘ 4K Gemstone Display",
-	},
-	{
-		id: 6,
-		link: "Our Packaging",
-	},
-	{
-		id: 7,
-		link: "Price Matching",
-	},
-	{
-		id: 8,
-		link: "Gemstone certification services",
-	},
-	{
-		id: 9,
-		link: "Virtual aapointment",
-	},
-	{
-		id: 10,
-		link: "Track your order",
-	},
-	{
-		id: 11,
-		link: "FAQs",
-	},
-	{
-		id: 12,
-		link: "Policies",
-		subLinks: [
-			{
-				id: 12.1,
-				link: "Privacy Policy",
-			},
-			{
-				id: 12.2,
-				link: "Return Policy",
-			},
-			{
-				id: 12.3,
-				link: "Terms and Conditions",
-			},
-		],
-	},
-	{
-		id: 13,
-		link: "Accessibility",
-	},
+  {
+    id: 0,
+    link: "100% Money back guarantee",
+  },
+  {
+    id: 1,
+    link: "24/7 Customer service",
+  },
+  {
+    id: 2,
+    link: "Encrypted Payment options",
+  },
+  {
+    id: 3,
+    link: "Free Worldwide Shipping",
+  },
+  {
+    id: 4,
+    link: "Standardized Gemstone Grading",
+  },
+  {
+    id: 5,
+    link: "360∘ 4K Gemstone Display",
+  },
+  {
+    id: 6,
+    link: "Our Packaging",
+  },
+  {
+    id: 7,
+    link: "Price Matching",
+  },
+  {
+    id: 8,
+    link: "Gemstone certification services",
+  },
+  {
+    id: 9,
+    link: "Virtual aapointment",
+  },
+  {
+    id: 10,
+    link: "Track your order",
+  },
+  {
+    id: 11,
+    link: "FAQs",
+  },
+  {
+    id: 12,
+    link: "Policies",
+    subLinks: [
+      {
+        id: 12.1,
+        link: "Privacy Policy",
+      },
+      {
+        id: 12.2,
+        link: "Return Policy",
+      },
+      {
+        id: 12.3,
+        link: "Terms and Conditions",
+      },
+    ],
+  },
+  {
+    id: 13,
+    link: "Accessibility",
+  },
 ];
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-	const { data } = await fetch(
-		`${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/why-links?populate=*`
-	).then((res) => res.json());
+  const { data } = await fetch(
+    `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/why-links?populate=*`
+  ).then((res) => res.json());
 
-	//@ts-ignore
-	const { why } = params;
+  //@ts-ignore
+  const { why } = params;
 
-	const parentLinks = data.filter((link: link) => {
-		if (!link?.attributes?.parent_link?.data) {
-			return link;
-		} else {
-		}
-	});
+  const parentLinks = data?.filter((link: link) => {
+    if (!link?.attributes?.parent_link?.data) {
+      return link;
+    } else {
+    }
+  });
 
-	let id;
+  let id;
+
 
 	data.map((link: link) => {
 		if (link?.attributes?.slug === why) {
@@ -100,35 +101,39 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 		}
 	});
 
-	console.log("---------------");
-	console.log(id);
 
-	console.log("------------------");
 
-	if (!id && why !== "why") {
-		return {
-			notFound: true,
-		};
-	}
 
-	if (why === "why") {
-		id = 1;
-	}
+  console.log("---------------");
+  console.log(id);
 
-	return {
-		props: {
-			links: data,
-			id,
-		},
-	};
+  console.log("------------------");
+
+  if (!id && why !== "why") {
+    return {
+      notFound: true,
+    };
+  }
+
+  if (why === "why") {
+    id = 1;
+  }
+
+  return {
+    props: {
+      links: data,
+      id,
+    },
+  };
 };
 
 type WhyProps = {
-	links: link[];
-	id?: number;
+  links: link[];
+  id?: number;
 };
 
 type link = {
+
 	id: string;
 	attributes: {
 		Link: string;
@@ -154,9 +159,11 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 	const [idSelected, setIdSelected] = useState<number>(id || 1);
 	const [showSidebar, setShowSidebar] = useState<boolean>(false);
 
-	const router = useRouter();
 
-	const linksWithSubLinks = [];
+  const router = useRouter();
+
+  const linksWithSubLinks = [];
+
 
 	const parentLinks = links?.filter((link: link) => {
 		if (!link?.attributes?.parent_link?.data) {
@@ -167,18 +174,20 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 
 	parentLinks?.sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
-	useEffect(() => {
-		id ? setIdSelected(id) : setIdSelected(parseInt(parentLinks[0].id));
-		if (id) {
-			parentLinks.map((link: link, i: number) => {
-				if (parseInt(link?.id) === id) {
-					setSelectedLink(i);
-				}
-			});
-		}
-	}, []);
 
-	console.log(!!parentLinks[selectedLink]?.attributes.sub_links.data.length);
+  useEffect(() => {
+    id ? setIdSelected(id) : setIdSelected(parseInt(parentLinks[0].id));
+    if (id) {
+      parentLinks?.map((link: link, i: number) => {
+        if (parseInt(link?.id) === id) {
+          setSelectedLink(i);
+        }
+      });
+    }
+  }, []);
+
+  console.log(!!parentLinks[selectedLink]?.attributes.sub_links.data.length);
+
 
 	return (
 		<div className="flex justify-center w-full">
@@ -213,12 +222,14 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 										<span className="flex justify-start w-full gap-8">
 											{link.attributes.Link}
 
-											{!!link?.attributes.sub_links.data.length && (
-												<div className="scale-y-150 scale-x-[200%] rotate-90">
-													›
-												</div>
-											)}
-										</span>
+
+                      {!!link?.attributes.sub_links.data.length && (
+                        <div className="scale-y-150 scale-x-[200%] rotate-90">
+                          ›
+                        </div>
+                      )}
+                    </span>
+
 
 										<div
 											className={`flex flex-col pl-4 mt-4 ${
@@ -378,6 +389,7 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 			</div>
 		</div>
 	);
+
 };
 
 export default Why;

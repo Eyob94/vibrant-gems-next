@@ -2,6 +2,7 @@ import Prices from "../components/Prices";
 import CommonLayout from "../containers/AccountPage/CommonLayout";
 import { PRODUCTS } from "../data/data";
 import ButtonSecondary from "../shared/Button/ButtonSecondary";
+import CheckAuth from "../shared/CheckAuth";
 
 const AccountOrder = () => {
   const renderProductItem = (product: any, index: number) => {
@@ -81,14 +82,18 @@ const AccountOrder = () => {
 
   return (
     <div>
-      <CommonLayout>
-        <div className="space-y-10 sm:space-y-12">
-          {/* HEADING */}
-          <h2 className="text-2xl sm:text-3xl font-semibold">Order History</h2>
-          {renderOrder()}
-          {renderOrder()}
-        </div>
-      </CommonLayout>
+      <CheckAuth>
+        <CommonLayout>
+          <div className="space-y-10 sm:space-y-12">
+            {/* HEADING */}
+            <h2 className="text-2xl sm:text-3xl font-semibold">
+              Order History
+            </h2>
+            {renderOrder()}
+            {renderOrder()}
+          </div>
+        </CommonLayout>
+      </CheckAuth>
     </div>
   );
 };
