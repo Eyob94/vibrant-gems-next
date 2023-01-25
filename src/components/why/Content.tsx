@@ -2,6 +2,7 @@ import Image from "next/image";
 import React, { FC, useEffect, useState } from "react";
 //@ts-ignore
 import { Markup } from "react-render-markup";
+import Spinner from "../Spinner/Spinner";
 
 type ContentProps = {
 	id: number;
@@ -38,7 +39,9 @@ const Content: FC<ContentProps> = ({ id, showSidebar }) => {
 
 	if (loading)
 		return (
-			<div className="flex items-center justify-center h-full">Loading...</div>
+			<div className="h-[80vh] flex items-center w-full justify-center">
+				<Spinner color="after:bg-purple-500" />;
+			</div>
 		);
 
 	if (error)

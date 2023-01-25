@@ -272,7 +272,7 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 				</div>
 				<div
 					onClick={() => setShowSidebar((prev) => !prev)}
-					className="absolute top-0 left-0 flex items-center justify-center w-10 h-16 text-5xl text-purple-500 bg-white border rounded-r-lg shadow-lg xl:hidden border-l-none"
+					className="absolute top-0 left-0 flex items-center justify-center w-10 h-16 text-5xl text-purple-600 bg-white border-l-4 border-purple-600 rounded-r-lg shadow-lg shadow-purple-500/20 xl:hidden border-l-none"
 				>
 					›
 				</div>
@@ -289,7 +289,7 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 							>
 								×
 							</div>
-							<div className="relative flex flex-col items-center w-full min-h-[900px]">
+							<div className="relative flex flex-col items-center w-full min-h-[900px] px-8">
 								{parentLinks.map((link: link, i: number) => {
 									return (
 										<div
@@ -302,9 +302,19 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 												}
 												router.push(link.attributes.slug);
 											}}
+											style={{
+												borderRight:
+													idSelected === parseInt(link.id)
+														? "6px solid rgb(124, 58, 237)"
+														: "",
+												border:
+													idSelected === parseInt(link.id)
+														? ".75px solid rgba(124, 58, 237,40%)"
+														: "",
+											}}
 											className={`flex justify-center items-center ${
 												idSelected == parseInt(link.id)
-													? "text-purple-500 border-r-4 border-violet-500"
+													? "text-violet-600 drop-shadow-md border-r-4 shadow-purple-600/30  shadow-md rounded-xl border-violet-600"
 													: ""
 											} w-full ${
 												!!link.attributes.sub_links.data.length &&
