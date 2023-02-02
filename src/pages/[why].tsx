@@ -95,7 +95,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 	let id;
 
 	data.map((link: link) => {
-		if (link?.attributes?.slug === why) {
+		if (link?.attributes?.url === why) {
 			id = parseInt(link.id);
 		}
 	});
@@ -132,6 +132,7 @@ type link = {
 	id: string;
 	attributes: {
 		Link: string;
+		url: string;
 		slug: string;
 		parent_link: {
 			data: [];
@@ -140,6 +141,7 @@ type link = {
 			data: [
 				id: string,
 				attributes: {
+					url: string;
 					Link: string;
 					slug: string;
 				}
@@ -149,7 +151,7 @@ type link = {
 };
 
 const Why: FC<WhyProps> = ({ links, id }) => {
-	const [selectedLink, setSelectedLink] = useState<number>(0);
+	const [selectedLink, setSelectedLink] = useState<number | null>(0);
 	const [selectedSubLink, setSelectedSubLink] = useState<number>(0.1);
 	const [idSelected, setIdSelected] = useState<number>(id || 1);
 	const [showSidebar, setShowSidebar] = useState<boolean>(false);
@@ -176,13 +178,13 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 				}
 			});
 		}
-	}, []);
+	}, [id]);
 
-	console.log(!!parentLinks[selectedLink]?.attributes.sub_links.data.length);
+	console.log(selectedLink);
 
 	return (
 		<div className="flex justify-center w-full">
-			<div className="relative flex justify-center w-full max-w-screen-lg pb-20 pt-28 2xl:max-w-screen-xl ">
+			<div className="relative flex flex-col justify-center w-full max-w-screen-lg pb-20 xl:flex-row xl:pt-28 2xl:max-w-screen-xl ">
 				<div className="top-0 hidden h-full pb-40 xl:block w-96">
 					<div className="sticky flex flex-col border-r-2 top-72 ">
 						{parentLinks?.map((link: link, i) => {
@@ -193,7 +195,7 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 										setSelectedLink(i);
 										if (!link?.attributes.sub_links.data.length) {
 											setIdSelected(parseInt(link.id));
-											router.push(`/${link?.attributes?.slug}`);
+											router.push(`/${link?.attributes?.url}`);
 										}
 									}}
 									className={`${
@@ -237,7 +239,7 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 															onClick={() => {
 																setSelectedSubLink(parseInt(subLink.id));
 																setIdSelected(parseInt(subLink.id));
-																router.push(`/${subLink.attributes.slug}`);
+																router.push(`/${subLink.attributes.url}`);
 															}}
 															className="mb-6"
 														>
@@ -270,110 +272,122 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 						></div>
 					</div>
 				</div>
-				<div
-					onClick={() => setShowSidebar((prev) => !prev)}
-					className="absolute top-0 left-0 flex items-center justify-center w-10 h-16 text-5xl text-purple-600 bg-white border-l-4 border-purple-600 rounded-r-lg shadow-lg shadow-purple-500/20 xl:hidden border-l-none"
-				>
-					›
-				</div>
-				<div
-					className={`fixed xl:hidden top-0 z-50 bg-white  shadow-lg shadow-black/20 ${
-						showSidebar ? "right-[0%]" : " right-[100%]  "
-					} w-screen   h-max overflow-y-auto transition-all  duration-500`}
-				>
-					<div className="relative w-full h-full py-4">
-						<div className="flex flex-col h-screen ">
-							<div
-								onClick={() => setShowSidebar(false)}
-								className="flex justify-end w-full h-10 px-10 mb-6 text-4xl text-red-500 "
-							>
-								×
-							</div>
-							<div className="relative flex flex-col items-center w-full min-h-[900px] px-8">
-								{parentLinks.map((link: link, i: number) => {
-									return (
-										<div
-											key={link.id}
-											onClick={() => {
-												setSelectedLink(i);
-												if (!link.attributes.sub_links.data.length) {
-													setIdSelected(parseInt(link.id));
-													setShowSidebar(false);
-												}
-												router.push(link.attributes.slug);
-											}}
-											style={{
-												borderRight:
-													idSelected === parseInt(link.id)
-														? "6px solid rgb(124, 58, 237)"
-														: "",
-												border:
-													idSelected === parseInt(link.id)
-														? ".75px solid rgba(124, 58, 237,40%)"
-														: "",
-											}}
-											className={`flex justify-center items-center ${
-												idSelected == parseInt(link.id)
-													? "text-violet-600 drop-shadow-md border-r-4 shadow-purple-600/30  shadow-md rounded-xl border-violet-600"
-													: ""
-											} w-full ${
-												!!link.attributes.sub_links.data.length &&
-												selectedLink === i
-													? "h-48"
-													: "h-14"
-											}  text-sm`}
-										>
-											<span className="flex justify-start gap-8 w-60">
-												{link.attributes.Link}
 
-												{!!link?.attributes.sub_links.data.length && (
-													<div className="scale-y-150 scale-x-[200%] rotate-90">
-														›
+				<div
+					className={`relative xl:hidden top-0  bg-gray-50  shadow-sm shadow-black/20  w-screen   ${
+						showSidebar ? "h-[950px]" : "h-16"
+					}  transition-all mb-10 overflow-y-hidden  duration-500`}
+				>
+					<div className="flex items-center justify-center w-full h-16 font-bold text-violet-500">
+						<div
+							className="w-12 text-2xl"
+							onClick={() => setShowSidebar((prev) => !prev)}
+						>
+							+
+						</div>
+						{links?.map((link: link) => {
+							if (parseInt(link.id) === idSelected) {
+								return <div key={link.id}>{link.attributes.Link}</div>;
+							}
+						})}
+					</div>
+					{showSidebar && (
+						<div className="relative w-full py-4 h-[500px] ">
+							<div className="flex flex-col h-screen ">
+								<div className="relative flex flex-col items-center w-full px-8">
+									{parentLinks.map((link: link, i: number) => {
+										if (parseInt(link.id) !== idSelected) {
+											return (
+												<div
+													key={link.id}
+													onClick={() => {
+														if (!link.attributes.sub_links.data.length) {
+															router.push(link.attributes.url);
+															window.scrollTo(0, 0);
+															/* setIdSelected(parseInt(link.id)); */
+															setShowSidebar(false);
+														} else {
+															setSelectedLink((prev) => {
+																if (prev == i) {
+																	return i + 1;
+																} else {
+																	return i;
+																}
+															});
+														}
+													}}
+													className={`flex  items-center ${
+														idSelected == parseInt(link.id)
+															? "text-violet-600 drop-shadow-md border-r-4 shadow-purple-600/30  shadow-md rounded-xl border-violet-600"
+															: ""
+													} w-full ${
+														!!link.attributes.sub_links.data.length &&
+														selectedLink === i
+															? "h-52 flex-col justify-start pt-1"
+															: "h-14 justify-center"
+													}  text-sm transition-all duration-300`}
+												>
+													<span className="flex items-center justify-start h-10 gap-1 w-60">
+														<div className="z-10 w-6">
+															{" "}
+															{!!link?.attributes.sub_links.data.length && (
+																<span>
+																	{!!link?.attributes.sub_links.data.length &&
+																	selectedLink == i
+																		? "-"
+																		: "+"}
+																</span>
+															)}
+														</div>
+														{link.attributes.Link}
+													</span>
+
+													<div
+														className={`flex flex-col pl-4 mt-4 ${
+															!!link?.attributes.sub_links.data.length &&
+															selectedLink == i
+																? "h-32"
+																: "h-0 hidden"
+														} font-normal w-60 transition-all duration-300 overflow-hidden mt-4 ml-12 relative text-neutral-800`}
+													>
+														{link?.attributes.sub_links?.data?.map(
+															(subLink: any) => {
+																return (
+																	<div
+																		key={subLink.id}
+																		onClick={() => {
+																			window.scrollTo(0, 0);
+																			router.push(subLink.attributes.url);
+																			setShowSidebar(false);
+																			setSelectedSubLink(subLink.id);
+																			setIdSelected(subLink.id);
+																		}}
+																		className="mb-6"
+																	>
+																		<div
+																			className={`${
+																				selectedSubLink === subLink.id &&
+																				"text-purple-600 border-r-2 border-purple-600 right-0 font-semibold"
+																			} flex items-center justify-start text-xs w-full h-6`}
+																		>
+																			{subLink?.attributes?.Link}
+																		</div>
+																	</div>
+																);
+															}
+														)}
 													</div>
-												)}
-											</span>
-											<div
-												className={`flex flex-col pl-4 mt-4 ${
-													!!link?.attributes.sub_links.data.length &&
-													selectedLink === i
-														? "h-48"
-														: "h-0 hidden"
-												} font-normal w-full transition-all duration-300 overflow-hidden mt-4 relative text-neutral-800`}
-											>
-												{link?.attributes.sub_links?.data?.map(
-													(subLink: any) => {
-														return (
-															<div
-																key={subLink.id}
-																onClick={() => {
-																	setShowSidebar(false);
-																	setSelectedSubLink(subLink.id);
-																	setIdSelected(subLink.id);
-																}}
-																className="mb-6"
-															>
-																<div
-																	className={`${
-																		selectedSubLink === subLink.id &&
-																		"text-purple-600 border-r-2 border-purple-600 right-0 font-semibold"
-																	} flex items-center justify-start w-full h-6`}
-																>
-																	{subLink?.attributes?.Link}
-																</div>
-															</div>
-														);
-													}
-												)}
-											</div>
-										</div>
-									);
-								})}
+												</div>
+											);
+										}
+									})}
+								</div>
 							</div>
 						</div>
-					</div>
+					)}
 				</div>
-				<div className="w-full">
-					<div>{<Content id={idSelected} showSidebar={showSidebar} />}</div>
+				<div className="w-full overflow-x-hidden max-w-screen">
+					<div>{<Content id={idSelected} />}</div>
 				</div>
 			</div>
 		</div>

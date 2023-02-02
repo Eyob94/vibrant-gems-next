@@ -6,15 +6,12 @@ import Spinner from "../Spinner/Spinner";
 
 type ContentProps = {
 	id: number;
-	showSidebar?: boolean;
 };
 
-const Content: FC<ContentProps> = ({ id, showSidebar }) => {
+const Content: FC<ContentProps> = ({ id }) => {
 	const [pageContent, setPageContent] = useState<string>("");
 	const [loading, setLoading] = useState<Boolean>();
 	const [error, setError] = useState<Boolean>();
-
-	console.log(pageContent);
 
 	useEffect(() => {
 		const fn = async () => {
@@ -58,9 +55,7 @@ const Content: FC<ContentProps> = ({ id, showSidebar }) => {
 
 	return (
 		<div>
-			<div className="px-4 md:px-28">
-				{!showSidebar && <Markup markup={pageContent} />}
-			</div>
+			<div className="px-4 md:px-28">{<Markup markup={pageContent} />}</div>
 		</div>
 	);
 };
