@@ -280,10 +280,14 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 				>
 					<div className="flex items-center justify-center w-full h-16 font-bold text-violet-500">
 						<div
-							className="w-12 text-2xl"
+							className="flex items-center justify-center w-12 text-4xl font-normal"
 							onClick={() => setShowSidebar((prev) => !prev)}
 						>
-							+
+							{showSidebar ? (
+								<div className={`w-2 h-2 rotate-90`}>‹</div>
+							) : (
+								<div className={`w-2 h-2 rotate-90`}>›</div>
+							)}
 						</div>
 						{links?.map((link: link) => {
 							if (parseInt(link.id) === idSelected) {
