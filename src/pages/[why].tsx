@@ -151,7 +151,7 @@ type link = {
 };
 
 const Why: FC<WhyProps> = ({ links, id }) => {
-	const [selectedLink, setSelectedLink] = useState<number | null>(0);
+	const [selectedLink, setSelectedLink] = useState<number>(0);
 	const [selectedSubLink, setSelectedSubLink] = useState<number>(0.1);
 	const [idSelected, setIdSelected] = useState<number>(id || 1);
 	const [showSidebar, setShowSidebar] = useState<boolean>(false);
