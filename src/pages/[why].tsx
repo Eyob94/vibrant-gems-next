@@ -275,7 +275,7 @@ const Why: FC<WhyProps> = ({ links, id }) => {
 
 				<div
 					className={`relative xl:hidden top-0  bg-gray-50  shadow-sm shadow-black/20  w-screen   ${
-						showSidebar ? "h-[950px]" : "h-16"
+						showSidebar ? "h-[1000px]" : "h-16"
 					}  transition-all mb-10 overflow-y-hidden  duration-500`}
 				>
 					<div className="flex items-center justify-center w-full h-16 font-bold text-violet-500">
