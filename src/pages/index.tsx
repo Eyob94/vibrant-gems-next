@@ -204,7 +204,7 @@ const PageHome: FC<Props> = ({
   return (
     <>
       <Head>
-        <title>Ciseco || Ecommerce Template</title>
+        <title>Vibrant Gems</title>
       </Head>
       <div className="nc-PageHome relative overflow-hidden">
         {/* SECTION HERO */}

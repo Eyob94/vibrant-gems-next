@@ -86,7 +86,15 @@ const PageLogin: FC<PageLoginProps> = ({
           Login
         </h2>
         <div className="max-w-md mx-auto space-y-6">
-          <p className="bg-red-600 ">{error}</p>
+          {error && (
+            <div
+              className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg "
+              role="alert"
+            >
+              <span className="font-medium">Error: </span>
+              {error}
+            </div>
+          )}
           <div className="grid gap-3">
             {loginSocials.map((item, index) => (
               <a
@@ -176,7 +184,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       providers,
-      csrfToken: JSON.parse(JSON.stringify(await getCsrfToken(context))),
+      csrfToken: (await getCsrfToken(context)) || null,
     },
   };
 };

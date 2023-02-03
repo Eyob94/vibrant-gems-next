@@ -8,8 +8,9 @@ export interface LogoProps {
 }
 
 const Logo: React.FC<LogoProps> = ({
-  img = "/images/logo.svg",
-  imgLight = "images/logo-light.svg",
+  img = "/images/logo.png",
+  imgLight = "/images/logo.png",
+  // imgLight = "images/logo-light.svg",
   className = "flex-shrink-0",
 }) => {
   return (
@@ -21,7 +22,7 @@ const Logo: React.FC<LogoProps> = ({
       {/* PLEASE UN COMMENT BELLOW CODE AND USE IT */}
       {img ? (
         <img
-          className={`block max-h-8 sm:max-h-10 ${
+          className={`block max-h-14 sm:max-h-16 ${
             imgLight ? "dark:hidden" : ""
           }`}
           src={img}
